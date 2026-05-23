@@ -9,23 +9,25 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         { href: "/", label: "Overview" },
         ...(session.role === "brand"
           ? [
-              { href: "/brand/missions", label: "Missions" },
+              { href: "/dashboard/brand", label: "Dashboard" },
+              { href: "/brand/missions", label: "Campaigns" },
               { href: "/brand/review", label: "Review" },
             ]
           : []),
         ...(session.role === "creator"
           ? [
-              { href: "/creator/missions", label: "Missions" },
+              { href: "/dashboard/creator", label: "Dashboard" },
+              { href: "/campaigns", label: "Campaigns" },
               { href: "/creator/profile", label: "Profile" },
-              { href: "/creator/submit", label: "Submit" },
+              { href: "/submit", label: "Submit" },
               { href: "/creator/wallet", label: "Wallet" },
             ]
           : []),
-        ...(session.role === "admin" ? [{ href: "/internal/ops/submissions", label: "Ops" }] : []),
+        ...(session.role === "admin" ? [{ href: "/admin", label: "Admin" }, { href: "/admin/campaigns", label: "Campaigns" }] : []),
       ]
     : [
         { href: "/", label: "Overview" },
-        { href: "/creator/missions", label: "Missions" },
+        { href: "/campaigns", label: "Campaigns" },
       ];
 
   return (

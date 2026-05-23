@@ -3,7 +3,7 @@ import type { Mission } from "@/lib/data";
 
 export function MissionCard({ mission }: { mission: Mission }) {
   return (
-    <Link className="mission-card" href={`/missions/${mission.id}`}>
+    <Link className="mission-card" href={`/campaigns/${mission.id}`}>
       <div className="mission-header">
         <div>
           <span>{mission.brand}</span>

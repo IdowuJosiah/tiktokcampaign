@@ -263,7 +263,7 @@ export async function signUp(formData: FormData) {
     authErrorRedirect("/signup", error);
   }
 
-  redirect(role === "brand" ? "/brand/missions/new" : "/creator/missions");
+  redirect(role === "brand" ? "/dashboard/brand" : "/dashboard/creator");
 }
 
 export async function logIn(formData: FormData) {
@@ -285,10 +285,10 @@ export async function logIn(formData: FormData) {
     await setAppSession({ id: appUser.id, email, role: appUser.role });
     destination =
       appUser.role === "admin"
-        ? "/internal/ops/submissions"
+        ? "/admin"
         : appUser.role === "brand"
-          ? "/brand/missions"
-          : "/creator/missions";
+          ? "/dashboard/brand"
+          : "/dashboard/creator";
   } catch (error) {
     authErrorRedirect("/login", error);
   }
@@ -320,13 +320,13 @@ export async function submitTikTokVideo(formData: FormData) {
     if (error) throw error;
 
     revalidatePath("/");
-    revalidatePath("/brand/review");
+    revalidatePath("/dashboard/creator");
     revalidatePath("/admin/submissions");
   } catch (error) {
-    writeErrorRedirect("/creator/submit", error);
+    writeErrorRedirect("/submit", error);
   }
 
-  redirect("/brand/review");
+  redirect("/dashboard/creator");
 }
 
 export async function logOut() {
@@ -359,12 +359,12 @@ export async function markTikTokVerified() {
 
     if (error) throw error;
     revalidatePath("/creator/profile");
-    revalidatePath("/creator/submit");
+    revalidatePath("/submit");
   } catch (error) {
     writeErrorRedirect("/creator/profile", error);
   }
 
-  redirect("/creator/submit");
+  redirect("/submit");
 }
 
 export async function approveMission(formData: FormData) {
@@ -385,12 +385,15 @@ export async function approveMission(formData: FormData) {
 
     if (error) throw error;
     revalidatePath("/");
+    revalidatePath("/campaigns");
     revalidatePath("/creator/missions");
+    revalidatePath("/admin/campaigns");
     revalidatePath("/internal/ops/submissions");
+    revalidatePath(`/admin/campaigns/${missionId}`);
     revalidatePath(`/internal/ops/missions/${missionId}`);
   } catch (error) {
-    writeErrorRedirect(`/internal/ops/missions/${missionId}`, error);
+    writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
   }
 
-  redirect(`/internal/ops/missions/${missionId}`);
+  redirect(`/admin/campaigns/${missionId}`);
 }

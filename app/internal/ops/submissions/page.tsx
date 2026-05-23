@@ -27,7 +27,7 @@ export default async function InternalSubmissionsPage() {
         </div>
         <div className="admin-table">
           {missions.map((mission) => (
-            <Link className="admin-row admin-link-row" href={`/internal/ops/missions/${mission.id}`} key={mission.id}>
+            <Link className="admin-row admin-link-row" href={`/admin/campaigns/${mission.id}`} key={mission.id}>
               <div>
                 <strong>{mission.title}</strong>
                 <span>{mission.brand}</span>
