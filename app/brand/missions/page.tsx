@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { MissionCard } from "@/app/components/MissionCard";
-import { missions } from "@/lib/data";
+import { listMissions } from "@/lib/repository";
 
-export default function BrandMissionsPage() {
+export default async function BrandMissionsPage() {
+  const missions = await listMissions();
+
   return (
     <AppShell>
       <header className="page-header">

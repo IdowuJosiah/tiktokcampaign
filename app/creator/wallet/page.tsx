@@ -1,7 +1,9 @@
 import { AppShell } from "@/app/components/AppShell";
-import { walletTransactions } from "@/lib/data";
+import { listWalletTransactions } from "@/lib/repository";
 
-export default function CreatorWalletPage() {
+export default async function CreatorWalletPage() {
+  const walletTransactions = await listWalletTransactions();
+
   return (
     <AppShell>
       <header className="page-header">

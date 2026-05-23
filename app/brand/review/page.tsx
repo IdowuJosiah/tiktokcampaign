@@ -1,8 +1,10 @@
 import { AppShell } from "@/app/components/AppShell";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
-import { submissions } from "@/lib/data";
+import { listSubmissions } from "@/lib/repository";
 
-export default function BrandReviewPage() {
+export default async function BrandReviewPage() {
+  const submissions = await listSubmissions();
+
   return (
     <AppShell>
       <header className="page-header">

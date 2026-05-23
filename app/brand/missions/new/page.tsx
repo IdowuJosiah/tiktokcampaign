@@ -1,6 +1,16 @@
 import { AppShell } from "@/app/components/AppShell";
+import { createMission } from "@/app/actions";
+import { FormStatus } from "@/app/components/FormStatus";
+import { requireRole } from "@/lib/auth";
 
-export default function NewMissionPage() {
+export default async function NewMissionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  await requireRole("brand");
+
   return (
     <AppShell>
       <header className="page-header">
@@ -12,44 +22,58 @@ export default function NewMissionPage() {
       </header>
 
       <section className="panel form-panel">
-        <form className="submission-form">
+        <FormStatus error={error} />
+        <form action={createMission} className="submission-form">
           <label>
             Brand name
-            <input type="text" placeholder="Kuda" />
+            <input name="brandName" required type="text" placeholder="Kuda" />
           </label>
           <label>
             Mission title
-            <input type="text" placeholder="Show your real split-bill routine" />
+            <input name="title" required type="text" placeholder="Show your real split-bill routine" />
           </label>
           <label>
             Creator brief
-            <textarea placeholder="Tell creators what to show, what to avoid, and what counts as valid proof." />
+            <textarea name="brief" required placeholder="Tell creators what to show, what to avoid, and what counts as valid proof." />
           </label>
           <div className="form-grid">
             <label>
               Reward pool
-              <input type="text" placeholder="$2,000" />
+              <input min="1" name="rewardPool" required type="number" placeholder="2000" />
             </label>
             <label>
               Minimum views
-              <input type="text" placeholder="1,000" />
+              <input min="0" name="minimumViews" required type="number" placeholder="1000" />
             </label>
           </div>
           <div className="form-grid">
             <label>
               Required hashtag
-              <input type="text" placeholder="#KudaSplit" />
+              <input name="requiredHashtag" required type="text" placeholder="#KudaSplit" />
             </label>
             <label>
               Required sound
-              <input type="text" placeholder="TikTok sound URL or sound name" />
+              <input name="requiredSound" type="text" placeholder="TikTok sound URL or sound name" />
             </label>
           </div>
           <label>
-            Deadline
-            <input type="date" />
+            Rules
+            <textarea name="rules" placeholder={"One rule per line\nUse #KudaSplit\nShow app screen or receipt\nAdd paid partnership disclosure"} />
           </label>
-          <button className="primary-button full" type="button">Save mission draft</button>
+          <label>
+            Deadline
+            <input name="deadline" required type="date" />
+          </label>
+          <div className="deposit-box">
+            <p className="eyebrow">Reward pool deposit</p>
+            <h2>Fund before approval.</h2>
+            <p>Your mission stays in draft until the reward pool deposit is confirmed by VoiceRank. Admin approval changes the mission to live.</p>
+            <label>
+              Deposit reference
+              <input name="depositReference" required type="text" placeholder="Bank transfer or payment reference" />
+            </label>
+          </div>
+          <button className="primary-button full" type="submit">Submit mission for approval</button>
         </form>
       </section>
     </AppShell>

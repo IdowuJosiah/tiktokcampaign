@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { MissionCard } from "@/app/components/MissionCard";
-import { missions } from "@/lib/data";
+import { listLiveMissions } from "@/lib/repository";
 
-export default function CreatorMissionsPage() {
+export default async function CreatorMissionsPage() {
+  const missions = await listLiveMissions();
+
   return (
     <AppShell>
       <header className="page-header">
@@ -16,7 +18,7 @@ export default function CreatorMissionsPage() {
       </header>
 
       <section className="mission-list full">
-        {missions.filter((mission) => mission.status === "Live").map((mission) => (
+        {missions.map((mission) => (
           <MissionCard mission={mission} key={mission.id} />
         ))}
       </section>

@@ -2,9 +2,16 @@ import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { MissionCard } from "@/app/components/MissionCard";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
-import { missions, scoreRules, stats, submissions } from "@/lib/data";
+import { listDashboardStats, listLiveMissions, listScoreRules, listSubmissions } from "@/lib/repository";
 
-export default function Home() {
+export default async function Home() {
+  const [stats, missions, scoreRules, submissions] = await Promise.all([
+    listDashboardStats(),
+    listLiveMissions(),
+    listScoreRules(),
+    listSubmissions(),
+  ]);
+
   return (
     <AppShell>
       <header className="hero">

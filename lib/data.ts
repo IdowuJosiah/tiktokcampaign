@@ -13,6 +13,9 @@ export type Mission = {
   requiredHashtag: string;
   requiredSound: string;
   requirements: string[];
+  fundingStatus?: "Funded" | "Pending deposit";
+  depositReference?: string | null;
+  approvedAt?: string | null;
 };
 
 export type Submission = {
@@ -47,6 +50,7 @@ export const missions: Mission[] = [
     requiredHashtag: "#KudaSplit",
     requiredSound: "Kuda creator sound",
     requirements: ["Use #KudaSplit", "Use the approved sound", "Show app screen or receipt", "Add paid partnership disclosure"],
+    fundingStatus: "Funded",
   },
   {
     id: "chowdeck-lunch",
@@ -60,6 +64,7 @@ export const missions: Mission[] = [
     requiredHashtag: "#ChowdeckRun",
     requiredSound: "Any original audio",
     requirements: ["Use #ChowdeckRun", "Film order to arrival", "No scripted claims", "Lagos creators only"],
+    fundingStatus: "Pending deposit",
   },
   {
     id: "piggyvest-lock",
@@ -73,6 +78,7 @@ export const missions: Mission[] = [
     requiredHashtag: "#PiggyProtectedIt",
     requiredSound: "Creator choice",
     requirements: ["Use #PiggyProtectedIt", "Mention a real goal", "No income guarantees", "Add paid partnership disclosure"],
+    fundingStatus: "Funded",
   },
 ];
 
