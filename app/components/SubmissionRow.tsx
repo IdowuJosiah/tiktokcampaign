@@ -1,8 +1,16 @@
+import Link from "next/link";
 import { getMissionTitle, type Submission } from "@/lib/data";
 
-export function SubmissionRow({ submission }: { submission: Submission }) {
+export function SubmissionRow({
+  submission,
+  href,
+}: {
+  submission: Submission;
+  href?: string;
+}) {
   return (
-    <article className="submission-row">
+    <Link className="submission-row clickable-row" href={href ?? `/submissions/${submission.id}`}>
+      <div className="item-icon">▶</div>
       <div>
         <strong>{submission.creator}</strong>
         <span>{submission.handle}</span>
@@ -16,8 +24,8 @@ export function SubmissionRow({ submission }: { submission: Submission }) {
         <span>engagement</span>
       </div>
       <div className="score-pill">{submission.score}</div>
-      <button className="row-button" type="button">{submission.status}</button>
+      <span className="row-button">{submission.status}</span>
       <p className="row-footnote">{getMissionTitle(submission.missionId)}</p>
-    </article>
+    </Link>
   );
 }

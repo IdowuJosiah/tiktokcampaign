@@ -1,11 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { missions as demoMissions } from "@/lib/data";
-import { clearAppSession, requireRole, setAppSession } from "@/lib/auth";
+import { clearAppSession, getAppSession, requireRole, setAppSession } from "@/lib/auth";
 import type { UserRole } from "@/lib/domain";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createSupabaseCookieAuthClient } from "@/lib/supabase/server";
 
 const DEMO_BRAND_EMAIL = "brand@voicerank.local";
 const DEMO_CREATOR_EMAIL = "creator@voicerank.local";
@@ -34,13 +35,33 @@ function checked(formData: FormData, key: string) {
   return formData.get(key) === "on";
 }
 
+function isTikTokUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com");
+  } catch {
+    return false;
+  }
+}
+
 function writeErrorRedirect(path: string, error: unknown): never {
   const message = error instanceof Error ? error.message : "Unable to reach Supabase.";
+  console.error("Database write failed:", message);
   const code =
     message.toLowerCase().includes("abort") ||
     message.toLowerCase().includes("timeout") ||
     message.toLowerCase().includes("upstream")
       ? "timeout"
+      : message.toLowerCase().includes("schema cache")
+        ? "schema_cache_stale"
+        : message.toLowerCase().includes("payout_per_5_submissions_cents") ||
+            message.toLowerCase().includes("views_per_submission")
+          ? "campaign_columns_missing"
+          : message.toLowerCase().includes("creator_payout_profiles") ||
+              message.toLowerCase().includes("creator_identity_verifications")
+            ? "payout_tables_missing"
+          : message.toLowerCase().includes("out of range") || message.toLowerCase().includes("integer")
+            ? "campaign_amount_too_large"
       : "write_failed";
 
   redirect(`${path}?error=${code}`);
@@ -184,11 +205,13 @@ async function createDemoMission(slug: string) {
       title: demoMission.title,
       brief: demoMission.brief,
       reward_pool_cents: parseCents(demoMission.rewardPool),
+      payout_per_5_submissions_cents: parseCents(demoMission.payoutPerFiveSubmissions),
       deadline: deadline.toISOString(),
       status: "live",
       required_hashtag: demoMission.requiredHashtag,
       required_sound: demoMission.requiredSound,
       minimum_views: parseNumber(demoMission.minimumViews),
+      views_per_submission: parseNumber(demoMission.viewsPerSubmission),
       disclosure_required: true,
       rules: demoMission.requirements,
     })
@@ -217,11 +240,13 @@ export async function createMission(formData: FormData) {
       title: asString(formData, "title"),
       brief: asString(formData, "brief"),
       reward_pool_cents: parseCents(asString(formData, "rewardPool")),
+      payout_per_5_submissions_cents: parseCents(asString(formData, "payoutPerFiveSubmissions")),
       deadline,
       status: "draft",
       required_hashtag: asString(formData, "requiredHashtag"),
       required_sound: asString(formData, "requiredSound") || null,
-      minimum_views: parseNumber(asString(formData, "minimumViews")),
+      minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
+      views_per_submission: parseNumber(asString(formData, "viewsPerSubmission")),
       disclosure_required: true,
       deposit_reference: asString(formData, "depositReference"),
       rules,
@@ -243,6 +268,7 @@ export async function signUp(formData: FormData) {
   const email = asString(formData, "email");
   const password = asString(formData, "password");
   const name = asString(formData, "name");
+  const tiktokHandle = asString(formData, "tiktokHandle");
   const supabase = createServerSupabaseClient();
 
   try {
@@ -258,9 +284,56 @@ export async function signUp(formData: FormData) {
 
     if (error) throw error;
     const appUser = await ensureUser(email, role);
+    if (role === "creator" && tiktokHandle) {
+      await ensureCreatorForUser(appUser.id, tiktokHandle, name);
+    }
     await setAppSession({ id: appUser.id, email, role: appUser.role });
   } catch (error) {
     authErrorRedirect("/signup", error);
+  }
+
+  redirect(role === "brand" ? "/dashboard/brand" : tiktokHandle ? "/creator/profile" : "/dashboard/creator");
+}
+
+export async function continueWithGoogle() {
+  const headerStore = await headers();
+  const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const supabase = await createSupabaseCookieAuthClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback?chooseRole=1`,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
+    },
+  });
+
+  if (error || !data.url) {
+    authErrorRedirect("/signup", error ?? new Error("Google OAuth URL was not returned."));
+  }
+
+  redirect(data.url);
+}
+
+export async function chooseAccountRole(formData: FormData) {
+  const session = await getAppSession();
+  const role = asString(formData, "role") === "brand" ? "brand" : "creator";
+
+  if (!session) {
+    redirect("/login?error=login_required");
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase.from("users").update({ role }).eq("id", session.id);
+
+    if (error) throw error;
+    await setAppSession({ ...session, role });
+  } catch (error) {
+    writeErrorRedirect("/onboarding/role", error);
   }
 
   redirect(role === "brand" ? "/dashboard/brand" : "/dashboard/creator");
@@ -304,18 +377,31 @@ export async function submitTikTokVideo(formData: FormData) {
     }
 
     const creatorId = await ensureCreator(asString(formData, "creatorHandle"));
+    const links = formData
+      .getAll("tiktokUrl")
+      .filter((value): value is string => typeof value === "string")
+      .map((value) => value.trim().replace(/\/$/, ""))
+      .filter(Boolean);
+    const uniqueLinks = Array.from(new Set(links));
+
+    if (links.length === 0 || links.length !== uniqueLinks.length || uniqueLinks.some((link) => !isTikTokUrl(link))) {
+      redirect("/submit?error=invalid_tiktok_links");
+    }
+
     const supabase = createServerSupabaseClient();
-    const { error } = await supabase.from("submissions").insert({
-      mission_id: missionId,
-      creator_id: creatorId,
-      tiktok_url: asString(formData, "tiktokUrl"),
-      status: "submitted",
-      hashtag_ok: checked(formData, "hashtagOk"),
-      sound_ok: checked(formData, "soundOk"),
-      disclosure_ok: checked(formData, "disclosureOk"),
-      deadline_ok: true,
-      public_video_ok: checked(formData, "publicVideoOk"),
-    });
+    const { error } = await supabase.from("submissions").insert(
+      uniqueLinks.map((link) => ({
+        mission_id: missionId,
+        creator_id: creatorId,
+        tiktok_url: link,
+        status: "submitted",
+        hashtag_ok: checked(formData, "hashtagOk"),
+        sound_ok: checked(formData, "soundOk"),
+        disclosure_ok: checked(formData, "disclosureOk"),
+        deadline_ok: true,
+        public_video_ok: checked(formData, "publicVideoOk"),
+      })),
+    );
 
     if (error) throw error;
 
@@ -367,6 +453,84 @@ export async function markTikTokVerified() {
   redirect("/submit");
 }
 
+export async function savePayoutProfile(formData: FormData) {
+  const session = await requireRole("creator");
+  const accountName = asString(formData, "accountName");
+
+  if (!accountName) {
+    redirect("/creator/profile?error=account_unresolved");
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: creator, error: creatorError } = await supabase
+      .from("creators")
+      .select("id")
+      .eq("user_id", session.id)
+      .maybeSingle();
+
+    if (creatorError) throw creatorError;
+    if (!creator) {
+      throw new Error("tiktok_profile_required");
+    }
+
+    const { error } = await supabase.from("creator_payout_profiles").upsert(
+      {
+        creator_id: creator.id,
+        bank_name: asString(formData, "bankName"),
+        account_number: asString(formData, "accountNumber"),
+        account_name: accountName,
+      },
+      { onConflict: "creator_id" },
+    );
+
+    if (error) throw error;
+    revalidatePath("/creator/profile");
+    revalidatePath("/creator/wallet");
+  } catch (error) {
+    if (error instanceof Error && error.message === "tiktok_profile_required") {
+      redirect("/creator/profile?error=tiktok_profile_required");
+    }
+    writeErrorRedirect("/creator/profile", error);
+  }
+
+  redirect("/creator/profile");
+}
+
+export async function saveIdentityVerification(formData: FormData) {
+  const session = await requireRole("creator");
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: creator, error: creatorError } = await supabase
+      .from("creators")
+      .select("id")
+      .eq("user_id", session.id)
+      .maybeSingle();
+
+    if (creatorError) throw creatorError;
+    if (!creator) throw new Error("Creator profile required.");
+
+    const { error } = await supabase.from("creator_identity_verifications").upsert(
+      {
+        creator_id: creator.id,
+        legal_name: asString(formData, "legalName"),
+        nin: asString(formData, "nin"),
+        status: "pending",
+      },
+      { onConflict: "creator_id" },
+    );
+
+    if (error) throw error;
+    revalidatePath("/creator/profile");
+    revalidatePath("/creator/wallet");
+  } catch (error) {
+    writeErrorRedirect("/creator/profile", error);
+  }
+
+  redirect("/creator/profile");
+}
+
 export async function approveMission(formData: FormData) {
   await requireRole("admin");
   const missionId = asString(formData, "missionId");
@@ -396,4 +560,74 @@ export async function approveMission(formData: FormData) {
   }
 
   redirect(`/admin/campaigns/${missionId}`);
+}
+
+export async function reviewSubmission(formData: FormData) {
+  const session = await requireRole("admin");
+  const submissionId = asString(formData, "submissionId");
+  const decision = asString(formData, "decision");
+  const reason = asString(formData, "reason");
+  const rewardCents = parseCents(asString(formData, "reward"));
+  const nextStatus =
+    decision === "approve"
+      ? "approved"
+      : decision === "request_fix"
+        ? "needs_fix"
+        : "rejected";
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: submission, error: submissionError } = await supabase
+      .from("submissions")
+      .select("id, creator_id, mission_id")
+      .eq("id", submissionId)
+      .maybeSingle();
+
+    if (submissionError) throw submissionError;
+    if (!submission) throw new Error("Submission not found.");
+
+    const { error: updateError } = await supabase
+      .from("submissions")
+      .update({
+        status: nextStatus,
+        reward_cents: nextStatus === "approved" ? rewardCents : 0,
+      })
+      .eq("id", submissionId);
+
+    if (updateError) throw updateError;
+
+    const { error: reviewError } = await supabase.from("submission_reviews").insert({
+      submission_id: submissionId,
+      reviewer_user_id: session.id,
+      decision,
+      reason,
+    });
+
+    if (reviewError) throw reviewError;
+
+    await supabase.from("wallet_transactions").delete().eq("submission_id", submissionId);
+
+    if (nextStatus === "approved" && rewardCents > 0) {
+      const { error: walletError } = await supabase.from("wallet_transactions").insert({
+        creator_id: submission.creator_id,
+        submission_id: submissionId,
+        amount_cents: rewardCents,
+        status: "available",
+        label: "Approved campaign reward",
+      });
+
+      if (walletError) throw walletError;
+    }
+
+    revalidatePath("/admin/submissions");
+    revalidatePath(`/admin/submissions/${submissionId}`);
+    revalidatePath("/dashboard/creator");
+    revalidatePath("/creator/profile");
+    revalidatePath("/creator/wallet");
+    revalidatePath(`/submissions/${submissionId}`);
+  } catch (error) {
+    writeErrorRedirect(`/admin/submissions/${submissionId}`, error);
+  }
+
+  redirect(`/admin/submissions/${submissionId}`);
 }

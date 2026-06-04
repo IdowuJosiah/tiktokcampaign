@@ -1,16 +1,16 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { approveMission } from "@/app/actions";
 import { AppShell } from "@/app/components/AppShell";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
 import { requireRole } from "@/lib/auth";
 import { findMissionForOps, listMissionSubmissions } from "@/lib/repository";
 
-export default async function InternalMissionDetailPage({
+export default async function BrandMissionDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole("admin");
+  await requireRole("brand");
   const { id } = await params;
   const [mission, submissions] = await Promise.all([findMissionForOps(id), listMissionSubmissions(id)]);
 
@@ -26,13 +26,14 @@ export default async function InternalMissionDetailPage({
           <h1>{mission.title}</h1>
           <p>{mission.brief}</p>
         </div>
+        <Link className="ghost-button" href="/brand/missions">Back to campaigns</Link>
       </header>
 
-      <section className="stats-grid three" aria-label="Mission approval details">
+      <section className="stats-grid">
         <article>
           <span>Status</span>
           <strong>{mission.status}</strong>
-          <small>{mission.approvedAt ? "Approved" : "Awaiting approval"}</small>
+          <small>{mission.approvedAt ? "Approved by admin" : "Awaiting admin approval"}</small>
         </article>
         <article>
           <span>Reward pool</span>
@@ -45,26 +46,26 @@ export default async function InternalMissionDetailPage({
           <small>Per 5 approved submissions</small>
         </article>
         <article>
-          <span>Deposit reference</span>
-          <strong>{mission.depositReference || "Missing"}</strong>
-          <small>Confirm before approval</small>
+          <span>Submissions</span>
+          <strong>{submissions.length}</strong>
+          <small>Inside this campaign</small>
         </article>
       </section>
 
       <section className="panel">
         <div className="section-title">
           <div>
-            <p className="eyebrow">Campaign rules</p>
-            <h2>Review before publishing.</h2>
+            <p className="eyebrow">Campaign setup</p>
+            <h2>Instructions and qualification rules.</h2>
           </div>
         </div>
         <div className="mission-detail-grid">
           <article>
-            <span>Hashtag</span>
+            <span>Required hashtag</span>
             <strong>{mission.requiredHashtag}</strong>
           </article>
           <article>
-            <span>Sound</span>
+            <span>Required sound</span>
             <strong>{mission.requiredSound}</strong>
           </article>
           <article>
@@ -83,27 +84,18 @@ export default async function InternalMissionDetailPage({
         </ul>
       </section>
 
-      <section className="panel form-panel">
-        <form action={approveMission} className="submission-form">
-          <input name="missionId" type="hidden" value={mission.id} />
-          <button className="primary-button full" disabled={mission.status === "Live"} type="submit">
-            {mission.status === "Live" ? "Mission approved" : "Approve and publish mission"}
-          </button>
-        </form>
-      </section>
-
       <section className="panel">
         <div className="section-title">
           <div>
-            <p className="eyebrow">Campaign submissions</p>
-            <h2>{mission.status === "Live" ? "Review creator videos." : "Submissions appear after approval."}</h2>
+            <p className="eyebrow">Review queue</p>
+            <h2>Submissions for this campaign.</h2>
           </div>
         </div>
-        {mission.status === "Live" && submissions.length > 0 ? (
+        {submissions.length > 0 ? (
           <div className="submission-table">
             {submissions.map((submission) => (
               <SubmissionRow
-                href={`/admin/submissions/${submission.id}`}
+                href={`/submissions/${submission.id}`}
                 submission={submission}
                 key={submission.id}
               />
@@ -111,12 +103,8 @@ export default async function InternalMissionDetailPage({
           </div>
         ) : (
           <div className="empty-state">
-            <h2>{mission.status === "Live" ? "No submissions yet." : "Approve this campaign first."}</h2>
-            <p>
-              {mission.status === "Live"
-                ? "Creator submissions for this campaign will show here when they arrive."
-                : "Once the campaign is live, creators can submit videos and admin review happens from this page."}
-            </p>
+            <h2>No submissions yet.</h2>
+            <p>Creator submissions will appear here after this campaign is approved and creators begin sending TikTok links.</p>
           </div>
         )}
       </section>

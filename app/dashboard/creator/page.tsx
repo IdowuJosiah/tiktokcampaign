@@ -2,11 +2,15 @@ import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
 import { requireRole } from "@/lib/auth";
-import { listLiveMissions, listSubmissions } from "@/lib/repository";
+import { getCreatorWalletSummary, listCreatorSubmissions, listLiveMissions } from "@/lib/repository";
 
 export default async function CreatorDashboardPage() {
-  await requireRole("creator");
-  const [campaigns, submissions] = await Promise.all([listLiveMissions(), listSubmissions()]);
+  const session = await requireRole("creator");
+  const [campaigns, submissions, wallet] = await Promise.all([
+    listLiveMissions(),
+    listCreatorSubmissions(session.id),
+    getCreatorWalletSummary(session.id),
+  ]);
 
   return (
     <AppShell>
@@ -20,8 +24,8 @@ export default async function CreatorDashboardPage() {
       </header>
 
       <section className="stats-grid">
-        <article><span>Confirmed balance</span><strong>$240</strong><small>Available</small></article>
-        <article><span>Pending balance</span><strong>$90</strong><small>In review</small></article>
+        <article><span>Confirmed balance</span><strong>{wallet.availableLabel}</strong><small>Available</small></article>
+        <article><span>Pending balance</span><strong>{wallet.pendingLabel}</strong><small>In review</small></article>
         <article><span>Active submissions</span><strong>{submissions.length}</strong><small>Across campaigns</small></article>
         <article><span>Open campaigns</span><strong>{campaigns.length}</strong><small>Approved</small></article>
       </section>

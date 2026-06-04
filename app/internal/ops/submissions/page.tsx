@@ -55,7 +55,7 @@ export default async function InternalSubmissionsPage() {
         </div>
         <div className="admin-table">
           {submissions.map((submission) => (
-            <article className="admin-row" key={submission.id}>
+            <Link className="admin-row admin-link-row" href={`/admin/submissions/${submission.id}`} key={submission.id}>
               <div>
                 <strong>{submission.creator}</strong>
                 <span>{submission.link}</span>
@@ -69,8 +69,8 @@ export default async function InternalSubmissionsPage() {
                 <span>{submission.checks.sound ? "Sound" : "No sound"}</span>
                 <span>{submission.checks.disclosure ? "Disclosure" : "No disclosure"}</span>
               </div>
-              <button className="row-button" type="button">Open</button>
-            </article>
+              <span className="row-button">Open</span>
+            </Link>
           ))}
         </div>
       </section>

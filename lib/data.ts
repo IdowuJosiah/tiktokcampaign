@@ -7,9 +7,11 @@ export type Mission = {
   title: string;
   brief: string;
   rewardPool: string;
+  payoutPerFiveSubmissions: string;
   deadline: string;
   status: MissionStatus;
   minimumViews: string;
+  viewsPerSubmission: string;
   requiredHashtag: string;
   requiredSound: string;
   requirements: string[];
@@ -20,6 +22,7 @@ export type Mission = {
 
 export type Submission = {
   id: string;
+  creatorId?: string;
   creator: string;
   handle: string;
   missionId: string;
@@ -44,9 +47,11 @@ export const missions: Mission[] = [
     title: "Show your real split-bill routine",
     brief: "Post a short TikTok showing how you split expenses with friends after a meal, trip, or shared purchase.",
     rewardPool: "$2,000",
+    payoutPerFiveSubmissions: "$250",
     deadline: "12 days left",
     status: "Live",
     minimumViews: "1,000",
+    viewsPerSubmission: "1,000",
     requiredHashtag: "#KudaSplit",
     requiredSound: "Kuda creator sound",
     requirements: ["Use #KudaSplit", "Use the approved sound", "Show app screen or receipt", "Add paid partnership disclosure"],
@@ -58,9 +63,11 @@ export const missions: Mission[] = [
     title: "Fastest lunch delivery proof",
     brief: "Film a simple order-to-arrival story for a real lunch delivery in Lagos.",
     rewardPool: "$1,200",
+    payoutPerFiveSubmissions: "$150",
     deadline: "6 days left",
     status: "Draft",
     minimumViews: "750",
+    viewsPerSubmission: "750",
     requiredHashtag: "#ChowdeckRun",
     requiredSound: "Any original audio",
     requirements: ["Use #ChowdeckRun", "Film order to arrival", "No scripted claims", "Lagos creators only"],
@@ -72,9 +79,11 @@ export const missions: Mission[] = [
     title: "Show what your locked savings protected",
     brief: "Tell a specific story about a purchase or goal that your savings discipline helped protect.",
     rewardPool: "$1,500",
+    payoutPerFiveSubmissions: "$200",
     deadline: "19 days left",
     status: "Live",
     minimumViews: "1,500",
+    viewsPerSubmission: "1,500",
     requiredHashtag: "#PiggyProtectedIt",
     requiredSound: "Creator choice",
     requirements: ["Use #PiggyProtectedIt", "Mention a real goal", "No income guarantees", "Add paid partnership disclosure"],

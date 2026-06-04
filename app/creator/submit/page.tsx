@@ -1,5 +1,5 @@
 import { AppShell } from "@/app/components/AppShell";
-import { submitTikTokVideo } from "@/app/actions";
+import { MultiLinkSubmissionForm } from "@/app/components/submission/MultiLinkSubmissionForm";
 import { FormStatus } from "@/app/components/FormStatus";
 import { requireRole } from "@/lib/auth";
 import { getCreatorProfile, listLiveMissions } from "@/lib/repository";
@@ -35,31 +35,7 @@ export default async function CreatorSubmitPage({
             <Link className="primary-button" href="/creator/profile">Verify TikTok profile</Link>
           </div>
         ) : (
-          <form action={submitTikTokVideo} className="submission-form">
-          <label>
-            Mission
-            <select name="missionId" defaultValue={missions[0].id}>
-              {missions.map((mission) => (
-                <option value={mission.id} key={mission.id}>{mission.brand} · {mission.title}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            TikTok video link
-            <input name="tiktokUrl" required type="url" placeholder="https://www.tiktok.com/@creator/video/..." />
-          </label>
-          <label>
-            Creator handle
-            <input name="creatorHandle" readOnly required type="text" value={creator?.tiktokHandle ?? ""} />
-          </label>
-          <div className="checklist">
-            <label><input name="hashtagOk" type="checkbox" /> I used the required hashtag</label>
-            <label><input name="soundOk" type="checkbox" /> I used the required sound, if listed</label>
-            <label><input name="disclosureOk" type="checkbox" /> I added paid partnership disclosure</label>
-            <label><input name="publicVideoOk" type="checkbox" /> The video is public</label>
-          </div>
-          <button className="primary-button full" type="submit">Submit for review</button>
-          </form>
+          <MultiLinkSubmissionForm creatorHandle={creator?.tiktokHandle ?? ""} missions={missions} />
         )}
       </section>
     </AppShell>

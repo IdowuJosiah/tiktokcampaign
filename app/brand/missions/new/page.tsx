@@ -39,11 +39,21 @@ export default async function NewMissionPage({
           <div className="form-grid">
             <label>
               Reward pool
-              <input min="1" name="rewardPool" required type="number" placeholder="2000" />
+              <input min="1" name="rewardPool" required type="number" placeholder="5000000" />
             </label>
             <label>
-              Minimum views
-              <input min="0" name="minimumViews" required type="number" placeholder="1000" />
+              Payment per 5 submissions
+              <input min="1" name="payoutPerFiveSubmissions" required type="number" placeholder="250000" />
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>
+              Views per submission
+              <input min="0" name="viewsPerSubmission" required type="number" placeholder="1000" />
+            </label>
+            <label>
+              Maximum payout batches
+              <input disabled type="number" placeholder="Calculated after save" />
             </label>
           </div>
           <div className="form-grid">
@@ -67,7 +77,7 @@ export default async function NewMissionPage({
           <div className="deposit-box">
             <p className="eyebrow">Reward pool deposit</p>
             <h2>Fund before approval.</h2>
-            <p>Your mission stays in draft until the reward pool deposit is confirmed by VoiceRank. Admin approval changes the mission to live.</p>
+            <p>Your mission stays in draft until the reward pool deposit is confirmed by CreatorLink. Admin approval changes the mission to live.</p>
             <label>
               Deposit reference
               <input name="depositReference" required type="text" placeholder="Bank transfer or payment reference" />

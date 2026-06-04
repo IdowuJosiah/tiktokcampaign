@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { MissionCard } from "@/app/components/MissionCard";
+import { requireRole } from "@/lib/auth";
 import { listMissions } from "@/lib/repository";
 
 export default async function BrandMissionsPage() {
+  await requireRole("brand");
   const missions = await listMissions();
 
   return (
@@ -19,7 +21,7 @@ export default async function BrandMissionsPage() {
 
       <section className="mission-list full">
         {missions.map((mission) => (
-          <MissionCard mission={mission} key={mission.id} />
+          <MissionCard href={`/brand/missions/${mission.id}`} mission={mission} key={mission.id} />
         ))}
       </section>
     </AppShell>

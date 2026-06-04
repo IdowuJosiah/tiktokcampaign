@@ -32,7 +32,6 @@ export default async function AdminOverviewPage() {
         </div>
         <div className="hero-actions">
           <Link className="primary-button" href="/admin/campaigns">Campaign Queue</Link>
-          <Link className="ghost-button" href="/admin/submissions">Submissions</Link>
         </div>
       </section>
     </AppShell>

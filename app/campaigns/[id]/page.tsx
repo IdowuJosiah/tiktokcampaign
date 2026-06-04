@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/app/components/AppShell";
+import { getAppSession } from "@/lib/auth";
 import { findMission } from "@/lib/repository";
 
 export default async function CampaignBriefPage({
@@ -9,7 +10,7 @@ export default async function CampaignBriefPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const campaign = await findMission(id);
+  const [session, campaign] = await Promise.all([getAppSession(), findMission(id)]);
 
   if (!campaign || campaign.status !== "Live") {
     notFound();
@@ -23,7 +24,7 @@ export default async function CampaignBriefPage({
           <h1>{campaign.title}</h1>
           <p>{campaign.brief}</p>
         </div>
-        <Link className="primary-button" href="/submit">Submit a Video</Link>
+        {session?.role === "creator" ? <Link className="primary-button" href="/submit">Submit a Video</Link> : null}
       </header>
 
       <section className="stats-grid three" aria-label="Campaign details">
@@ -33,14 +34,14 @@ export default async function CampaignBriefPage({
           <small>{campaign.fundingStatus ?? "Funded"}</small>
         </article>
         <article>
-          <span>Minimum views</span>
-          <strong>{campaign.minimumViews}</strong>
-          <small>Required to qualify</small>
+          <span>Payment batch</span>
+          <strong>{campaign.payoutPerFiveSubmissions}</strong>
+          <small>Per 5 approved submissions</small>
         </article>
         <article>
-          <span>Deadline</span>
-          <strong>{campaign.deadline}</strong>
-          <small>Submit before close</small>
+          <span>Views per submission</span>
+          <strong>{campaign.viewsPerSubmission}</strong>
+          <small>Required to qualify</small>
         </article>
       </section>
 
@@ -59,6 +60,10 @@ export default async function CampaignBriefPage({
           <article>
             <span>Required sound</span>
             <strong>{campaign.requiredSound}</strong>
+          </article>
+          <article>
+            <span>Deadline</span>
+            <strong>{campaign.deadline}</strong>
           </article>
         </div>
         <ul className="detail-list">

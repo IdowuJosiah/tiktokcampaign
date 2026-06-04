@@ -64,11 +64,13 @@ create table if not exists missions (
   title text not null,
   brief text not null,
   reward_pool_cents integer not null check (reward_pool_cents >= 0),
+  payout_per_5_submissions_cents integer not null default 0 check (payout_per_5_submissions_cents >= 0),
   deadline timestamptz not null,
   status mission_status not null default 'draft',
   required_hashtag text not null,
   required_sound text,
   minimum_views integer not null default 0,
+  views_per_submission integer not null default 0,
   disclosure_required boolean not null default true,
   deposit_reference text,
   funded_at timestamptz,
@@ -80,6 +82,8 @@ create table if not exists missions (
 alter table missions add column if not exists deposit_reference text;
 alter table missions add column if not exists funded_at timestamptz;
 alter table missions add column if not exists approved_at timestamptz;
+alter table missions add column if not exists payout_per_5_submissions_cents integer not null default 0;
+alter table missions add column if not exists views_per_submission integer not null default 0;
 
 create table if not exists submissions (
   id uuid primary key default gen_random_uuid(),
@@ -138,6 +142,28 @@ create table if not exists wallet_transactions (
   status wallet_transaction_status not null default 'pending',
   label text not null,
   created_at timestamptz not null default now()
+);
+
+create table if not exists creator_payout_profiles (
+  id uuid primary key default gen_random_uuid(),
+  creator_id uuid not null references creators(id),
+  bank_name text not null,
+  account_number text not null,
+  account_name text not null,
+  verified_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique (creator_id)
+);
+
+create table if not exists creator_identity_verifications (
+  id uuid primary key default gen_random_uuid(),
+  creator_id uuid not null references creators(id),
+  legal_name text not null,
+  nin text not null,
+  status text not null default 'pending',
+  submitted_at timestamptz not null default now(),
+  verified_at timestamptz,
+  unique (creator_id)
 );
 
 create index if not exists missions_status_idx on missions(status);

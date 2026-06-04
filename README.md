@@ -1,4 +1,4 @@
-# VoiceRank TikTok Missions
+# CreatorLink Impact Missions
 
 Phase 1 MVP for TikTok creator missions: brands create campaign instructions, creators submit TikTok links, reviewers verify requirements, and approved rewards flow into creator wallets.
 

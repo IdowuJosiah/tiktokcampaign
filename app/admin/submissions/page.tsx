@@ -1,1 +1,5 @@
-export { default } from "@/app/internal/ops/submissions/page";
+import { redirect } from "next/navigation";
+
+export default function AdminSubmissionsRedirectPage() {
+  redirect("/admin/campaigns");
+}

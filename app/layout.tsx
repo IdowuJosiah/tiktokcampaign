@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VoiceRank TikTok Missions",
-  description: "Launch TikTok creator missions, verify submissions, and reward performance.",
+  title: "CreatorLink",
+  description: "Launch creator campaigns, verify submissions, and reward measurable impact.",
 };
 
 export default function RootLayout({
