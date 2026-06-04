@@ -114,6 +114,8 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
               {item.label}
             </Link>
           ))}
+          <Link href="/terms">Terms</Link>
+          <Link href="/privacy">Privacy</Link>
           {session ? (
             <form action={logOut}>
               <button className="nav-button" type="submit">Logout</button>

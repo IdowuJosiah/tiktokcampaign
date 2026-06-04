@@ -923,6 +923,42 @@ button {
   width: min(520px, 100%);
 }
 
+.legal-page {
+  display: grid;
+  gap: 28px;
+}
+
+.legal-page .panel {
+  display: grid;
+  gap: 24px;
+}
+
+.legal-section {
+  display: grid;
+  gap: 10px;
+}
+
+.legal-section h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 0;
+}
+
+.legal-section p,
+.legal-section li {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.legal-section p,
+.legal-section ul {
+  margin: 0;
+}
+
+.legal-section ul {
+  padding-left: 22px;
+}
+
 .auth-screen {
   display: grid;
   grid-template-columns: minmax(420px, 1fr) minmax(520px, 1fr);
