@@ -33,7 +33,7 @@ export default async function RolePickerPage() {
       <section className="role-card">
         <div className="auth-mark"><span /></div>
         <div className="auth-title">
-          <h1>How will you use CreatorLink?</h1>
+          <h1>How will you use VoiceRank?</h1>
           <p>Choose your account type to finish setting up your workspace.</p>
         </div>
 

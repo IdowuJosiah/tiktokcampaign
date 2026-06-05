@@ -33,7 +33,7 @@ export default async function Home() {
         <div className="network-visual" aria-hidden="true">
           <div className="network-ring outer" />
           <div className="network-ring inner" />
-          <div className="network-core">CL</div>
+          <div className="network-core">VR</div>
           {["₦", "▶", "#", "✓", "₿", "↗", "◎", "★"].map((item, index) => (
             <span className={`network-node node-${index + 1}`} key={item}>{item}</span>
           ))}

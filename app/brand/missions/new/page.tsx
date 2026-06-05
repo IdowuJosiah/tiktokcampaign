@@ -77,7 +77,7 @@ export default async function NewMissionPage({
           <div className="deposit-box">
             <p className="eyebrow">Reward pool deposit</p>
             <h2>Fund before approval.</h2>
-            <p>Your mission stays in draft until the reward pool deposit is confirmed by CreatorLink. Admin approval changes the mission to live.</p>
+            <p>Your mission stays in draft until the reward pool deposit is confirmed by VoiceRank. Admin approval changes the mission to live.</p>
             <label>
               Deposit reference
               <input name="depositReference" required type="text" placeholder="Bank transfer or payment reference" />

@@ -8,8 +8,12 @@ export default function TermsPage() {
       <main className="legal-page">
         <header className="page-header">
           <div>
+            <div className="legal-brand">
+              <img alt="VoiceRank app icon" src="/voicerank-icon.png" />
+              <strong>VoiceRank</strong>
+            </div>
             <p className="eyebrow">Legal</p>
-            <h1>Terms of Service</h1>
+            <h1>VoiceRank Terms of Service</h1>
             <p>Last updated: {updatedAt}</p>
           </div>
         </header>
@@ -18,8 +22,8 @@ export default function TermsPage() {
           <div className="legal-section">
             <h2>1. Overview</h2>
             <p>
-              CreatorLink is a campaign platform that helps brands create TikTok creator campaigns and helps creators
-              submit eligible TikTok videos for review and reward consideration. By using CreatorLink, you agree to
+              VoiceRank is a campaign platform that helps brands create TikTok creator campaigns and helps creators
+              submit eligible TikTok videos for review and reward consideration. By using VoiceRank, you agree to
               these Terms of Service.
             </p>
           </div>
@@ -38,7 +42,7 @@ export default function TermsPage() {
             <ul>
               <li>Creators must submit original TikTok videos that they are authorized to share.</li>
               <li>Submitted videos must follow the campaign instructions, including hashtags, sound requirements, disclosure rules, deadlines, and minimum views.</li>
-              <li>CreatorLink may reject submissions that are fraudulent, misleading, duplicated, unavailable, private, or inconsistent with campaign rules.</li>
+              <li>VoiceRank may reject submissions that are fraudulent, misleading, duplicated, unavailable, private, or inconsistent with campaign rules.</li>
               <li>Submitting a TikTok link does not guarantee approval or payment.</li>
             </ul>
           </div>
@@ -55,7 +59,7 @@ export default function TermsPage() {
           <div className="legal-section">
             <h2>5. Rewards and Payouts</h2>
             <p>
-              Rewards are released only after submissions pass review. CreatorLink may delay or withhold payouts where
+              Rewards are released only after submissions pass review. VoiceRank may delay or withhold payouts where
               fraud, policy violations, invalid payout details, identity mismatch, or compliance concerns are detected.
               Bank and identity details may be required before withdrawals.
             </p>
@@ -64,8 +68,8 @@ export default function TermsPage() {
           <div className="legal-section">
             <h2>6. TikTok Integration</h2>
             <p>
-              If you connect TikTok, you authorize CreatorLink to use TikTok-approved access to verify your account and
-              review public video data relevant to campaign participation. CreatorLink is not affiliated with or endorsed
+              If you connect TikTok, you authorize VoiceRank to use TikTok-approved access to verify your account and
+              review public video data relevant to campaign participation. VoiceRank is not affiliated with or endorsed
               by TikTok.
             </p>
           </div>
@@ -76,21 +80,21 @@ export default function TermsPage() {
               <li>Submitting fake, purchased, botted, private, stolen, or manipulated content or engagement.</li>
               <li>Impersonating another person, creator, brand, or organization.</li>
               <li>Attempting to bypass review, payout, identity, or platform safety checks.</li>
-              <li>Using CreatorLink for unlawful, deceptive, harmful, or abusive activity.</li>
+              <li>Using VoiceRank for unlawful, deceptive, harmful, or abusive activity.</li>
             </ul>
           </div>
 
           <div className="legal-section">
             <h2>8. Changes and Termination</h2>
             <p>
-              CreatorLink may update these terms, suspend access, remove campaigns, reject submissions, or terminate
+              VoiceRank may update these terms, suspend access, remove campaigns, reject submissions, or terminate
               accounts where necessary to protect users, brands, platform integrity, or legal compliance.
             </p>
           </div>
 
           <div className="legal-section">
             <h2>9. Contact</h2>
-            <p>For questions about these terms, contact CreatorLink at support@creatorlink.app.</p>
+            <p>For questions about these terms, contact VoiceRank at support@voicerank.vercel.app.</p>
           </div>
         </section>
       </main>

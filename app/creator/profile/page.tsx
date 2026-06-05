@@ -25,7 +25,7 @@ export default async function CreatorProfilePage({
         <div>
           <p className="eyebrow">Creator profile</p>
           <h1>Link TikTok.</h1>
-          <p>Connect your TikTok presence, place your CreatorLink code in your TikTok bio, then confirm once it is visible.</p>
+          <p>Connect your TikTok presence, place your VoiceRank code in your TikTok bio, then confirm once it is visible.</p>
         </div>
       </header>
 

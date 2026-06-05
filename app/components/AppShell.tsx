@@ -49,9 +49,9 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <main className="app-frame">
         <aside className="sidebar">
           <Link className="sidebar-brand" href="/">
-            <span>CL</span>
+            <span>VR</span>
             <div>
-              <strong>CreatorLink</strong>
+              <strong>VoiceRank</strong>
               <small>{session.role === "creator" ? "Creator Portal" : session.role === "brand" ? "Brand Portal" : "Admin Portal"}</small>
             </div>
           </Link>
@@ -104,7 +104,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     <main className="app-shell">
       <header className="top-nav">
         <Link className="logo-block" href="/">
-          <strong>CreatorLink</strong>
+          <strong>VoiceRank</strong>
           <small>Creator campaigns</small>
         </Link>
 

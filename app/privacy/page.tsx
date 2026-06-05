@@ -8,8 +8,12 @@ export default function PrivacyPage() {
       <main className="legal-page">
         <header className="page-header">
           <div>
+            <div className="legal-brand">
+              <img alt="VoiceRank app icon" src="/voicerank-icon.png" />
+              <strong>VoiceRank</strong>
+            </div>
             <p className="eyebrow">Legal</p>
-            <h1>Privacy Policy</h1>
+            <h1>VoiceRank Privacy Policy</h1>
             <p>Last updated: {updatedAt}</p>
           </div>
         </header>
@@ -29,7 +33,7 @@ export default function PrivacyPage() {
           <div className="legal-section">
             <h2>2. TikTok Data</h2>
             <p>
-              If you connect TikTok, CreatorLink may request TikTok-approved permissions to access basic profile
+              If you connect TikTok, VoiceRank may request TikTok-approved permissions to access basic profile
               information and public video information needed to verify submissions. This may include your TikTok user
               identity, display information, public videos, video links, captions, view counts, and engagement metrics
               where TikTok makes that data available through its developer APIs.
@@ -39,12 +43,12 @@ export default function PrivacyPage() {
           <div className="legal-section">
             <h2>3. How We Use Information</h2>
             <ul>
-              <li>To create and manage CreatorLink accounts.</li>
+              <li>To create and manage VoiceRank accounts.</li>
               <li>To link creator TikTok accounts and verify campaign submissions.</li>
               <li>To show eligible campaigns, process reviews, and calculate rewards.</li>
               <li>To resolve bank account names, prepare payouts, and support compliance checks.</li>
               <li>To prevent fraud, abuse, duplicate submissions, and unsafe platform activity.</li>
-              <li>To operate, troubleshoot, secure, and improve CreatorLink.</li>
+              <li>To operate, troubleshoot, secure, and improve VoiceRank.</li>
             </ul>
           </div>
 
@@ -52,9 +56,9 @@ export default function PrivacyPage() {
             <h2>4. Sharing Information</h2>
             <p>
               We do not sell personal information. We may share information with service providers that help us operate
-              CreatorLink, including hosting, database, authentication, analytics, payment, payout, identity verification,
+              VoiceRank, including hosting, database, authentication, analytics, payment, payout, identity verification,
               and communication providers. We may also share information when required by law or necessary to protect
-              users, brands, CreatorLink, or the public.
+              users, brands, VoiceRank, or the public.
             </p>
           </div>
 
@@ -71,7 +75,7 @@ export default function PrivacyPage() {
           <div className="legal-section">
             <h2>6. Your Choices</h2>
             <ul>
-              <li>You may disconnect TikTok from your CreatorLink profile when supported in the product.</li>
+              <li>You may disconnect TikTok from your VoiceRank profile when supported in the product.</li>
               <li>You may request account deletion or correction of inaccurate information.</li>
               <li>You may decline to provide payout or identity information, but withdrawals may be unavailable.</li>
             </ul>
@@ -88,14 +92,14 @@ export default function PrivacyPage() {
           <div className="legal-section">
             <h2>8. Children</h2>
             <p>
-              CreatorLink is not intended for children. Users must be old enough to enter into these terms and comply
+              VoiceRank is not intended for children. Users must be old enough to enter into these terms and comply
               with applicable TikTok, payment, payout, and local legal requirements.
             </p>
           </div>
 
           <div className="legal-section">
             <h2>9. Contact</h2>
-            <p>For privacy requests or questions, contact CreatorLink at privacy@creatorlink.app.</p>
+            <p>For privacy requests or questions, contact VoiceRank at privacy@voicerank.vercel.app.</p>
           </div>
         </section>
       </main>

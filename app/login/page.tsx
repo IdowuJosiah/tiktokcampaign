@@ -23,7 +23,7 @@ export default async function LoginPage({
           <div className="auth-mark"><span /></div>
           <div className="auth-title">
             <h1>Welcome back</h1>
-            <p>Log in to CreatorLink</p>
+            <p>Log in to VoiceRank</p>
           </div>
           <FormStatus error={error} />
           <form action={logIn} className="submission-form">
@@ -41,7 +41,7 @@ export default async function LoginPage({
             <button className="primary-button full" type="submit">Log in</button>
           </form>
           <p className="auth-switch">
-            New to CreatorLink? <Link href="/signup">Create an account</Link>
+            New to VoiceRank? <Link href="/signup">Create an account</Link>
           </p>
         </div>
       </section>

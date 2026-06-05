@@ -10,7 +10,7 @@ const messages = {
   oauth_missing_code: "Google did not return an auth code. Check the Supabase redirect URL settings.",
   oauth_exchange_failed: "Supabase could not exchange the Google login code. Check Site URL and Redirect URLs.",
   oauth_email_missing: "Google did not return an email address for this account.",
-  oauth_app_user_failed: "Google login worked, but CreatorLink could not create your app profile. Check the users table/schema.",
+  oauth_app_user_failed: "Google login worked, but VoiceRank could not create your app profile. Check the users table/schema.",
   invalid_credentials: "The email or password is not correct.",
   already_registered: "That email is already registered. Try logging in instead.",
   brand_required: "You need to log in with a brand account before creating a mission.",

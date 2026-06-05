@@ -933,6 +933,25 @@ button {
   gap: 24px;
 }
 
+.legal-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--foreground);
+}
+
+.legal-brand img {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(0, 217, 163, 0.18);
+}
+
+.legal-brand strong {
+  font-size: 20px;
+}
+
 .legal-section {
   display: grid;
   gap: 10px;
