@@ -1,4 +1,4 @@
-const messages = {
+const errors: Record<string, string> = {
   timeout: "Supabase did not respond in time. Check the project status and try again.",
   write_failed: "The database write failed. Confirm the Phase 1 SQL schema has been run.",
   schema_cache_stale: "Supabase has the new columns, but its API schema cache has not refreshed yet. Run the payout-fields SQL patch again, including the schema reload line.",
@@ -21,12 +21,24 @@ const messages = {
   invalid_tiktok_links: "Each entry must be a unique TikTok video link.",
 };
 
-export function FormStatus({ error }: { error?: string }) {
-  if (!error || !(error in messages)) return null;
+const successes: Record<string, string> = {
+  nin_submitted: "NIN submitted successfully. It will be reviewed shortly.",
+};
+
+export function FormStatus({ error, success }: { error?: string; success?: string }) {
+  if (success && success in successes) {
+    return (
+      <div className="form-status" role="status" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+        {successes[success]}
+      </div>
+    );
+  }
+
+  if (!error || !(error in errors)) return null;
 
   return (
     <div className="form-status" role="alert">
-      {messages[error as keyof typeof messages]}
+      {errors[error]}
     </div>
   );
 }

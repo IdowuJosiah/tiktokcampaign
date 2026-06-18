@@ -455,7 +455,7 @@ export async function getCreatorPayoutReadiness(userId: string) {
         .maybeSingle(),
       supabase
         .from("creator_identity_verifications")
-        .select("legal_name, status, verified_at")
+        .select("legal_name, nin, status, verified_at")
         .eq("creator_id", creator.id)
         .maybeSingle(),
     ]);
@@ -476,6 +476,7 @@ export async function getCreatorPayoutReadiness(userId: string) {
     accountName: row?.payout?.account_name,
     accountNumber: row?.payout?.account_number,
     legalName: row?.identity?.legal_name,
+    nin: row?.identity?.nin,
     identityStatus: row?.identity?.status ?? "not_started",
   };
 }

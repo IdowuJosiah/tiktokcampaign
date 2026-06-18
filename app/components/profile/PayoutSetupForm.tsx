@@ -64,8 +64,7 @@ export function PayoutSetupForm({
         .then((response) => response.json().then((payload) => ({ ok: response.ok, payload })))
         .then(({ ok, payload }: { ok: boolean; payload: { accountName?: string; error?: string } }) => {
           if (!ok || !payload.accountName) {
-            setAccountName("");
-            setStatus(payload.error ?? "Could not resolve account name.");
+            setStatus(payload.error ?? "Could not resolve account name. Enter it manually.");
             return;
           }
 
@@ -126,7 +125,6 @@ export function PayoutSetupForm({
           onChange={(event) => {
             const nextAccountNumber = event.target.value.replace(/\D/g, "").slice(0, 10);
             setAccountNumber(nextAccountNumber);
-            setAccountName("");
             setStatus(nextAccountNumber.length === 10 ? "Ready to resolve account name." : "Enter a 10-digit account number.");
           }}
           placeholder="0123456789"
@@ -134,7 +132,13 @@ export function PayoutSetupForm({
       </label>
       <label>
         Account name
-        <input readOnly required type="text" value={accountName} placeholder="Resolved automatically" />
+        <input
+          required
+          type="text"
+          value={accountName}
+          onChange={(event) => setAccountName(event.target.value)}
+          placeholder="Enter account name"
+        />
       </label>
       <p className="form-hint">{isResolving ? "Checking Paystack..." : status}</p>
       <button className="primary-button full" disabled={!accountName || isResolving} type="submit">

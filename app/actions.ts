@@ -191,6 +191,21 @@ async function ensureCreatorForUser(userId: string, handle: string, displayName?
   return creator.id as string;
 }
 
+async function ensureTemporaryCreatorForUser(userId: string, email: string) {
+  const supabase = createServerSupabaseClient();
+  const { data: existingCreator, error: findError } = await supabase
+    .from("creators")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (findError) throw findError;
+  if (existingCreator) return existingCreator.id as string;
+
+  const fallbackName = email.split("@")[0] || "creator";
+  return ensureCreatorForUser(userId, `@voicerank_${userId.slice(0, 8)}`, fallbackName);
+}
+
 async function createDemoMission(slug: string) {
   const demoMission = demoMissions.find((mission) => mission.id === slug) ?? demoMissions[0];
   const brandId = await createBrand(demoMission.brand);
@@ -463,20 +478,11 @@ export async function savePayoutProfile(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .select("id")
-      .eq("user_id", session.id)
-      .maybeSingle();
-
-    if (creatorError) throw creatorError;
-    if (!creator) {
-      throw new Error("tiktok_profile_required");
-    }
+    const creatorId = await ensureTemporaryCreatorForUser(session.id, session.email);
 
     const { error } = await supabase.from("creator_payout_profiles").upsert(
       {
-        creator_id: creator.id,
+        creator_id: creatorId,
         bank_name: asString(formData, "bankName"),
         account_number: asString(formData, "accountNumber"),
         account_name: accountName,
@@ -502,18 +508,11 @@ export async function saveIdentityVerification(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .select("id")
-      .eq("user_id", session.id)
-      .maybeSingle();
-
-    if (creatorError) throw creatorError;
-    if (!creator) throw new Error("Creator profile required.");
+    const creatorId = await ensureTemporaryCreatorForUser(session.id, session.email);
 
     const { error } = await supabase.from("creator_identity_verifications").upsert(
       {
-        creator_id: creator.id,
+        creator_id: creatorId,
         legal_name: asString(formData, "legalName"),
         nin: asString(formData, "nin"),
         status: "pending",
@@ -528,7 +527,7 @@ export async function saveIdentityVerification(formData: FormData) {
     writeErrorRedirect("/creator/profile", error);
   }
 
-  redirect("/creator/profile");
+  redirect("/creator/profile?success=nin_submitted");
 }
 
 export async function approveMission(formData: FormData) {
