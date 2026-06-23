@@ -17,12 +17,15 @@ const errors: Record<string, string> = {
   creator_required: "You need to log in with a creator account to continue.",
   tiktok_required: "Verify your TikTok handle before submitting videos.",
   tiktok_profile_required: "Link TikTok before adding payout details.",
+  tiktok_not_configured: "TikTok login is not configured yet. Add TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET.",
+  tiktok_oauth_failed: "TikTok verification failed or was cancelled. Please try connecting again.",
   account_unresolved: "Resolve the account name before saving bank details.",
   invalid_tiktok_links: "Each entry must be a unique TikTok video link.",
 };
 
 const successes: Record<string, string> = {
   nin_submitted: "NIN submitted successfully. It will be reviewed shortly.",
+  tiktok_verified: "TikTok account connected and verified.",
 };
 
 export function FormStatus({ error, success }: { error?: string; success?: string }) {

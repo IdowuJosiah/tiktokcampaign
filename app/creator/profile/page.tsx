@@ -2,7 +2,6 @@ import { AppShell } from "@/app/components/AppShell";
 import { FormStatus } from "@/app/components/FormStatus";
 import { PayoutSetupForm } from "@/app/components/profile/PayoutSetupForm";
 import { NinVerificationForm } from "@/app/components/profile/NinVerificationForm";
-import { saveTikTokProfile } from "@/app/actions";
 import { requireRole } from "@/lib/auth";
 import { getCreatorPayoutReadiness, getCreatorProfile, listCreatorSubmissions } from "@/lib/repository";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
@@ -20,80 +19,103 @@ export default async function CreatorProfilePage({
     getCreatorPayoutReadiness(session.id),
   ]);
 
+  const steps = [
+    { label: "TikTok", done: Boolean(creator?.verifiedAt) },
+    { label: "Bank", done: Boolean(payout.accountNumber) },
+    { label: "NIN", done: payout.identityStatus === "verified" },
+  ];
+  const completedSteps = steps.filter((s) => s.done).length;
+
   return (
     <AppShell>
-      <header className="page-header">
-        <div>
-          <p className="eyebrow">Creator profile</p>
-          <h1>Profile setup.</h1>
-          <p>Add your TikTok handle, bank details, and NIN to start earning.</p>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Profile &amp; Setup</h1>
+        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Complete your profile to start earning</p>
+      </div>
+
+      {/* Setup progress */}
+      <div style={{ background: "rgba(0,217,163,0.06)", border: "1px solid rgba(0,217,163,0.2)", borderRadius: 14, padding: "18px 22px", marginBottom: 28, display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Setup progress — {completedSteps} / {steps.length} complete</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {steps.map((step) => (
+              <div key={step.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: step.done ? "#00d9a3" : "#99a1af" }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "rgba(255,255,255,0.12)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
+                  {step.done ? "✓" : "·"}
+                </div>
+                {step.label}
+              </div>
+            ))}
+          </div>
         </div>
-      </header>
+        <div style={{ height: 6, width: 160, background: "rgba(255,255,255,0.1)", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(completedSteps / steps.length) * 100}%`, background: "#00d9a3", borderRadius: 99 }} />
+        </div>
+      </div>
 
-      <section className="profile-grid">
-        <article className="panel profile-card">
-          <FormStatus error={error} success={success} />
-          <div className="section-title">
-            <div>
-              <p className="eyebrow">Social account</p>
-              <h2>TikTok profile.</h2>
-            </div>
-          </div>
-          <form action={saveTikTokProfile} className="submission-form">
-            <label>
-              Display name
-              <input name="displayName" required type="text" defaultValue={creator?.displayName ?? ""} placeholder="Tomi Ade" />
-            </label>
-            <label>
-              TikTok profile
-              <input name="tiktokHandle" required type="text" defaultValue={creator?.tiktokHandle ?? ""} placeholder="@yourhandle" />
-            </label>
-            <button className="primary-button full" type="submit">Save TikTok profile</button>
-          </form>
-        </article>
+      <FormStatus error={error} success={success} />
 
-        <article className="panel profile-card">
-          <div className="section-title">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
+        {/* TikTok */}
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 1</div>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>TikTok Account</h2>
+          {creator?.verifiedAt ? (
             <div>
-              <p className="eyebrow">Payout setup</p>
-              <h2>Bank account.</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,217,163,0.06)", border: "1px solid rgba(0,217,163,0.25)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+                {creator.tiktokAvatarUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={creator.tiktokAvatarUrl} alt="" width={36} height={36} style={{ borderRadius: "50%" }} />
+                )}
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{creator.tiktokHandle}</div>
+                  <div style={{ fontSize: 12, color: "#00d9a3" }}>✓ Verified via TikTok login</div>
+                </div>
+              </div>
+              <a className="ghost-button" href="/api/tiktok/connect" style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", height: 38, fontSize: 14, borderRadius: 8 }}>Reconnect TikTok</a>
             </div>
-          </div>
+          ) : (
+            <div>
+              <p style={{ color: "#99a1af", fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Connect your TikTok account to verify ownership and unlock campaign submissions.</p>
+              <a href="/api/tiktok/connect" style={{ display: "inline-flex", alignItems: "center", height: 44, padding: "0 20px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, textDecoration: "none" }}>Connect TikTok →</a>
+            </div>
+          )}
+        </div>
+
+        {/* Bank */}
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 2</div>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>Bank Account</h2>
           <PayoutSetupForm
             defaultAccountName={payout.accountName}
             defaultAccountNumber={payout.accountNumber}
             defaultBankName={payout.bankName}
           />
-        </article>
-      </section>
-
-      <section className="panel profile-card">
-        <div className="section-title">
-          <div>
-            <p className="eyebrow">Identity verification</p>
-            <h2>NIN verification.</h2>
-          </div>
         </div>
+      </div>
+
+      {/* NIN */}
+      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24, marginBottom: 24 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 3</div>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>Identity Verification (NIN)</h2>
         <NinVerificationForm
           defaultLegalName={payout.legalName}
           defaultNin={payout.nin}
           identityStatus={payout.identityStatus}
         />
-      </section>
+      </div>
 
-      <section className="panel">
-        <div className="section-title">
-          <div>
-            <p className="eyebrow">Campaign history</p>
-            <h2>Submissions and status.</h2>
+      {/* Submission history */}
+      {submissions.length > 0 && (
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 15, fontWeight: 700 }}>Submission history</div>
+          <div style={{ padding: "8px 22px" }}>
+            {submissions.map((submission) => (
+              <SubmissionRow submission={submission} key={submission.id} />
+            ))}
           </div>
         </div>
-        <div className="submission-table">
-          {submissions.map((submission) => (
-            <SubmissionRow submission={submission} key={submission.id} />
-          ))}
-        </div>
-      </section>
+      )}
     </AppShell>
   );
 }
