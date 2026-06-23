@@ -25,7 +25,8 @@ export type Creator = {
   userId: string;
   displayName: string;
   tiktokHandle: string;
-  tiktokVerificationCode?: string;
+  tiktokUsername?: string;
+  tiktokAvatarUrl?: string;
   tiktokVerifiedAt?: string;
   country: string;
   createdAt: string;

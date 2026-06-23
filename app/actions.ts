@@ -12,10 +12,6 @@ const DEMO_BRAND_EMAIL = "brand@voicerank.local";
 const DEMO_CREATOR_EMAIL = "creator@voicerank.local";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function makeVerificationCode() {
-  return `VR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-}
-
 function asString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -166,7 +162,6 @@ async function ensureCreatorForUser(userId: string, handle: string, displayName?
       .update({
         display_name: displayName || normalizedHandle.replace("@", ""),
         tiktok_handle: normalizedHandle,
-        tiktok_verification_code: makeVerificationCode(),
         tiktok_verified_at: null,
       })
       .eq("id", existingCreator.id);
@@ -181,7 +176,6 @@ async function ensureCreatorForUser(userId: string, handle: string, displayName?
       user_id: userId,
       display_name: displayName || normalizedHandle.replace("@", ""),
       tiktok_handle: normalizedHandle,
-      tiktok_verification_code: makeVerificationCode(),
       country: "NG",
     })
     .select("id")
@@ -433,39 +427,6 @@ export async function submitTikTokVideo(formData: FormData) {
 export async function logOut() {
   await clearAppSession();
   redirect("/");
-}
-
-export async function saveTikTokProfile(formData: FormData) {
-  const session = await requireRole("creator");
-
-  try {
-    await ensureCreatorForUser(session.id, asString(formData, "tiktokHandle"), asString(formData, "displayName"));
-    revalidatePath("/creator/profile");
-  } catch (error) {
-    writeErrorRedirect("/creator/profile", error);
-  }
-
-  redirect("/creator/profile");
-}
-
-export async function markTikTokVerified() {
-  const session = await requireRole("creator");
-
-  try {
-    const supabase = createServerSupabaseClient();
-    const { error } = await supabase
-      .from("creators")
-      .update({ tiktok_verified_at: new Date().toISOString() })
-      .eq("user_id", session.id);
-
-    if (error) throw error;
-    revalidatePath("/creator/profile");
-    revalidatePath("/submit");
-  } catch (error) {
-    writeErrorRedirect("/creator/profile", error);
-  }
-
-  redirect("/submit");
 }
 
 export async function savePayoutProfile(formData: FormData) {

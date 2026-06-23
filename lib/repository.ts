@@ -39,6 +39,8 @@ type CreatorRow = {
   tiktok_handle: string;
   tiktok_verification_code?: string | null;
   tiktok_verified_at?: string | null;
+  tiktok_username?: string | null;
+  tiktok_avatar_url?: string | null;
 };
 
 type SubmissionScoreRow = {
@@ -416,7 +418,7 @@ export async function getCreatorProfile(userId: string) {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("creators")
-      .select("id, display_name, tiktok_handle, tiktok_verification_code, tiktok_verified_at")
+      .select("id, display_name, tiktok_handle, tiktok_username, tiktok_avatar_url, tiktok_verified_at")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -429,7 +431,8 @@ export async function getCreatorProfile(userId: string) {
         id: row.id,
         displayName: row.display_name,
         tiktokHandle: row.tiktok_handle,
-        verificationCode: row.tiktok_verification_code,
+        tiktokUsername: row.tiktok_username,
+        tiktokAvatarUrl: row.tiktok_avatar_url,
         verifiedAt: row.tiktok_verified_at,
       }
     : null;
