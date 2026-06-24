@@ -21,11 +21,26 @@ const errors: Record<string, string> = {
   tiktok_oauth_failed: "TikTok verification failed or was cancelled. Please try connecting again.",
   account_unresolved: "Resolve the account name before saving bank details.",
   invalid_tiktok_links: "Each entry must be a unique TikTok video link.",
+  title_too_long: "Campaign title is too long. Keep it under 80 characters.",
+  brief_too_long: "Creator brief is too long. Keep it under 2000 characters.",
+  hashtag_too_long: "Required hashtag is too long. Keep it under 50 characters.",
+  rule_too_long: "One of the rules is too long. Keep each rule under 200 characters.",
+  invalid_sound_url: "Required sound must be a real TikTok sound link, e.g. tiktok.com/music/... or tiktok.com/sound/...",
+  payout_exceeds_pool: "Payout per 5 submissions can't be larger than the total reward pool.",
+  insufficient_wallet_balance: "Your wallet balance doesn't cover this reward pool. Add funds first.",
+  invalid_deposit_amount: "Enter a deposit amount of at least ₦1.",
+  deposit_key_missing: "PAYSTACK_SECRET_KEY is not set. Add it to your environment variables (locally in .env.local, on Vercel under Project Settings → Environment Variables).",
+  deposit_api_failed: "Paystack rejected the request. Check that your PAYSTACK_SECRET_KEY is valid and the account is active.",
+  wallet_table_missing: "The brand wallet table is missing in Supabase. Run database/add-brand-wallet.sql in the SQL editor.",
+  deposit_init_failed: "Could not start the deposit. Check server logs for the exact error.",
+  deposit_not_successful: "Paystack reported this payment as not successful.",
+  deposit_verification_failed: "We couldn't verify your deposit with Paystack. No funds were added.",
 };
 
 const successes: Record<string, string> = {
   nin_submitted: "NIN submitted successfully. It will be reviewed shortly.",
   tiktok_verified: "TikTok account connected and verified.",
+  funds_added: "Deposit verified and added to your wallet balance.",
 };
 
 export function FormStatus({ error, success }: { error?: string; success?: string }) {

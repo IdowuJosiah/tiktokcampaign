@@ -1,11 +1,22 @@
 import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
+import { FormStatus } from "@/app/components/FormStatus";
+import { initiateBrandDeposit } from "@/app/actions";
 import { requireRole } from "@/lib/auth";
-import { listMissions, listSubmissions } from "@/lib/repository";
+import { getBrandWalletBalance, listMissions, listSubmissions } from "@/lib/repository";
 
-export default async function BrandDashboardPage() {
-  await requireRole("brand");
-  const [campaigns, submissions] = await Promise.all([listMissions(), listSubmissions()]);
+export default async function BrandDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
+  const { error, success } = await searchParams;
+  const session = await requireRole("brand");
+  const [campaigns, submissions, walletBalance] = await Promise.all([
+    listMissions(session.id),
+    listSubmissions(),
+    getBrandWalletBalance(session.id),
+  ]);
 
   const liveCampaigns = campaigns.filter((c) => c.status === "Live");
   const pendingSubs = submissions.filter((s) => s.status === "Pending");
@@ -21,6 +32,31 @@ export default async function BrandDashboardPage() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Create Campaign
         </Link>
+      </div>
+
+      <FormStatus error={error} success={success} />
+
+      {/* Wallet */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, marginBottom: 28, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 8 }}>Wallet balance</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#00d9a3" }}>{walletBalance}</div>
+          <p style={{ color: "#99a1af", fontSize: 13, margin: "6px 0 0" }}>Reward pools are funded from this balance automatically when you create a campaign.</p>
+        </div>
+        <form action={initiateBrandDeposit} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <input
+            name="amount"
+            required
+            type="number"
+            min="1"
+            step="0.01"
+            placeholder="Amount (₦)"
+            style={{ width: 160, height: 44, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
+          />
+          <button type="submit" style={{ height: 44, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer" }}>
+            Add funds
+          </button>
+        </form>
       </div>
 
       {/* Stat cards */}

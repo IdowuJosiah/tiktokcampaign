@@ -199,9 +199,30 @@ export async function listDashboardStats() {
   return stats;
 }
 
-export async function listMissions() {
+export async function listMissions(ownerUserId?: string) {
   const rows = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
+
+    if (ownerUserId) {
+      const { data: brandRows, error: brandError } = await supabase
+        .from("brands")
+        .select("id")
+        .eq("owner_user_id", ownerUserId);
+
+      if (brandError) throw brandError;
+      const brandIds = (brandRows ?? []).map((row) => row.id as string);
+      if (brandIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from("missions")
+        .select("*, brands(name)")
+        .in("brand_id", brandIds)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as MissionRow[];
+    }
+
     const { data, error } = await supabase
       .from("missions")
       .select("*, brands(name)")
@@ -211,7 +232,33 @@ export async function listMissions() {
     return data as MissionRow[];
   });
 
-  return rows?.length ? rows.map(mapMission) : missions;
+  if (rows === null) return ownerUserId ? [] : missions;
+  return rows.map(mapMission);
+}
+
+export async function getBrandWalletBalance(ownerUserId: string) {
+  const row = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data: brand, error: brandError } = await supabase
+      .from("brands")
+      .select("id")
+      .eq("owner_user_id", ownerUserId)
+      .maybeSingle();
+
+    if (brandError) throw brandError;
+    if (!brand) return 0;
+
+    const { data, error } = await supabase
+      .from("brand_wallet_transactions")
+      .select("amount_cents")
+      .eq("brand_id", brand.id)
+      .eq("status", "completed");
+
+    if (error) throw error;
+    return (data ?? []).reduce((sum, item) => sum + item.amount_cents, 0);
+  });
+
+  return formatMoney(row ?? 0);
 }
 
 export async function listLiveMissions() {

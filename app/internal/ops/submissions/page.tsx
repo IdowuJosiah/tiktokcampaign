@@ -38,7 +38,7 @@ export default async function InternalSubmissionsPage() {
               </div>
               <div className="checks">
                 <span>{mission.status}</span>
-                <span>{mission.depositReference ? "Deposit ref" : "No deposit ref"}</span>
+                <span>{mission.fundingStatus === "Funded" ? "Wallet funded" : "Awaiting wallet debit"}</span>
               </div>
               <span className="row-button">Open</span>
             </Link>
