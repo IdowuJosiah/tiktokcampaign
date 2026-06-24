@@ -40,6 +40,21 @@ function isTikTokUrl(value: string) {
   }
 }
 
+function isTikTokSoundUrl(value: string) {
+  try {
+    const url = new URL(value);
+    const isTikTokHost = url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com");
+    return isTikTokHost && (url.pathname.includes("/music/") || url.pathname.includes("/sound/"));
+  } catch {
+    return false;
+  }
+}
+
+const MAX_TITLE_LENGTH = 80;
+const MAX_BRIEF_LENGTH = 2000;
+const MAX_HASHTAG_LENGTH = 50;
+const MAX_RULE_LENGTH = 200;
+
 function writeErrorRedirect(path: string, error: unknown): never {
   const message = error instanceof Error ? error.message : "Unable to reach Supabase.";
   console.error("Database write failed:", message);
@@ -100,9 +115,26 @@ async function ensureUser(email: string, role: UserRole) {
   return { id: user.id as string, role: normalizeRole(user.role) };
 }
 
-async function createBrand(brandName: string, ownerUserId?: string) {
+async function ensureBrandForUser(brandName: string, ownerUserId?: string) {
   const supabase = createServerSupabaseClient();
   const brandOwnerUserId = ownerUserId ?? (await ensureUser(DEMO_BRAND_EMAIL, "brand")).id;
+
+  const { data: existingBrand, error: findError } = await supabase
+    .from("brands")
+    .select("id")
+    .eq("owner_user_id", brandOwnerUserId)
+    .maybeSingle();
+
+  if (findError) throw findError;
+
+  if (existingBrand) {
+    if (brandName) {
+      const { error } = await supabase.from("brands").update({ name: brandName }).eq("id", existingBrand.id);
+      if (error) throw error;
+    }
+    return existingBrand.id as string;
+  }
+
   const { data: brand, error } = await supabase
     .from("brands")
     .insert({
@@ -115,6 +147,18 @@ async function createBrand(brandName: string, ownerUserId?: string) {
 
   if (error) throw error;
   return brand.id as string;
+}
+
+async function getBrandWalletBalanceCents(brandId: string) {
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("brand_wallet_transactions")
+    .select("amount_cents")
+    .eq("brand_id", brandId)
+    .eq("status", "completed");
+
+  if (error) throw error;
+  return (data ?? []).reduce((sum, row) => sum + row.amount_cents, 0);
 }
 
 async function ensureCreator(handle: string) {
@@ -202,7 +246,7 @@ async function ensureTemporaryCreatorForUser(userId: string, email: string) {
 
 async function createDemoMission(slug: string) {
   const demoMission = demoMissions.find((mission) => mission.id === slug) ?? demoMissions[0];
-  const brandId = await createBrand(demoMission.brand);
+  const brandId = await ensureBrandForUser(demoMission.brand);
   const supabase = createServerSupabaseClient();
   const deadline = new Date();
   deadline.setDate(deadline.getDate() + 14);
@@ -234,42 +278,135 @@ async function createDemoMission(slug: string) {
 export async function createMission(formData: FormData) {
   const session = await requireRole("brand");
 
-  try {
-    const brandId = await createBrand(asString(formData, "brandName"), session.id);
-    const supabase = createServerSupabaseClient();
-    const rules = asString(formData, "rules")
-      .split("\n")
-      .map((rule) => rule.trim())
-      .filter(Boolean);
+  const title = asString(formData, "title");
+  const brief = asString(formData, "brief");
+  const requiredHashtag = asString(formData, "requiredHashtag");
+  const requiredSound = asString(formData, "requiredSound");
+  const rewardPoolCents = parseCents(asString(formData, "rewardPool"));
+  const payoutPerFiveCents = parseCents(asString(formData, "payoutPerFiveSubmissions"));
+  const rules = asString(formData, "rules")
+    .split("\n")
+    .map((rule) => rule.trim())
+    .filter(Boolean);
 
+  if (title.length > MAX_TITLE_LENGTH) {
+    redirect("/brand/missions/new?error=title_too_long");
+  }
+  if (brief.length > MAX_BRIEF_LENGTH) {
+    redirect("/brand/missions/new?error=brief_too_long");
+  }
+  if (requiredHashtag.length > MAX_HASHTAG_LENGTH) {
+    redirect("/brand/missions/new?error=hashtag_too_long");
+  }
+  if (rules.some((rule) => rule.length > MAX_RULE_LENGTH)) {
+    redirect("/brand/missions/new?error=rule_too_long");
+  }
+  if (requiredSound && !isTikTokSoundUrl(requiredSound)) {
+    redirect("/brand/missions/new?error=invalid_sound_url");
+  }
+  if (payoutPerFiveCents > rewardPoolCents) {
+    redirect("/brand/missions/new?error=payout_exceeds_pool");
+  }
+
+  let brandId: string;
+  try {
+    brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
+  } catch (error) {
+    writeErrorRedirect("/brand/missions/new", error);
+  }
+
+  const balanceCents = await getBrandWalletBalanceCents(brandId).catch(() => 0);
+  if (rewardPoolCents > balanceCents) {
+    redirect("/brand/missions/new?error=insufficient_wallet_balance");
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
     const deadline = asString(formData, "deadline") || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { error } = await supabase.from("missions").insert({
-      brand_id: brandId,
-      title: asString(formData, "title"),
-      brief: asString(formData, "brief"),
-      reward_pool_cents: parseCents(asString(formData, "rewardPool")),
-      payout_per_5_submissions_cents: parseCents(asString(formData, "payoutPerFiveSubmissions")),
-      deadline,
-      status: "draft",
-      required_hashtag: asString(formData, "requiredHashtag"),
-      required_sound: asString(formData, "requiredSound") || null,
-      minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
-      views_per_submission: parseNumber(asString(formData, "viewsPerSubmission")),
-      disclosure_required: true,
-      deposit_reference: asString(formData, "depositReference"),
-      rules,
-    });
+    const { data: mission, error } = await supabase
+      .from("missions")
+      .insert({
+        brand_id: brandId,
+        title,
+        brief,
+        reward_pool_cents: rewardPoolCents,
+        payout_per_5_submissions_cents: payoutPerFiveCents,
+        deadline,
+        status: "draft",
+        required_hashtag: requiredHashtag,
+        required_sound: requiredSound || null,
+        minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
+        views_per_submission: parseNumber(asString(formData, "viewsPerSubmission")),
+        disclosure_required: true,
+        funded_at: new Date().toISOString(),
+        rules,
+      })
+      .select("id")
+      .single();
 
     if (error) throw error;
 
+    const { error: ledgerError } = await supabase.from("brand_wallet_transactions").insert({
+      brand_id: brandId,
+      mission_id: mission.id,
+      amount_cents: -rewardPoolCents,
+      type: "campaign_funding",
+      status: "completed",
+    });
+
+    if (ledgerError) throw ledgerError;
+
     revalidatePath("/");
     revalidatePath("/brand/missions");
+    revalidatePath("/dashboard/brand");
   } catch (error) {
     writeErrorRedirect("/brand/missions/new", error);
   }
 
   redirect("/brand/missions");
+}
+
+export async function initiateBrandDeposit(formData: FormData) {
+  const session = await requireRole("brand");
+  const amountCents = parseCents(asString(formData, "amount"));
+
+  if (amountCents < 100) {
+    redirect("/dashboard/brand?error=invalid_deposit_amount");
+  }
+
+  if (!process.env.PAYSTACK_SECRET_KEY) {
+    redirect("/dashboard/brand?error=deposit_key_missing");
+  }
+
+  let authorizationUrl: string;
+  try {
+    const brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
+    const headerStore = await headers();
+    const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const reference = `brand_${brandId.slice(0, 8)}_${Date.now()}`;
+
+    const { initializePaystackTransaction } = await import("@/lib/paystack");
+    authorizationUrl = await initializePaystackTransaction({
+      email: session.email,
+      amountCents,
+      reference,
+      callbackUrl: `${origin}/api/paystack/callback`,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not start deposit.";
+    console.error("Brand deposit initialization failed:", message);
+    const isPaystackError = message.toLowerCase().includes("paystack") || message.toLowerCase().includes("transaction");
+    const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
+    if (isWalletTableError) {
+      redirect("/dashboard/brand?error=wallet_table_missing");
+    } else if (isPaystackError) {
+      redirect("/dashboard/brand?error=deposit_api_failed");
+    }
+    redirect("/dashboard/brand?error=deposit_init_failed");
+  }
+
+  redirect(authorizationUrl);
 }
 
 export async function signUp(formData: FormData) {
@@ -293,10 +430,13 @@ export async function signUp(formData: FormData) {
 
     if (error) throw error;
     const appUser = await ensureUser(email, role);
+    if (appUser.role !== role) {
+      await supabase.from("users").update({ role }).eq("id", appUser.id);
+    }
     if (role === "creator" && tiktokHandle) {
       await ensureCreatorForUser(appUser.id, tiktokHandle, name);
     }
-    await setAppSession({ id: appUser.id, email, role: appUser.role });
+    await setAppSession({ id: appUser.id, email, role });
   } catch (error) {
     authErrorRedirect("/signup", error);
   }
@@ -364,11 +504,15 @@ export async function logIn(formData: FormData) {
 
     const role = normalizeRole(data.user?.user_metadata?.role);
     const appUser = await ensureUser(email, role);
-    await setAppSession({ id: appUser.id, email, role: appUser.role });
+    if (appUser.role !== role) {
+      await supabase.from("users").update({ role }).eq("id", appUser.id);
+    }
+    const effectiveRole = appUser.role !== role ? role : appUser.role;
+    await setAppSession({ id: appUser.id, email, role: effectiveRole });
     destination =
-      appUser.role === "admin"
+      effectiveRole === "admin"
         ? "/admin"
-        : appUser.role === "brand"
+        : effectiveRole === "brand"
           ? "/dashboard/brand"
           : "/dashboard/creator";
   } catch (error) {

@@ -5,8 +5,8 @@ import { requireRole } from "@/lib/auth";
 import { listMissions } from "@/lib/repository";
 
 export default async function BrandMissionsPage() {
-  await requireRole("brand");
-  const missions = await listMissions();
+  const session = await requireRole("brand");
+  const missions = await listMissions(session.id);
 
   return (
     <AppShell>

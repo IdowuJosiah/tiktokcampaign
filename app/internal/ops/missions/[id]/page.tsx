@@ -45,9 +45,9 @@ export default async function InternalMissionDetailPage({
           <small>Per 5 approved submissions</small>
         </article>
         <article>
-          <span>Deposit reference</span>
-          <strong>{mission.depositReference || "Missing"}</strong>
-          <small>Confirm before approval</small>
+          <span>Funding source</span>
+          <strong>Brand wallet</strong>
+          <small>{mission.fundingStatus === "Funded" ? "Reward pool deducted on creation" : "Awaiting wallet debit"}</small>
         </article>
       </section>
 
