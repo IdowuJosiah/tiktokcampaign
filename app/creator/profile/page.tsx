@@ -5,6 +5,7 @@ import { NinVerificationForm } from "@/app/components/profile/NinVerificationFor
 import { requireRole } from "@/lib/auth";
 import { getCreatorPayoutReadiness, getCreatorProfile, listCreatorSubmissions } from "@/lib/repository";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
+import { unlinkTikTok } from "@/app/actions";
 
 export default async function CreatorProfilePage({
   searchParams,
@@ -72,7 +73,12 @@ export default async function CreatorProfilePage({
                   <div style={{ fontSize: 12, color: "#00d9a3" }}>✓ Verified via TikTok login</div>
                 </div>
               </div>
-              <a className="ghost-button" href="/api/tiktok/connect" style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", height: 38, fontSize: 14, borderRadius: 8 }}>Reconnect TikTok</a>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <a className="ghost-button" href="/api/tiktok/connect" style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", height: 38, fontSize: 14, borderRadius: 8 }}>Reconnect TikTok</a>
+                <form action={unlinkTikTok}>
+                  <button type="submit" style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", height: 38, fontSize: 14, borderRadius: 8, background: "transparent", border: "1px solid rgba(255,80,80,0.4)", color: "#ff5050", cursor: "pointer", fontFamily: "inherit" }}>Unlink TikTok</button>
+                </form>
+              </div>
             </div>
           ) : (
             <div>
