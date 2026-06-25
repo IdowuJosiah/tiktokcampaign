@@ -19,6 +19,7 @@ const errors: Record<string, string> = {
   tiktok_profile_required: "Link TikTok before adding payout details.",
   tiktok_not_configured: "TikTok login is not configured yet. Add TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET.",
   tiktok_oauth_failed: "TikTok verification failed or was cancelled. Please try connecting again.",
+  tiktok_username_unavailable: "TikTok returned no username. Make sure the user.info.profile scope is approved in the TikTok developer portal.",
   account_unresolved: "Resolve the account name before saving bank details.",
   invalid_tiktok_links: "Each entry must be a unique TikTok video link.",
   title_too_long: "Campaign title is too long. Keep it under 80 characters.",

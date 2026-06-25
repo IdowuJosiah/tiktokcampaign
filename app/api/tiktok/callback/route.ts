@@ -35,6 +35,20 @@ export async function GET(request: NextRequest) {
   try {
     const accessToken = await exchangeCodeForAccessToken({ code, redirectUri, codeVerifier });
     const profile = await fetchTikTokUserInfo(accessToken);
+
+    if (!profile.openId) {
+      console.error("TikTok callback: missing open_id in profile response");
+      return NextResponse.redirect(new URL(errorDest, request.url));
+    }
+
+    if (!profile.username) {
+      console.error("TikTok callback: username missing — user.info.profile scope may not be approved in the TikTok developer portal");
+      return NextResponse.redirect(new URL(
+        intent === "auth" ? "/login?error=tiktok_username_unavailable" : "/creator/profile?error=tiktok_username_unavailable",
+        request.url
+      ));
+    }
+
     const supabase = createServerSupabaseClient();
 
     if (intent === "auth") {
