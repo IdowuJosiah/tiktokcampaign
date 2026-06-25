@@ -32,7 +32,7 @@ export function buildAuthorizeUrl(params: { state: string; codeChallenge: string
 
   const url = new URL(AUTHORIZE_URL);
   url.searchParams.set("client_key", clientKey);
-  url.searchParams.set("scope", "user.info.basic");
+  url.searchParams.set("scope", "user.info.basic,user.info.profile");
   url.searchParams.set("response_type", "code");
   url.searchParams.set("redirect_uri", params.redirectUri);
   url.searchParams.set("state", params.state);
