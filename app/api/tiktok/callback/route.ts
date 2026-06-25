@@ -177,8 +177,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL("/creator/profile?success=tiktok_verified", request.url));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "TikTok verification failed.";
-    console.error("TikTok callback failed:", message);
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error("TikTok callback failed:", message, error);
     return NextResponse.redirect(new URL(errorDest, request.url));
   }
 }
