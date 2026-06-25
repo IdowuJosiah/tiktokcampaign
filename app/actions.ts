@@ -9,7 +9,6 @@ import type { UserRole } from "@/lib/domain";
 import { createServerSupabaseClient, createSupabaseCookieAuthClient } from "@/lib/supabase/server";
 
 const DEMO_BRAND_EMAIL = "brand@voicerank.local";
-const DEMO_CREATOR_EMAIL = "creator@voicerank.local";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function asString(formData: FormData, key: string) {
@@ -159,34 +158,6 @@ async function getBrandWalletBalanceCents(brandId: string) {
 
   if (error) throw error;
   return (data ?? []).reduce((sum, row) => sum + row.amount_cents, 0);
-}
-
-async function ensureCreator(handle: string) {
-  const supabase = createServerSupabaseClient();
-  const normalizedHandle = handle.startsWith("@") ? handle : `@${handle}`;
-  const { data: existingCreator, error: findError } = await supabase
-    .from("creators")
-    .select("id")
-    .eq("tiktok_handle", normalizedHandle)
-    .maybeSingle();
-
-  if (findError) throw findError;
-  if (existingCreator) return existingCreator.id as string;
-
-  const userId = (await ensureUser(DEMO_CREATOR_EMAIL, "creator")).id;
-  const { data: creator, error } = await supabase
-    .from("creators")
-    .insert({
-      user_id: userId,
-      display_name: normalizedHandle.replace("@", ""),
-      tiktok_handle: normalizedHandle,
-      country: "NG",
-    })
-    .select("id")
-    .single();
-
-  if (error) throw error;
-  return creator.id as string;
 }
 
 async function ensureCreatorForUser(userId: string, handle: string, displayName?: string) {
@@ -524,12 +495,25 @@ export async function logIn(formData: FormData) {
 
 export async function submitTikTokVideo(formData: FormData) {
   try {
+    const session = await requireRole("creator");
+    const supabaseCheck = createServerSupabaseClient();
+    const { data: verifiedCreator, error: verifyError } = await supabaseCheck
+      .from("creators")
+      .select("id, tiktok_verified_at")
+      .eq("user_id", session.id)
+      .maybeSingle();
+
+    if (verifyError) throw verifyError;
+    if (!verifiedCreator?.tiktok_verified_at) {
+      redirect("/submit?error=tiktok_required");
+    }
+
     let missionId = asString(formData, "missionId");
     if (!uuidPattern.test(missionId)) {
       missionId = await createDemoMission(missionId);
     }
 
-    const creatorId = await ensureCreator(asString(formData, "creatorHandle"));
+    const creatorId = verifiedCreator.id as string;
     const links = formData
       .getAll("tiktokUrl")
       .filter((value): value is string => typeof value === "string")
