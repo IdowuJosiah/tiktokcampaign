@@ -5,10 +5,8 @@ import { buildAuthorizeUrl, createPkcePair, createState } from "@/lib/tiktok";
 
 export async function GET(request: NextRequest) {
   const session = await getAppSession();
-  const mode = new URL(request.url).searchParams.get("mode");
-  const isAuthMode = mode === "auth";
 
-  if (!isAuthMode && (!session || session.role !== "creator")) {
+  if (!session || session.role !== "creator") {
     return NextResponse.redirect(new URL("/login?error=creator_required", request.url));
   }
 
@@ -23,8 +21,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "TikTok is not configured.";
     console.error("TikTok connect failed:", message);
-    const errorDest = isAuthMode ? "/login?error=tiktok_not_configured" : "/creator/profile?error=tiktok_not_configured";
-    return NextResponse.redirect(new URL(errorDest, request.url));
+    return NextResponse.redirect(new URL("/creator/profile?error=tiktok_not_configured", request.url));
   }
 
   const cookieStore = await cookies();
@@ -37,7 +34,6 @@ export async function GET(request: NextRequest) {
   };
   cookieStore.set("tiktok_oauth_state", state, cookieOptions);
   cookieStore.set("tiktok_oauth_code_verifier", codeVerifier, cookieOptions);
-  cookieStore.set("tiktok_oauth_intent", isAuthMode ? "auth" : "reconnect", cookieOptions);
 
   return NextResponse.redirect(authorizeUrl);
 }
