@@ -573,6 +573,39 @@ export async function logOut() {
   redirect("/");
 }
 
+export async function unlinkTikTok() {
+  const session = await requireRole("creator");
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: creator, error: findError } = await supabase
+      .from("creators")
+      .select("id")
+      .eq("user_id", session.id)
+      .maybeSingle();
+
+    if (findError) throw findError;
+    if (!creator) redirect("/creator/profile?error=write_failed");
+
+    const { error } = await supabase
+      .from("creators")
+      .update({
+        tiktok_verified_at: null,
+        tiktok_open_id: null,
+        tiktok_username: null,
+        tiktok_avatar_url: null,
+      })
+      .eq("id", creator.id);
+
+    if (error) throw error;
+    revalidatePath("/creator/profile");
+  } catch (error) {
+    writeErrorRedirect("/creator/profile", error);
+  }
+
+  redirect("/creator/profile");
+}
+
 export async function savePayoutProfile(formData: FormData) {
   const session = await requireRole("creator");
   const accountName = asString(formData, "accountName");
