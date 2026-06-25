@@ -36,18 +36,21 @@ export async function GET(request: NextRequest) {
     const accessToken = await exchangeCodeForAccessToken({ code, redirectUri, codeVerifier });
     const profile = await fetchTikTokUserInfo(accessToken);
 
+    console.log("TikTok callback: profile received", {
+      openId: profile.openId || "(empty)",
+      username: profile.username || "(empty — user.info.profile scope may not be approved)",
+      displayName: profile.displayName || "(empty)",
+      hasAvatar: Boolean(profile.avatarUrl),
+    });
+
     if (!profile.openId) {
       console.error("TikTok callback: missing open_id in profile response");
       return NextResponse.redirect(new URL(errorDest, request.url));
     }
 
-    if (!profile.username) {
-      console.error("TikTok callback: username missing — user.info.profile scope may not be approved in the TikTok developer portal");
-      return NextResponse.redirect(new URL(
-        intent === "auth" ? "/login?error=tiktok_username_unavailable" : "/creator/profile?error=tiktok_username_unavailable",
-        request.url
-      ));
-    }
+    // username requires user.info.profile scope approval — fall back to display_name if missing
+    const resolvedUsername = profile.username || profile.displayName || profile.openId;
+    const handle = `@${resolvedUsername}`;
 
     const supabase = createServerSupabaseClient();
 
@@ -72,46 +75,49 @@ export async function GET(request: NextRequest) {
         if (userError) throw userError;
 
         // Refresh avatar/handle in case they changed
-        await supabase.from("creators").update({
-          tiktok_handle: `@${profile.username}`,
-          tiktok_username: profile.username,
-          tiktok_avatar_url: profile.avatarUrl,
+        const { error: updateError } = await supabase.from("creators").update({
+          tiktok_handle: handle,
+          tiktok_username: profile.username || null,
+          tiktok_avatar_url: profile.avatarUrl || null,
           tiktok_verified_at: new Date().toISOString(),
         }).eq("id", existingCreator.id);
+        if (updateError) console.error("TikTok callback: failed to refresh existing creator", updateError.message);
 
         await setAppSession({ id: user.id, email: user.email, role: "creator" });
         return NextResponse.redirect(new URL("/dashboard/creator", request.url));
       }
 
       // New TikTok user — check if a creator with this handle already exists (from old flow)
-      const handle = `@${profile.username}`;
-      const { data: handleCreator, error: handleError } = await supabase
-        .from("creators")
-        .select("id, user_id")
-        .eq("tiktok_handle", handle)
-        .maybeSingle();
+      if (profile.username) {
+        const { data: handleCreator, error: handleError } = await supabase
+          .from("creators")
+          .select("id, user_id")
+          .eq("tiktok_handle", handle)
+          .maybeSingle();
 
-      if (handleError) throw handleError;
+        if (handleError) throw handleError;
 
-      if (handleCreator) {
-        // Attach open_id to existing creator and log them in
-        await supabase.from("creators").update({
-          tiktok_open_id: profile.openId,
-          tiktok_username: profile.username,
-          tiktok_avatar_url: profile.avatarUrl,
-          tiktok_verified_at: new Date().toISOString(),
-        }).eq("id", handleCreator.id);
+        if (handleCreator) {
+          // Attach open_id to existing creator and log them in
+          const { error: attachError } = await supabase.from("creators").update({
+            tiktok_open_id: profile.openId,
+            tiktok_username: profile.username || null,
+            tiktok_avatar_url: profile.avatarUrl || null,
+            tiktok_verified_at: new Date().toISOString(),
+          }).eq("id", handleCreator.id);
+          if (attachError) throw attachError;
 
-        const { data: user, error: userError } = await supabase
-          .from("users")
-          .select("id, email")
-          .eq("id", handleCreator.user_id)
-          .single();
+          const { data: user, error: userError } = await supabase
+            .from("users")
+            .select("id, email")
+            .eq("id", handleCreator.user_id)
+            .single();
 
-        if (userError) throw userError;
+          if (userError) throw userError;
 
-        await setAppSession({ id: user.id, email: user.email, role: "creator" });
-        return NextResponse.redirect(new URL("/dashboard/creator", request.url));
+          await setAppSession({ id: user.id, email: user.email, role: "creator" });
+          return NextResponse.redirect(new URL("/dashboard/creator", request.url));
+        }
       }
 
       // Brand new user — create user row + creator row
@@ -139,11 +145,11 @@ export async function GET(request: NextRequest) {
 
       const { error: creatorInsertError } = await supabase.from("creators").insert({
         user_id: userId,
-        display_name: profile.displayName || profile.username,
+        display_name: profile.displayName || resolvedUsername,
         tiktok_handle: handle,
         tiktok_open_id: profile.openId,
-        tiktok_username: profile.username,
-        tiktok_avatar_url: profile.avatarUrl,
+        tiktok_username: profile.username || null,
+        tiktok_avatar_url: profile.avatarUrl || null,
         tiktok_verified_at: new Date().toISOString(),
         country: "NG",
       });
@@ -157,8 +163,11 @@ export async function GET(request: NextRequest) {
     // Reconnect — update existing creator's TikTok profile
     const session = await getAppSession();
     if (!session || session.role !== "creator") {
+      console.error("TikTok callback: no creator session found for reconnect flow");
       return NextResponse.redirect(new URL("/login?error=creator_required", request.url));
     }
+
+    console.log("TikTok callback: reconnecting for user_id", session.id);
 
     const { data: existingCreator, error: findError } = await supabase
       .from("creators")
@@ -168,25 +177,35 @@ export async function GET(request: NextRequest) {
 
     if (findError) throw findError;
 
+    console.log("TikTok callback: existing creator found:", Boolean(existingCreator));
+
     const update = {
-      tiktok_handle: `@${profile.username}`,
+      tiktok_handle: handle,
       tiktok_open_id: profile.openId,
-      tiktok_username: profile.username,
-      tiktok_avatar_url: profile.avatarUrl,
+      tiktok_username: profile.username || null,
+      tiktok_avatar_url: profile.avatarUrl || null,
       tiktok_verified_at: new Date().toISOString(),
     };
 
     if (existingCreator) {
       const { error } = await supabase.from("creators").update(update).eq("id", existingCreator.id);
-      if (error) throw error;
+      if (error) {
+        console.error("TikTok callback: update failed", error.message, error.details);
+        throw error;
+      }
+      console.log("TikTok callback: creator updated successfully, id:", existingCreator.id);
     } else {
       const { error } = await supabase.from("creators").insert({
         user_id: session.id,
-        display_name: profile.displayName || profile.username,
+        display_name: profile.displayName || resolvedUsername,
         country: "NG",
         ...update,
       });
-      if (error) throw error;
+      if (error) {
+        console.error("TikTok callback: insert failed", error.message, error.details);
+        throw error;
+      }
+      console.log("TikTok callback: new creator inserted for user_id", session.id);
     }
 
     return NextResponse.redirect(new URL("/creator/profile?success=tiktok_verified", request.url));
