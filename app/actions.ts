@@ -578,6 +578,8 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=tiktok_ownership_mismatch");
   }
 
+  let soundFlags: boolean[] | null = null;
+
   if (verifiedCreator.tiktok_access_token && verifiedCreator.tiktok_refresh_token) {
     let validationError: string | null = null;
 
@@ -619,11 +621,11 @@ export async function submitTikTokVideo(formData: FormData) {
         validationError = "tiktok_video_not_found";
       } else if (minimumViews > 0 && videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)) {
         validationError = "insufficient_views";
-      } else if (
-        requiredSoundKeyword &&
-        videoStats.some((stats) => !stats?.description.toLowerCase().includes(requiredSoundKeyword))
-      ) {
-        validationError = "sound_mismatch";
+      } else if (requiredSoundKeyword) {
+        // Caption keyword matching is a heuristic, not real sound-usage data (TikTok's
+        // public API doesn't expose it) — flag mismatches for admin review instead of
+        // blocking the submission outright, since false negatives are common.
+        soundFlags = videoStats.map((stats) => Boolean(stats?.description.toLowerCase().includes(requiredSoundKeyword)));
       }
     } catch (error) {
       console.error("TikTok video validation failed:", error);
@@ -635,16 +637,18 @@ export async function submitTikTokVideo(formData: FormData) {
     }
   }
 
+  const needsSoundReview = soundFlags?.some((matched) => !matched) ?? false;
+
   try {
     const supabase = createServerSupabaseClient();
     const { error } = await supabase.from("submissions").insert(
-      uniqueLinks.map((link) => ({
+      uniqueLinks.map((link, index) => ({
         mission_id: missionId,
         creator_id: creatorId,
         tiktok_url: link,
-        status: "submitted",
+        status: needsSoundReview ? "in_review" : "submitted",
         hashtag_ok: checked(formData, "hashtagOk"),
-        sound_ok: checked(formData, "soundOk"),
+        sound_ok: soundFlags ? soundFlags[index] : checked(formData, "soundOk"),
         disclosure_ok: checked(formData, "disclosureOk"),
         deadline_ok: true,
         public_video_ok: checked(formData, "publicVideoOk"),
@@ -660,7 +664,7 @@ export async function submitTikTokVideo(formData: FormData) {
     writeErrorRedirect("/submit", error);
   }
 
-  redirect("/dashboard/creator");
+  redirect(needsSoundReview ? "/dashboard/creator?success=submitted_for_sound_review" : "/dashboard/creator");
 }
 
 export async function logOut() {

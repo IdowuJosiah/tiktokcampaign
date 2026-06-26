@@ -41,7 +41,6 @@ const errors: Record<string, string> = {
   minimum_five_links: "You need at least 5 TikTok links to submit a batch.",
   tiktok_video_not_found: "We couldn't find one of these videos on your TikTok account. Make sure the video is public and the link is correct.",
   insufficient_views: "One or more videos haven't reached the minimum view count required for this campaign yet.",
-  sound_mismatch: "One or more videos don't appear to use the required sound for this campaign.",
   tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
 };
 
@@ -49,6 +48,7 @@ const successes: Record<string, string> = {
   nin_submitted: "NIN submitted successfully. It will be reviewed shortly.",
   tiktok_verified: "TikTok account connected and verified.",
   funds_added: "Deposit verified and added to your wallet balance.",
+  submitted_for_sound_review: "Submitted! We couldn't auto-confirm the required sound on one or more videos, so this batch is flagged for manual review.",
 };
 
 export function FormStatus({ error, success }: { error?: string; success?: string }) {
