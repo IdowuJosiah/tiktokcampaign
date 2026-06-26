@@ -75,6 +75,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/brand", icon: icons.dashboard, label: "Dashboard" },
     { href: "/brand/missions/new", icon: icons.campaign, label: "Create Campaign" },
     { href: "/brand/missions", icon: icons.analytics, label: "Analytics" },
+    { href: "/brand/wallet", icon: icons.wallet, label: "Wallet" },
   ];
 
   const adminNav = [
