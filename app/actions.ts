@@ -368,11 +368,11 @@ export async function initiateBrandDeposit(formData: FormData) {
   const amountCents = parseCents(asString(formData, "amount"));
 
   if (amountCents < 100) {
-    redirect("/dashboard/brand?error=invalid_deposit_amount");
+    redirect("/brand/wallet?error=invalid_deposit_amount");
   }
 
   if (!process.env.PAYSTACK_SECRET_KEY) {
-    redirect("/dashboard/brand?error=deposit_key_missing");
+    redirect("/brand/wallet?error=deposit_key_missing");
   }
 
   let brandId: string;
@@ -382,7 +382,7 @@ export async function initiateBrandDeposit(formData: FormData) {
     const message = extractErrorMessage(error, "Could not resolve brand.");
     console.error("Brand deposit initialization failed (brand lookup):", message);
     const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
-    redirect(`/dashboard/brand?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`);
+    redirect(`/brand/wallet?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`);
   }
 
   const headerStore = await headers();
@@ -401,7 +401,7 @@ export async function initiateBrandDeposit(formData: FormData) {
   } catch (error) {
     const message = extractErrorMessage(error, "Could not initialize Paystack transaction.");
     console.error("Brand deposit initialization failed (Paystack):", message);
-    redirect("/dashboard/brand?error=deposit_api_failed");
+    redirect("/brand/wallet?error=deposit_api_failed");
   }
 
   redirect(authorizationUrl);
