@@ -494,37 +494,46 @@ export async function logIn(formData: FormData) {
 }
 
 export async function submitTikTokVideo(formData: FormData) {
+  const session = await requireRole("creator");
+
+  let verifiedCreator: { id: string; tiktok_verified_at: string | null };
   try {
-    const session = await requireRole("creator");
     const supabaseCheck = createServerSupabaseClient();
-    const { data: verifiedCreator, error: verifyError } = await supabaseCheck
+    const { data, error: verifyError } = await supabaseCheck
       .from("creators")
       .select("id, tiktok_verified_at")
       .eq("user_id", session.id)
       .maybeSingle();
 
     if (verifyError) throw verifyError;
-    if (!verifiedCreator?.tiktok_verified_at) {
-      redirect("/submit?error=tiktok_required");
-    }
+    if (!data) redirect("/submit?error=tiktok_required");
+    verifiedCreator = data;
+  } catch (error) {
+    writeErrorRedirect("/submit", error);
+  }
 
-    let missionId = asString(formData, "missionId");
-    if (!uuidPattern.test(missionId)) {
-      missionId = await createDemoMission(missionId);
-    }
+  if (!verifiedCreator.tiktok_verified_at) {
+    redirect("/submit?error=tiktok_required");
+  }
 
-    const creatorId = verifiedCreator.id as string;
-    const links = formData
-      .getAll("tiktokUrl")
-      .filter((value): value is string => typeof value === "string")
-      .map((value) => value.trim().replace(/\/$/, ""))
-      .filter(Boolean);
-    const uniqueLinks = Array.from(new Set(links));
+  let missionId = asString(formData, "missionId");
+  if (!uuidPattern.test(missionId)) {
+    missionId = await createDemoMission(missionId);
+  }
 
-    if (links.length === 0 || links.length !== uniqueLinks.length || uniqueLinks.some((link) => !isTikTokUrl(link))) {
-      redirect("/submit?error=invalid_tiktok_links");
-    }
+  const creatorId = verifiedCreator.id;
+  const links = formData
+    .getAll("tiktokUrl")
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim().replace(/\/$/, ""))
+    .filter(Boolean);
+  const uniqueLinks = Array.from(new Set(links));
 
+  if (links.length === 0 || links.length !== uniqueLinks.length || uniqueLinks.some((link) => !isTikTokUrl(link))) {
+    redirect("/submit?error=invalid_tiktok_links");
+  }
+
+  try {
     const supabase = createServerSupabaseClient();
     const { error } = await supabase.from("submissions").insert(
       uniqueLinks.map((link) => ({
