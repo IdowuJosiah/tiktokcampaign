@@ -43,6 +43,7 @@ const errors: Record<string, string> = {
   insufficient_views: "One or more videos haven't reached the minimum view count required for this campaign yet.",
   tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
   rejection_reason_required: "Enter a reason before rejecting this campaign.",
+  mission_rejected: "This campaign was rejected and can't be approved. The brand needs to create a new campaign instead.",
 };
 
 const successes: Record<string, string> = {

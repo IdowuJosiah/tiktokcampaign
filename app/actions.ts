@@ -774,6 +774,25 @@ export async function approveMission(formData: FormData) {
   await requireRole("admin");
   const missionId = asString(formData, "missionId");
 
+  let currentStatus: string | null;
+  try {
+    const supabaseCheck = createServerSupabaseClient();
+    const { data: existing, error: findError } = await supabaseCheck
+      .from("missions")
+      .select("status")
+      .eq("id", missionId)
+      .maybeSingle();
+
+    if (findError) throw findError;
+    currentStatus = existing?.status ?? null;
+  } catch (error) {
+    writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
+  }
+
+  if (currentStatus === "rejected") {
+    redirect(`/admin/campaigns/${missionId}?error=mission_rejected`);
+  }
+
   try {
     const supabase = createServerSupabaseClient();
     const now = new Date().toISOString();

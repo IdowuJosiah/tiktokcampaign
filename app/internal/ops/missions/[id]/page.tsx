@@ -102,20 +102,23 @@ export default async function InternalMissionDetailPage({
       <section className="panel form-panel">
         <form action={approveMission} className="submission-form">
           <input name="missionId" type="hidden" value={mission.id} />
-          <button className="primary-button full" disabled={isLive} type="submit">
-            {isLive ? "Mission approved" : "Approve and publish mission"}
+          <button className="primary-button full" disabled={isLive || isRejected} type="submit">
+            {isLive ? "Mission approved" : isRejected ? "Rejected — resubmission required" : "Approve and publish mission"}
           </button>
+          {isRejected ? (
+            <small>This campaign was rejected and can't be approved as-is. The brand needs to create a new campaign with the feedback applied.</small>
+          ) : null}
         </form>
 
-        {!isLive ? (
+        {!isLive && !isRejected ? (
           <form action={rejectMission} className="submission-form" style={{ marginTop: 16 }}>
             <input name="missionId" type="hidden" value={mission.id} />
             <label>
               Rejection reason
-              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" required rows={3} defaultValue={mission.rejectionReason ?? ""} />
+              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" required rows={3} />
             </label>
             <button className="ghost-button full" type="submit">
-              {isRejected ? "Update rejection reason" : "Reject campaign"}
+              Reject campaign
             </button>
           </form>
         ) : null}
