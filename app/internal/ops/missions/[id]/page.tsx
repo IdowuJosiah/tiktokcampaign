@@ -92,7 +92,7 @@ export default async function InternalMissionDetailPage({
 
       <FormStatus error={isRejected ? undefined : error} />
 
-      <section className="panel form-panel">
+      <section className="panel form-panel compact">
         <div className="section-title">
           <div>
             <p className="eyebrow">Decision</p>
@@ -127,34 +127,29 @@ export default async function InternalMissionDetailPage({
         )}
       </section>
 
-      <section className="panel">
-        <div className="section-title">
-          <div>
-            <p className="eyebrow">Campaign submissions</p>
-            <h2>{mission.status === "Live" ? "Review creator videos." : "Submissions appear after approval."}</h2>
+      {isLive ? (
+        <section className="panel compact">
+          <div className="section-title">
+            <div>
+              <p className="eyebrow">Campaign submissions</p>
+              <h2>Review creator videos.</h2>
+            </div>
           </div>
-        </div>
-        {mission.status === "Live" && submissions.length > 0 ? (
-          <div className="submission-table">
-            {submissions.map((submission) => (
-              <SubmissionRow
-                href={`/admin/submissions/${submission.id}`}
-                submission={submission}
-                key={submission.id}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <h2>{mission.status === "Live" ? "No submissions yet." : "Approve this campaign first."}</h2>
-            <p>
-              {mission.status === "Live"
-                ? "Creator submissions for this campaign will show here when they arrive."
-                : "Once the campaign is live, creators can submit videos and admin review happens from this page."}
-            </p>
-          </div>
-        )}
-      </section>
+          {submissions.length > 0 ? (
+            <div className="submission-table">
+              {submissions.map((submission) => (
+                <SubmissionRow
+                  href={`/admin/submissions/${submission.id}`}
+                  submission={submission}
+                  key={submission.id}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="muted-copy">No submissions yet.</p>
+          )}
+        </section>
+      ) : null}
     </AppShell>
   );
 }
