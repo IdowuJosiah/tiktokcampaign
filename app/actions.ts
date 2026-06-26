@@ -55,8 +55,13 @@ const MAX_HASHTAG_LENGTH = 50;
 const MAX_RULE_LENGTH = 200;
 
 function writeErrorRedirect(path: string, error: unknown): never {
-  const message = error instanceof Error ? error.message : "Unable to reach Supabase.";
-  console.error("Database write failed:", message);
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message: unknown }).message)
+        : "Unable to reach Supabase.";
+  console.error("Database write failed:", message, error);
   const code =
     message.toLowerCase().includes("abort") ||
     message.toLowerCase().includes("timeout") ||
