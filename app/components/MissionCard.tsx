@@ -24,6 +24,9 @@ export function MissionCard({
         <span>{mission.payoutPerFiveSubmissions} per 5 submissions · {mission.deadline}</span>
       </div>
       {mission.fundingStatus ? <span className="funding-status">{mission.fundingStatus}</span> : null}
+      {mission.status === "Rejected" && mission.rejectionReason ? (
+        <p style={{ color: "#ff6467", fontSize: 13, margin: "4px 0 0" }}>Rejected: {mission.rejectionReason}</p>
+      ) : null}
       <ul className="tag-list">
         {mission.requirements.map((item) => (
           <li key={item}>{item}</li>

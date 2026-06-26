@@ -20,7 +20,7 @@ type MissionRow = {
   reward_pool_cents: number;
   payout_per_5_submissions_cents: number | null;
   deadline: string;
-  status: "draft" | "live" | "closed";
+  status: "draft" | "live" | "closed" | "rejected";
   required_hashtag: string;
   required_sound: string | null;
   minimum_views: number;
@@ -29,6 +29,8 @@ type MissionRow = {
   funded_at?: string | null;
   approved_at?: string | null;
   deposit_reference?: string | null;
+  rejection_reason?: string | null;
+  rejected_at?: string | null;
   rules: string[] | null;
   brands: BrandRow | BrandRow[] | null;
 };
@@ -102,6 +104,7 @@ function first<T>(value: T | T[] | null | undefined) {
 function missionStatus(status: MissionRow["status"]) {
   if (status === "live") return "Live" as const;
   if (status === "closed") return "Closed" as const;
+  if (status === "rejected") return "Rejected" as const;
   return "Draft" as const;
 }
 
@@ -136,6 +139,7 @@ function mapMission(row: MissionRow) {
     fundingStatus: row.funded_at ? ("Funded" as const) : ("Pending deposit" as const),
     depositReference: row.deposit_reference,
     approvedAt: row.approved_at,
+    rejectionReason: row.rejection_reason ?? null,
     requirements: row.rules?.length
       ? row.rules
       : [

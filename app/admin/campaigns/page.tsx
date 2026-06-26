@@ -10,6 +10,7 @@ export default async function AdminCampaignsPage() {
   const pending = missions.filter((m) => m.status === "Draft");
   const live = missions.filter((m) => m.status === "Live");
   const closed = missions.filter((m) => m.status === "Closed");
+  const rejected = missions.filter((m) => m.status === "Rejected");
 
   return (
     <AppShell>
@@ -24,6 +25,7 @@ export default async function AdminCampaignsPage() {
           { label: "Pending approval", count: pending.length, color: "#ff8904", bg: "rgba(255,137,4,0.1)", border: "rgba(255,137,4,0.3)" },
           { label: "Live", count: live.length, color: "#00d9a3", bg: "rgba(0,217,163,0.1)", border: "rgba(0,217,163,0.3)" },
           { label: "Closed", count: closed.length, color: "#99a1af", bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.1)" },
+          { label: "Rejected", count: rejected.length, color: "#ff6467", bg: "rgba(255,100,103,0.1)", border: "rgba(255,100,103,0.3)" },
         ].map((s) => (
           <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.count}</span>
@@ -50,7 +52,7 @@ export default async function AdminCampaignsPage() {
                 <div style={{ color: "#99a1af", fontSize: 13, marginTop: 2 }}>{m.brand} · {m.deadline}</div>
               </div>
               <div style={{ fontSize: 14, color: "#fff", marginRight: 8 }}>{m.rewardPool}</div>
-              <span style={{ fontSize: 12, color: m.status === "Live" ? "#00d9a3" : m.status === "Draft" ? "#ff8904" : "#99a1af", background: m.status === "Live" ? "rgba(0,217,163,0.1)" : m.status === "Draft" ? "rgba(255,137,4,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${m.status === "Live" ? "rgba(0,217,163,0.3)" : m.status === "Draft" ? "rgba(255,137,4,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 12, color: m.status === "Live" ? "#00d9a3" : m.status === "Draft" ? "#ff8904" : m.status === "Rejected" ? "#ff6467" : "#99a1af", background: m.status === "Live" ? "rgba(0,217,163,0.1)" : m.status === "Draft" ? "rgba(255,137,4,0.1)" : m.status === "Rejected" ? "rgba(255,100,103,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${m.status === "Live" ? "rgba(0,217,163,0.3)" : m.status === "Draft" ? "rgba(255,137,4,0.3)" : m.status === "Rejected" ? "rgba(255,100,103,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap" }}>
                 {m.status}
               </span>
             </Link>
