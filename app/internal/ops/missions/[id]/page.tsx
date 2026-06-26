@@ -1,22 +1,29 @@
 import { notFound } from "next/navigation";
-import { approveMission } from "@/app/actions";
+import { approveMission, rejectMission } from "@/app/actions";
 import { AppShell } from "@/app/components/AppShell";
+import { FormStatus } from "@/app/components/FormStatus";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
 import { requireRole } from "@/lib/auth";
 import { findMissionForOps, listMissionSubmissions } from "@/lib/repository";
 
 export default async function InternalMissionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   await requireRole("admin");
   const { id } = await params;
+  const { error } = await searchParams;
   const [mission, submissions] = await Promise.all([findMissionForOps(id), listMissionSubmissions(id)]);
 
   if (!mission) {
     notFound();
   }
+
+  const isRejected = mission.status === "Rejected";
+  const isLive = mission.status === "Live";
 
   return (
     <AppShell>
@@ -83,13 +90,35 @@ export default async function InternalMissionDetailPage({
         </ul>
       </section>
 
+      <FormStatus error={error} />
+
+      {isRejected && mission.rejectionReason ? (
+        <section className="panel" style={{ borderColor: "rgba(255,100,103,0.4)" }}>
+          <p className="eyebrow">Rejected</p>
+          <p>{mission.rejectionReason}</p>
+        </section>
+      ) : null}
+
       <section className="panel form-panel">
         <form action={approveMission} className="submission-form">
           <input name="missionId" type="hidden" value={mission.id} />
-          <button className="primary-button full" disabled={mission.status === "Live"} type="submit">
-            {mission.status === "Live" ? "Mission approved" : "Approve and publish mission"}
+          <button className="primary-button full" disabled={isLive} type="submit">
+            {isLive ? "Mission approved" : "Approve and publish mission"}
           </button>
         </form>
+
+        {!isLive ? (
+          <form action={rejectMission} className="submission-form" style={{ marginTop: 16 }}>
+            <input name="missionId" type="hidden" value={mission.id} />
+            <label>
+              Rejection reason
+              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" required rows={3} defaultValue={mission.rejectionReason ?? ""} />
+            </label>
+            <button className="ghost-button full" type="submit">
+              {isRejected ? "Update rejection reason" : "Reject campaign"}
+            </button>
+          </form>
+        ) : null}
       </section>
 
       <section className="panel">

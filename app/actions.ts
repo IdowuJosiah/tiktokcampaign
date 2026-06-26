@@ -801,6 +801,41 @@ export async function approveMission(formData: FormData) {
   redirect(`/admin/campaigns/${missionId}`);
 }
 
+export async function rejectMission(formData: FormData) {
+  await requireRole("admin");
+  const missionId = asString(formData, "missionId");
+  const reason = asString(formData, "reason").trim();
+
+  if (!reason) {
+    redirect(`/admin/campaigns/${missionId}?error=rejection_reason_required`);
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase
+      .from("missions")
+      .update({
+        status: "rejected",
+        rejection_reason: reason,
+        rejected_at: new Date().toISOString(),
+      })
+      .eq("id", missionId);
+
+    if (error) throw error;
+    revalidatePath("/");
+    revalidatePath("/campaigns");
+    revalidatePath("/creator/missions");
+    revalidatePath("/admin/campaigns");
+    revalidatePath("/brand/missions");
+    revalidatePath(`/admin/campaigns/${missionId}`);
+    revalidatePath(`/internal/ops/missions/${missionId}`);
+  } catch (error) {
+    writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
+  }
+
+  redirect(`/admin/campaigns/${missionId}`);
+}
+
 export async function reviewSubmission(formData: FormData) {
   const session = await requireRole("admin");
   const submissionId = asString(formData, "submissionId");

@@ -1,4 +1,4 @@
-export type MissionStatus = "Live" | "Draft" | "Closed";
+export type MissionStatus = "Live" | "Draft" | "Closed" | "Rejected";
 export type SubmissionStatus = "Pending" | "Approved" | "Needs fix" | "Rejected";
 
 export type Mission = {
@@ -18,6 +18,7 @@ export type Mission = {
   fundingStatus?: "Funded" | "Pending deposit";
   depositReference?: string | null;
   approvedAt?: string | null;
+  rejectionReason?: string | null;
 };
 
 export type Submission = {

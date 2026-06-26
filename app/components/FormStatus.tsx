@@ -42,6 +42,7 @@ const errors: Record<string, string> = {
   tiktok_video_not_found: "We couldn't find one of these videos on your TikTok account. Make sure the video is public and the link is correct.",
   insufficient_views: "One or more videos haven't reached the minimum view count required for this campaign yet.",
   tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
+  rejection_reason_required: "Enter a reason before rejecting this campaign.",
 };
 
 const successes: Record<string, string> = {
