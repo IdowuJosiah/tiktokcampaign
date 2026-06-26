@@ -4,12 +4,19 @@ import crypto from "node:crypto";
 const AUTHORIZE_URL = "https://www.tiktok.com/v2/auth/authorize/";
 const TOKEN_URL = "https://open.tiktokapis.com/v2/oauth/token/";
 const USER_INFO_URL = "https://open.tiktokapis.com/v2/user/info/";
+const VIDEO_LIST_URL = "https://open.tiktokapis.com/v2/video/list/";
 
 export type TikTokUserInfo = {
   openId: string;
   username: string;
   displayName: string;
   avatarUrl: string;
+};
+
+export type TikTokTokenSet = {
+  accessToken: string;
+  refreshToken: string;
+  expiresInSeconds: number;
 };
 
 function base64url(input: Buffer) {
@@ -32,7 +39,7 @@ export function buildAuthorizeUrl(params: { state: string; codeChallenge: string
 
   const url = new URL(AUTHORIZE_URL);
   url.searchParams.set("client_key", clientKey);
-  url.searchParams.set("scope", "user.info.basic,user.info.profile");
+  url.searchParams.set("scope", "user.info.basic,user.info.profile,video.list");
   url.searchParams.set("response_type", "code");
   url.searchParams.set("redirect_uri", params.redirectUri);
   url.searchParams.set("state", params.state);
@@ -45,7 +52,7 @@ export async function exchangeCodeForAccessToken(params: {
   code: string;
   redirectUri: string;
   codeVerifier: string;
-}) {
+}): Promise<TikTokTokenSet> {
   const clientKey = process.env.TIKTOK_CLIENT_KEY;
   const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
   if (!clientKey || !clientSecret) throw new Error("TikTok client credentials are not configured.");
@@ -71,7 +78,42 @@ export async function exchangeCodeForAccessToken(params: {
     throw new Error(data.error_description || data.error || "TikTok token exchange failed.");
   }
 
-  return data.access_token as string;
+  return {
+    accessToken: data.access_token as string,
+    refreshToken: data.refresh_token as string,
+    expiresInSeconds: data.expires_in as number,
+  };
+}
+
+export async function refreshTikTokAccessToken(refreshToken: string): Promise<TikTokTokenSet> {
+  const clientKey = process.env.TIKTOK_CLIENT_KEY;
+  const clientSecret = process.env.TIKTOK_CLIENT_SECRET;
+  if (!clientKey || !clientSecret) throw new Error("TikTok client credentials are not configured.");
+
+  const response = await fetch(TOKEN_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Cache-Control": "no-cache",
+    },
+    body: new URLSearchParams({
+      client_key: clientKey,
+      client_secret: clientSecret,
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok || data.error) {
+    throw new Error(data.error_description || data.error || "TikTok token refresh failed.");
+  }
+
+  return {
+    accessToken: data.access_token as string,
+    refreshToken: data.refresh_token as string,
+    expiresInSeconds: data.expires_in as number,
+  };
 }
 
 export async function fetchTikTokUserInfo(accessToken: string): Promise<TikTokUserInfo> {
@@ -109,4 +151,58 @@ export async function fetchTikTokVideoAuthor(videoUrl: string): Promise<string |
   const authorUrl = typeof data.author_url === "string" ? data.author_url : "";
   const match = authorUrl.match(/tiktok\.com\/@([^/?]+)/i);
   return match ? match[1].toLowerCase() : null;
+}
+
+function normalizeShareUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return `${url.hostname}${url.pathname}`.replace(/\/$/, "").toLowerCase();
+  } catch {
+    return value.trim().replace(/\/$/, "").replace(/^https?:\/\//, "").toLowerCase();
+  }
+}
+
+export type TikTokVideoStats = {
+  viewCount: number;
+  description: string;
+};
+
+export async function findTikTokVideoByShareUrl(
+  accessToken: string,
+  shareUrl: string,
+): Promise<TikTokVideoStats | null> {
+  const target = normalizeShareUrl(shareUrl);
+  let cursor: number | undefined;
+
+  for (let page = 0; page < 5; page++) {
+    const response = await fetch(`${VIDEO_LIST_URL}?fields=id,share_url,view_count,video_description`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ max_count: 20, ...(cursor ? { cursor } : {}) }),
+    });
+
+    const data = await response.json();
+    if (!response.ok || data.error?.code !== "ok") {
+      throw new Error(data.error?.message || "Unable to fetch TikTok video list.");
+    }
+
+    const videos = (data.data?.videos ?? []) as Array<{
+      share_url: string;
+      view_count: number;
+      video_description: string;
+    }>;
+
+    const match = videos.find((video) => normalizeShareUrl(video.share_url) === target);
+    if (match) {
+      return { viewCount: match.view_count, description: match.video_description ?? "" };
+    }
+
+    if (!data.data?.has_more) return null;
+    cursor = data.data.cursor;
+  }
+
+  return null;
 }
