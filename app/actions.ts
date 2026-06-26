@@ -67,13 +67,16 @@ const MAX_BRIEF_LENGTH = 2000;
 const MAX_HASHTAG_LENGTH = 50;
 const MAX_RULE_LENGTH = 200;
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return fallback;
+}
+
 function writeErrorRedirect(path: string, error: unknown): never {
-  const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === "object" && error !== null && "message" in error
-        ? String((error as { message: unknown }).message)
-        : "Unable to reach Supabase.";
+  const message = extractErrorMessage(error, "Unable to reach Supabase.");
   console.error("Database write failed:", message, error);
   const code =
     message.toLowerCase().includes("abort") ||
@@ -374,7 +377,7 @@ export async function initiateBrandDeposit(formData: FormData) {
   try {
     brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not resolve brand.";
+    const message = extractErrorMessage(error, "Could not resolve brand.");
     console.error("Brand deposit initialization failed (brand lookup):", message);
     const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
     redirect(`/dashboard/brand?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`);
@@ -394,7 +397,7 @@ export async function initiateBrandDeposit(formData: FormData) {
       callbackUrl: `${origin}/api/paystack/callback`,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not initialize Paystack transaction.";
+    const message = extractErrorMessage(error, "Could not initialize Paystack transaction.");
     console.error("Brand deposit initialization failed (Paystack):", message);
     redirect("/dashboard/brand?error=deposit_api_failed");
   }
