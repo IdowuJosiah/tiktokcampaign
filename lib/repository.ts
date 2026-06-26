@@ -70,6 +70,7 @@ type SubmissionRow = {
   creators: CreatorRow | CreatorRow[] | null;
   submission_scores: SubmissionScoreRow[] | null;
   submission_metrics: SubmissionMetricsRow[] | null;
+  missions?: { title: string; brands: { name: string } | { name: string }[] | null } | { title: string; brands: { name: string } | { name: string }[] | null }[] | null;
 };
 
 type WalletTransactionRow = {
@@ -149,6 +150,8 @@ function mapMission(row: MissionRow) {
 
 function mapSubmission(row: SubmissionRow) {
   const creator = first(row.creators);
+  const mission = first(row.missions);
+  const brand = mission ? first(mission.brands) : null;
   const metrics = row.submission_metrics?.[0];
   const score = row.submission_scores?.[0];
   const engagement =
@@ -162,6 +165,8 @@ function mapSubmission(row: SubmissionRow) {
     creator: creator?.display_name ?? "Creator",
     handle: creator?.tiktok_handle ?? "@creator",
     missionId: row.mission_id,
+    missionTitle: mission?.title ?? "Campaign",
+    missionBrand: brand?.name ?? "Brand",
     link: row.tiktok_url,
     views: metrics ? formatViews(metrics.views) : "Pending",
     engagement,
@@ -355,7 +360,7 @@ export async function listCreatorSubmissions(userId: string) {
 
     const { data, error } = await supabase
       .from("submissions")
-      .select("*, creators(display_name, tiktok_handle), submission_metrics(views, likes, comments, shares, saves), submission_scores(composite)")
+      .select("*, creators(display_name, tiktok_handle), missions(title, brands(name)), submission_metrics(views, likes, comments, shares, saves), submission_scores(composite)")
       .eq("creator_id", creator.id)
       .order("submitted_at", { ascending: false });
 

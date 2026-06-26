@@ -67,7 +67,7 @@ export default async function CreatorDashboardPage() {
       {/* Tabs */}
       <div style={{ display: "inline-flex", gap: 4, padding: 4, background: "rgba(255,255,255,0.05)", borderRadius: 12, marginBottom: 22 }}>
         <div style={{ padding: "7px 16px", borderRadius: 9, background: "#00d9a3", color: "#000", fontSize: 14, fontWeight: 700 }}>Available Campaigns</div>
-        <Link href="/creator/submit" style={{ padding: "7px 16px", borderRadius: 9, color: "#d1d5dc", fontSize: 14, textDecoration: "none" }}>My Submissions</Link>
+        <Link href="/creator/submissions" style={{ padding: "7px 16px", borderRadius: 9, color: "#d1d5dc", fontSize: 14, textDecoration: "none" }}>My Submissions</Link>
       </div>
 
       {/* Campaign list */}

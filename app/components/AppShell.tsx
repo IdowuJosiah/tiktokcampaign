@@ -66,7 +66,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const creatorNav = [
     { href: "/dashboard/creator", icon: icons.dashboard, label: "Dashboard" },
     { href: "/campaigns", icon: icons.search, label: "Browse Campaigns" },
-    { href: "/creator/submit", icon: icons.submit, label: "My Submissions" },
+    { href: "/creator/submissions", icon: icons.submit, label: "My Submissions" },
     { href: "/creator/wallet", icon: icons.wallet, label: "Wallet" },
     { href: "/creator/profile", icon: icons.profile, label: "Profile & Setup" },
   ];
