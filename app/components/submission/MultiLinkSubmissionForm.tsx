@@ -22,12 +22,14 @@ function isTikTokUrl(value: string) {
   }
 }
 
+const MINIMUM_LINKS = 5;
+
 export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
-  const [links, setLinks] = useState([""]);
+  const [links, setLinks] = useState(Array(MINIMUM_LINKS).fill(""));
   const normalizedLinks = useMemo(() => links.map(normalizeUrl).filter(Boolean), [links]);
   const duplicates = normalizedLinks.filter((link, index) => normalizedLinks.indexOf(link) !== index);
   const invalidLinks = normalizedLinks.filter((link) => !isTikTokUrl(link));
-  const canSubmit = normalizedLinks.length > 0 && duplicates.length === 0 && invalidLinks.length === 0;
+  const canSubmit = normalizedLinks.length >= MINIMUM_LINKS && duplicates.length === 0 && invalidLinks.length === 0;
 
   return (
     <form action={submitTikTokVideo} className="submission-form">
