@@ -1,115 +1,167 @@
-import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { requireRole } from "@/lib/auth";
 import { listMissions } from "@/lib/repository";
+import { approveMission } from "@/app/actions";
 import type { Mission } from "@/lib/data";
 
-const STATUS_STYLES: Record<Mission["status"], { color: string; bg: string; border: string }> = {
-  Live: { color: "#00d9a3", bg: "rgba(0,217,163,0.1)", border: "rgba(0,217,163,0.3)" },
-  Draft: { color: "#ff8904", bg: "rgba(255,137,4,0.1)", border: "rgba(255,137,4,0.3)" },
-  Rejected: { color: "#ff6467", bg: "rgba(255,100,103,0.1)", border: "rgba(255,100,103,0.3)" },
-  Closed: { color: "#99a1af", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.1)" },
-};
+const REVIEW_CHECKS = [
+  "Required hashtags include a disclosure tag (#Ad)",
+  "Advocacy topic is legal and within guidelines",
+  "Don't list contains no unrealistic instructions",
+  "Required TikTok sound URL resolves",
+  "Campaign duration ≥ 3 days",
+];
 
-function CampaignList({ missions, emptyLabel }: { missions: Mission[]; emptyLabel: string }) {
-  if (missions.length === 0) {
-    return <div style={{ padding: 32, textAlign: "center", color: "#99a1af" }}>{emptyLabel}</div>;
-  }
-
+function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selected: boolean; waitLabel: string }) {
   return (
-    <>
-      {missions.map((m, i) => {
-        const style = STATUS_STYLES[m.status];
-        return (
-          <Link
-            key={m.id}
-            href={`/admin/campaigns/${m.id}`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              padding: "16px 22px",
-              borderBottom: i < missions.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="1.8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>{m.title}</div>
-              <div style={{ color: "#99a1af", fontSize: 13, marginTop: 2 }}>{m.brand} · {m.deadline}</div>
-            </div>
-            <div style={{ fontSize: 14, color: "#fff", marginRight: 8, flexShrink: 0 }}>{m.rewardPool}</div>
-            <span
-              style={{
-                fontSize: 12,
-                color: style.color,
-                background: style.bg,
-                border: `1px solid ${style.border}`,
-                borderRadius: 999,
-                padding: "4px 10px",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              {m.status}
-            </span>
-          </Link>
-        );
-      })}
-    </>
+    <a
+      href={`/admin/campaigns?id=${mission.id}`}
+      style={{
+        display: "block",
+        background: selected ? "rgba(0,217,163,0.06)" : "rgba(255,255,255,0.02)",
+        border: selected ? "1px solid rgba(0,217,163,0.3)" : "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 12,
+        padding: 16,
+        cursor: "pointer",
+        textDecoration: "none",
+        color: "inherit",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 14, fontWeight: 700 }}>{mission.title}</span>
+        <span style={{ fontSize: 11, color: selected ? "#ff8904" : "#99a1af" }}>{waitLabel}</span>
+      </div>
+      <div style={{ fontSize: 13, color: "#99a1af", marginTop: 4 }}>
+        {mission.brand} · {mission.rewardPool} pool
+      </div>
+    </a>
   );
 }
 
-export default async function AdminCampaignsPage() {
+export default async function AdminCampaignQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
   await requireRole("admin");
+  const { id: selectedId } = await searchParams;
   const missions = await listMissions();
 
   const pending = missions.filter((m) => m.status === "Draft");
-  const live = missions.filter((m) => m.status === "Live");
-  const closed = missions.filter((m) => m.status === "Closed");
-  const rejected = missions.filter((m) => m.status === "Rejected");
-  const active = missions.filter((m) => m.status !== "Rejected");
+  const selected = pending.find((m) => m.id === selectedId) ?? pending[0] ?? null;
+
+  const waitLabels: Record<string, string> = {};
+  pending.forEach((m, i) => {
+    const hours = Math.max(1, (i + 1) * 1);
+    waitLabels[m.id] = `${hours}h`;
+  });
 
   return (
     <AppShell>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Campaign Approvals</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Review submitted campaigns and approve them for creators</p>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Campaign Review</h1>
+        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>
+          {pending.length} campaign{pending.length !== 1 ? "s" : ""} awaiting approval · oldest first
+        </p>
       </div>
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 12, marginBottom: 28 }}>
-        {[
-          { label: "Pending approval", count: pending.length, style: STATUS_STYLES.Draft },
-          { label: "Live", count: live.length, style: STATUS_STYLES.Live },
-          { label: "Closed", count: closed.length, style: STATUS_STYLES.Closed },
-          { label: "Rejected", count: rejected.length, style: STATUS_STYLES.Rejected },
-        ].map((s) => (
-          <div key={s.label} style={{ background: s.style.bg, border: `1px solid ${s.style.border}`, borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22, fontWeight: 700, color: s.style.color }}>{s.count}</span>
-            <span style={{ fontSize: 13, color: "#99a1af" }}>{s.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Active campaigns */}
-      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, overflow: "hidden", marginBottom: 28 }}>
-        <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 15, fontWeight: 700 }}>
-          Active campaigns ({active.length})
+      {pending.length === 0 ? (
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 48, textAlign: "center", color: "#99a1af" }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
+          <div>Queue is clear — no campaigns pending review.</div>
         </div>
-        <CampaignList missions={active} emptyLabel="No active campaigns yet." />
-      </div>
-
-      {/* Rejected campaigns */}
-      {rejected.length > 0 && (
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,100,103,0.2)", borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 15, fontWeight: 700, color: "#ff6467" }}>
-            Rejected campaigns ({rejected.length})
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 20, alignItems: "start" }}>
+          {/* Queue list */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {pending.map((m) => (
+              <QueueItem
+                key={m.id}
+                mission={m}
+                selected={m.id === selected?.id}
+                waitLabel={waitLabels[m.id]}
+              />
+            ))}
           </div>
-          <CampaignList missions={rejected} emptyLabel="No rejected campaigns." />
+
+          {/* Detail panel */}
+          {selected && (
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 26 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+                <div>
+                  <div style={{ fontSize: 19, fontWeight: 700 }}>{selected.title}</div>
+                  <div style={{ fontSize: 14, color: "#99a1af", marginTop: 4 }}>
+                    {selected.brand} · {selected.deadline}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: "#00d9a3" }}>{selected.rewardPool}</div>
+                  <div style={{ fontSize: 13, color: "#99a1af" }}>pool · {selected.payoutPerFiveSubmissions}/5 subs</div>
+                </div>
+              </div>
+
+              {/* Brief */}
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
+                <div style={{ fontSize: 12, color: "#99a1af", fontWeight: 700, marginBottom: 6 }}>BRIEF</div>
+                <p style={{ fontSize: 14, color: "#d1d5dc", margin: 0, lineHeight: 1.5 }}>{selected.brief}</p>
+              </div>
+
+              {/* Review checklist */}
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Review checklist</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+                {REVIEW_CHECKS.map((check) => (
+                  <div
+                    key={check}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "rgba(0,217,163,0.04)", border: "1px solid rgba(0,217,163,0.18)", borderRadius: 10 }}
+                  >
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(0,217,163,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
+                    </div>
+                    <span style={{ fontSize: 14, color: "#d1d5dc" }}>{check}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Funding status */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,217,163,0.06)", border: "1px solid rgba(0,217,163,0.3)", borderRadius: 11, padding: "14px 18px", marginBottom: 22 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/></svg>
+                <span style={{ fontSize: 14, color: "#d1d5dc" }}>
+                  Funding status:{" "}
+                  <strong style={{ color: selected.fundingStatus === "Funded" ? "#00d9a3" : "#ff8904" }}>
+                    {selected.fundingStatus ?? "Unknown"}
+                  </strong>
+                  {selected.depositReference && (
+                    <span style={{ color: "#99a1af", fontSize: 13, marginLeft: 8 }}>· ref {selected.depositReference}</span>
+                  )}
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: 12 }}>
+                <form action={approveMission} style={{ flex: 1 }}>
+                  <input name="missionId" type="hidden" value={selected.id} />
+                  <button
+                    type="submit"
+                    style={{ width: "100%", height: 46, fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 9, cursor: "pointer" }}
+                  >
+                    Approve &amp; publish
+                  </button>
+                </form>
+                <a
+                  href={`/admin/campaigns/${selected.id}`}
+                  style={{ height: 46, padding: "0 20px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#ff8904", background: "rgba(255,137,4,0.1)", border: "1px solid rgba(255,137,4,0.3)", borderRadius: 9, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none", whiteSpace: "nowrap" }}
+                >
+                  Request edits
+                </a>
+                <a
+                  href={`/admin/campaigns/${selected.id}`}
+                  style={{ height: 46, padding: "0 20px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#ff6b6b", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.3)", borderRadius: 9, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none", whiteSpace: "nowrap" }}
+                >
+                  Reject
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </AppShell>

@@ -79,8 +79,10 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   const adminNav = [
     { href: "/admin", icon: icons.dashboard, label: "Overview" },
-    { href: "/admin/submissions", icon: icons.review, label: "Campaign Queue" },
-    { href: "/admin/campaigns", icon: icons.ops, label: "Campaigns" },
+    { href: "/admin/campaigns", icon: icons.review, label: "Campaign Queue" },
+    { href: "/admin/disputes", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>, label: "Disputes" },
+    { href: "/admin/users", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>, label: "Users" },
+    { href: "/admin/wallet", icon: icons.wallet, label: "Wallet Ledger" },
   ];
 
   const navItems =
@@ -126,18 +128,30 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Topbar */}
         <header style={{ height: 64, flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
-          <div style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
-            <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
-            <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ position: "relative", width: 36, height: 36, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              {icons.bell}
+          {session.role === "admin" ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14, color: "#99a1af" }}>Platform status</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#00d9a3" }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d9a3", display: "inline-block" }} />
+                All systems operational
+              </span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: 18, borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,217,163,0.2)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#00d9a3", fontSize: 13, fontWeight: 700 }}>{initials}</div>
+          ) : (
+            <div style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
+              <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
+              <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+            </div>
+          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+            {session.role !== "admin" && (
+              <div style={{ position: "relative", width: 36, height: 36, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                {icons.bell}
+              </div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: session.role !== "admin" ? 18 : 0, borderLeft: session.role !== "admin" ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: session.role === "admin" ? "rgba(124,58,237,0.2)" : "rgba(0,217,163,0.2)", border: `1px solid ${session.role === "admin" ? "rgba(124,58,237,0.4)" : "rgba(0,217,163,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: session.role === "admin" ? "#a78bfa" : "#00d9a3", fontSize: 13, fontWeight: 700 }}>{initials}</div>
               <div style={{ lineHeight: 1.2 }}>
-                <div style={{ fontSize: 14, color: "#fff" }}>{session.email.split("@")[0]}</div>
+                <div style={{ fontSize: 14, color: "#fff" }}>{session.role === "admin" ? "Admin" : session.email.split("@")[0]}</div>
                 <div style={{ fontSize: 12, color: "#99a1af" }}>{session.email}</div>
               </div>
             </div>
