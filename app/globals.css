@@ -916,6 +916,23 @@ button {
   margin: 0 auto;
 }
 
+.muted-copy {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.decision-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.decision-actions .primary-button.full,
+.decision-actions .ghost-button.full {
+  flex: 1;
+}
+
 .auth-header {
   padding-bottom: 0;
 }

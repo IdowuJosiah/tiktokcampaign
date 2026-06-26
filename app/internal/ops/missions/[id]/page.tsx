@@ -39,7 +39,7 @@ export default async function InternalMissionDetailPage({
         <article>
           <span>Status</span>
           <strong>{mission.status}</strong>
-          <small>{mission.approvedAt ? "Approved" : "Awaiting approval"}</small>
+          <small>{isRejected ? "Rejected" : mission.approvedAt ? "Approved" : "Awaiting approval"}</small>
         </article>
         <article>
           <span>Reward pool</span>
@@ -90,38 +90,41 @@ export default async function InternalMissionDetailPage({
         </ul>
       </section>
 
-      <FormStatus error={error} />
-
-      {isRejected && mission.rejectionReason ? (
-        <section className="panel" style={{ borderColor: "rgba(255,100,103,0.4)" }}>
-          <p className="eyebrow">Rejected</p>
-          <p>{mission.rejectionReason}</p>
-        </section>
-      ) : null}
+      <FormStatus error={isRejected ? undefined : error} />
 
       <section className="panel form-panel">
-        <form action={approveMission} className="submission-form">
-          <input name="missionId" type="hidden" value={mission.id} />
-          <button className="primary-button full" disabled={isLive || isRejected} type="submit">
-            {isLive ? "Mission approved" : isRejected ? "Rejected — resubmission required" : "Approve and publish mission"}
-          </button>
-          {isRejected ? (
-            <small>This campaign was rejected and can't be approved as-is. The brand needs to create a new campaign with the feedback applied.</small>
-          ) : null}
-        </form>
+        <div className="section-title">
+          <div>
+            <p className="eyebrow">Decision</p>
+            <h2>{isLive ? "This campaign is live." : isRejected ? "This campaign was rejected." : "Approve or reject this campaign."}</h2>
+          </div>
+        </div>
 
-        {!isLive && !isRejected ? (
-          <form action={rejectMission} className="submission-form" style={{ marginTop: 16 }}>
+        {isRejected ? (
+          <p className="muted-copy">
+            Reason: {mission.rejectionReason || "No reason recorded."}
+            <br />
+            The brand needs to create a new campaign with this feedback applied — this one can&apos;t be approved as-is.
+          </p>
+        ) : isLive ? (
+          <p className="muted-copy">Approved and visible to creators.</p>
+        ) : (
+          <form action={approveMission} className="submission-form">
             <input name="missionId" type="hidden" value={mission.id} />
             <label>
-              Rejection reason
-              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" required rows={3} />
+              Rejection reason (only required if rejecting)
+              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" rows={3} />
             </label>
-            <button className="ghost-button full" type="submit">
-              Reject campaign
-            </button>
+            <div className="decision-actions">
+              <button className="primary-button full" formAction={approveMission} type="submit">
+                Approve and publish
+              </button>
+              <button className="ghost-button full" formAction={rejectMission} type="submit">
+                Reject
+              </button>
+            </div>
           </form>
-        ) : null}
+        )}
       </section>
 
       <section className="panel">
