@@ -611,6 +611,23 @@ button {
   padding: clamp(28px, 4vw, 56px);
 }
 
+.panel.compact {
+  padding: 24px 28px;
+}
+
+.panel.compact .section-title {
+  margin-bottom: 16px;
+}
+
+.panel.compact .section-title h2 {
+  font-size: 20px;
+}
+
+.panel.compact .submission-form {
+  margin-top: 0;
+  gap: 16px;
+}
+
 .stats-grid article {
   border: 1px solid var(--line);
   border-radius: 16px;
