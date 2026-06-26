@@ -28,6 +28,10 @@ html {
   scroll-behavior: smooth;
 }
 
+::selection {
+  background: var(--accent-soft);
+}
+
 body {
   margin: 0;
   background: var(--background);
