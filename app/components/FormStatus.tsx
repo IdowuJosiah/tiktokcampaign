@@ -36,6 +36,7 @@ const errors: Record<string, string> = {
   deposit_init_failed: "Could not start the deposit. Check server logs for the exact error.",
   deposit_not_successful: "Paystack reported this payment as not successful.",
   deposit_verification_failed: "We couldn't verify your deposit with Paystack. No funds were added.",
+  duplicate_submission: "You've already submitted this exact TikTok link for this campaign.",
 };
 
 const successes: Record<string, string> = {

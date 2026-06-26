@@ -77,6 +77,8 @@ function writeErrorRedirect(path: string, error: unknown): never {
             ? "payout_tables_missing"
           : message.toLowerCase().includes("out of range") || message.toLowerCase().includes("integer")
             ? "campaign_amount_too_large"
+          : message.toLowerCase().includes("duplicate key") && message.toLowerCase().includes("submissions")
+            ? "duplicate_submission"
       : "write_failed";
 
   redirect(`${path}?error=${code}`);
