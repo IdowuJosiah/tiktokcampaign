@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
+import { FormStatus } from "@/app/components/FormStatus";
 import { requireRole } from "@/lib/auth";
 import { getCreatorWalletSummary, listCreatorSubmissions, listLiveMissions } from "@/lib/repository";
 
-export default async function CreatorDashboardPage() {
+export default async function CreatorDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
+  const { error, success } = await searchParams;
   const session = await requireRole("creator");
   const [campaigns, submissions, wallet] = await Promise.all([
     listLiveMissions(),
@@ -19,6 +25,8 @@ export default async function CreatorDashboardPage() {
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Creator Dashboard</h1>
         <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Find campaigns and track your earnings</p>
       </div>
+
+      <FormStatus error={error} success={success} />
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, marginBottom: 28 }}>
