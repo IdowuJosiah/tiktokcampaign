@@ -370,13 +370,22 @@ export async function initiateBrandDeposit(formData: FormData) {
     redirect("/dashboard/brand?error=deposit_key_missing");
   }
 
+  let brandId: string;
+  try {
+    brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not resolve brand.";
+    console.error("Brand deposit initialization failed (brand lookup):", message);
+    const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
+    redirect(`/dashboard/brand?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`);
+  }
+
+  const headerStore = await headers();
+  const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const reference = `brand_${brandId.slice(0, 8)}_${Date.now()}`;
+
   let authorizationUrl: string;
   try {
-    const brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
-    const headerStore = await headers();
-    const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-    const reference = `brand_${brandId.slice(0, 8)}_${Date.now()}`;
-
     const { initializePaystackTransaction } = await import("@/lib/paystack");
     authorizationUrl = await initializePaystackTransaction({
       email: session.email,
@@ -385,16 +394,9 @@ export async function initiateBrandDeposit(formData: FormData) {
       callbackUrl: `${origin}/api/paystack/callback`,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not start deposit.";
-    console.error("Brand deposit initialization failed:", message);
-    const isPaystackError = message.toLowerCase().includes("paystack") || message.toLowerCase().includes("transaction");
-    const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
-    if (isWalletTableError) {
-      redirect("/dashboard/brand?error=wallet_table_missing");
-    } else if (isPaystackError) {
-      redirect("/dashboard/brand?error=deposit_api_failed");
-    }
-    redirect("/dashboard/brand?error=deposit_init_failed");
+    const message = error instanceof Error ? error.message : "Could not initialize Paystack transaction.";
+    console.error("Brand deposit initialization failed (Paystack):", message);
+    redirect("/dashboard/brand?error=deposit_api_failed");
   }
 
   redirect(authorizationUrl);
