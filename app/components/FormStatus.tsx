@@ -37,6 +37,7 @@ const errors: Record<string, string> = {
   deposit_not_successful: "Paystack reported this payment as not successful.",
   deposit_verification_failed: "We couldn't verify your deposit with Paystack. No funds were added.",
   duplicate_submission: "You've already submitted this exact TikTok link for this campaign.",
+  tiktok_ownership_mismatch: "One or more of these videos doesn't belong to your connected TikTok account. Submit links from your own verified handle only.",
 };
 
 const successes: Record<string, string> = {
