@@ -26,6 +26,8 @@ export type Submission = {
   creator: string;
   handle: string;
   missionId: string;
+  missionTitle?: string;
+  missionBrand?: string;
   link: string;
   views: string;
   engagement: string;
