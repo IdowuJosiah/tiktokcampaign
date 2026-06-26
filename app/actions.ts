@@ -49,6 +49,19 @@ function isTikTokSoundUrl(value: string) {
   }
 }
 
+function extractSoundKeyword(soundUrl: string): string | null {
+  try {
+    const url = new URL(soundUrl);
+    const segments = url.pathname.split("/").filter(Boolean);
+    const slug = segments[segments.length - 1] ?? "";
+    const withoutTrailingId = slug.replace(/-\d+$/, "");
+    const keyword = withoutTrailingId.replace(/-/g, " ").trim().toLowerCase();
+    return keyword.length > 2 ? keyword : null;
+  } catch {
+    return null;
+  }
+}
+
 const MAX_TITLE_LENGTH = 80;
 const MAX_BRIEF_LENGTH = 2000;
 const MAX_HASHTAG_LENGTH = 50;
@@ -503,12 +516,22 @@ export async function logIn(formData: FormData) {
 export async function submitTikTokVideo(formData: FormData) {
   const session = await requireRole("creator");
 
-  let verifiedCreator: { id: string; tiktok_verified_at: string | null; tiktok_username: string | null; tiktok_handle: string | null };
+  let verifiedCreator: {
+    id: string;
+    tiktok_verified_at: string | null;
+    tiktok_username: string | null;
+    tiktok_handle: string | null;
+    tiktok_access_token: string | null;
+    tiktok_refresh_token: string | null;
+    tiktok_token_expires_at: string | null;
+  };
   try {
     const supabaseCheck = createServerSupabaseClient();
     const { data, error: verifyError } = await supabaseCheck
       .from("creators")
-      .select("id, tiktok_verified_at, tiktok_username, tiktok_handle")
+      .select(
+        "id, tiktok_verified_at, tiktok_username, tiktok_handle, tiktok_access_token, tiktok_refresh_token, tiktok_token_expires_at",
+      )
       .eq("user_id", session.id)
       .maybeSingle();
 
@@ -549,10 +572,67 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=minimum_five_links");
   }
 
-  const { fetchTikTokVideoAuthor } = await import("@/lib/tiktok");
+  const { fetchTikTokVideoAuthor, findTikTokVideoByShareUrl, refreshTikTokAccessToken } = await import("@/lib/tiktok");
   const authors = await Promise.all(uniqueLinks.map((link) => fetchTikTokVideoAuthor(link).catch(() => null)));
   if (authors.some((author) => author !== ownerHandle)) {
     redirect("/submit?error=tiktok_ownership_mismatch");
+  }
+
+  if (verifiedCreator.tiktok_access_token && verifiedCreator.tiktok_refresh_token) {
+    let validationError: string | null = null;
+
+    try {
+      let accessToken = verifiedCreator.tiktok_access_token;
+      const expiresAt = verifiedCreator.tiktok_token_expires_at
+        ? new Date(verifiedCreator.tiktok_token_expires_at).getTime()
+        : 0;
+
+      if (expiresAt < Date.now() + 60_000) {
+        const refreshed = await refreshTikTokAccessToken(verifiedCreator.tiktok_refresh_token);
+        accessToken = refreshed.accessToken;
+        const supabaseRefresh = createServerSupabaseClient();
+        await supabaseRefresh
+          .from("creators")
+          .update({
+            tiktok_access_token: refreshed.accessToken,
+            tiktok_refresh_token: refreshed.refreshToken,
+            tiktok_token_expires_at: new Date(Date.now() + refreshed.expiresInSeconds * 1000).toISOString(),
+          })
+          .eq("id", creatorId);
+      }
+
+      const supabaseMission = createServerSupabaseClient();
+      const { data: missionRow } = await supabaseMission
+        .from("missions")
+        .select("minimum_views, required_sound")
+        .eq("id", missionId)
+        .maybeSingle();
+
+      const minimumViews = missionRow?.minimum_views ?? 0;
+      const requiredSoundKeyword = missionRow?.required_sound ? extractSoundKeyword(missionRow.required_sound) : null;
+
+      const videoStats = await Promise.all(
+        uniqueLinks.map((link) => findTikTokVideoByShareUrl(accessToken, link).catch(() => null)),
+      );
+
+      if (videoStats.some((stats) => !stats)) {
+        validationError = "tiktok_video_not_found";
+      } else if (minimumViews > 0 && videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)) {
+        validationError = "insufficient_views";
+      } else if (
+        requiredSoundKeyword &&
+        videoStats.some((stats) => !stats?.description.toLowerCase().includes(requiredSoundKeyword))
+      ) {
+        validationError = "sound_mismatch";
+      }
+    } catch (error) {
+      console.error("TikTok video validation failed:", error);
+      validationError = "tiktok_validation_failed";
+    }
+
+    if (validationError) {
+      redirect(`/submit?error=${validationError}`);
+    }
   }
 
   try {
@@ -609,6 +689,9 @@ export async function unlinkTikTok() {
         tiktok_open_id: null,
         tiktok_username: null,
         tiktok_avatar_url: null,
+        tiktok_access_token: null,
+        tiktok_refresh_token: null,
+        tiktok_token_expires_at: null,
       })
       .eq("id", creator.id);
 

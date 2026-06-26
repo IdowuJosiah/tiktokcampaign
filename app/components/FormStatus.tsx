@@ -39,6 +39,10 @@ const errors: Record<string, string> = {
   duplicate_submission: "You've already submitted this exact TikTok link for this campaign.",
   tiktok_ownership_mismatch: "One or more of these videos doesn't belong to your connected TikTok account. Submit links from your own verified handle only.",
   minimum_five_links: "You need at least 5 TikTok links to submit a batch.",
+  tiktok_video_not_found: "We couldn't find one of these videos on your TikTok account. Make sure the video is public and the link is correct.",
+  insufficient_views: "One or more videos haven't reached the minimum view count required for this campaign yet.",
+  sound_mismatch: "One or more videos don't appear to use the required sound for this campaign.",
+  tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
 };
 
 const successes: Record<string, string> = {

@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
   const redirectUri = `${origin}/api/tiktok/callback`;
 
   try {
-    const accessToken = await exchangeCodeForAccessToken({ code, redirectUri, codeVerifier });
-    const profile = await fetchTikTokUserInfo(accessToken);
+    const tokens = await exchangeCodeForAccessToken({ code, redirectUri, codeVerifier });
+    const profile = await fetchTikTokUserInfo(tokens.accessToken);
     const supabase = createServerSupabaseClient();
 
     const { data: existingCreator, error: findError } = await supabase
@@ -54,6 +54,9 @@ export async function GET(request: NextRequest) {
       tiktok_username: profile.username,
       tiktok_avatar_url: profile.avatarUrl,
       tiktok_verified_at: new Date().toISOString(),
+      tiktok_access_token: tokens.accessToken,
+      tiktok_refresh_token: tokens.refreshToken,
+      tiktok_token_expires_at: new Date(Date.now() + tokens.expiresInSeconds * 1000).toISOString(),
     };
 
     if (existingCreator) {
