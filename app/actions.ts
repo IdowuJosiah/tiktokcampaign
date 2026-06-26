@@ -545,6 +545,10 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=invalid_tiktok_links");
   }
 
+  if (uniqueLinks.length < 5) {
+    redirect("/submit?error=minimum_five_links");
+  }
+
   const { fetchTikTokVideoAuthor } = await import("@/lib/tiktok");
   const authors = await Promise.all(uniqueLinks.map((link) => fetchTikTokVideoAuthor(link).catch(() => null)));
   if (authors.some((author) => author !== ownerHandle)) {
