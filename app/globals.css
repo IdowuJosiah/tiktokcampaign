@@ -604,6 +604,10 @@ button {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.content-stack > * + * {
+  margin-top: 28px;
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: 16px;

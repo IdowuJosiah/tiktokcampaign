@@ -35,7 +35,7 @@ export default async function InternalMissionDetailPage({
         </div>
       </header>
 
-      <section className="stats-grid three" aria-label="Mission approval details">
+      <section className="stats-grid" aria-label="Mission approval details">
         <article>
           <span>Status</span>
           <strong>{mission.status}</strong>

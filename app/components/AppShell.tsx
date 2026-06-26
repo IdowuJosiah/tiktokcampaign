@@ -145,7 +145,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main style={{ flex: 1, minWidth: 0, padding: 32 }}>
+        <main className="content-stack" style={{ flex: 1, minWidth: 0, padding: 32 }}>
           {children}
         </main>
       </div>
