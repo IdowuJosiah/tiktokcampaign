@@ -503,12 +503,12 @@ export async function logIn(formData: FormData) {
 export async function submitTikTokVideo(formData: FormData) {
   const session = await requireRole("creator");
 
-  let verifiedCreator: { id: string; tiktok_verified_at: string | null };
+  let verifiedCreator: { id: string; tiktok_verified_at: string | null; tiktok_username: string | null; tiktok_handle: string | null };
   try {
     const supabaseCheck = createServerSupabaseClient();
     const { data, error: verifyError } = await supabaseCheck
       .from("creators")
-      .select("id, tiktok_verified_at")
+      .select("id, tiktok_verified_at, tiktok_username, tiktok_handle")
       .eq("user_id", session.id)
       .maybeSingle();
 
@@ -520,6 +520,11 @@ export async function submitTikTokVideo(formData: FormData) {
   }
 
   if (!verifiedCreator.tiktok_verified_at) {
+    redirect("/submit?error=tiktok_required");
+  }
+
+  const ownerHandle = (verifiedCreator.tiktok_username || verifiedCreator.tiktok_handle?.replace(/^@/, "") || "").toLowerCase();
+  if (!ownerHandle) {
     redirect("/submit?error=tiktok_required");
   }
 
@@ -538,6 +543,12 @@ export async function submitTikTokVideo(formData: FormData) {
 
   if (links.length === 0 || links.length !== uniqueLinks.length || uniqueLinks.some((link) => !isTikTokUrl(link))) {
     redirect("/submit?error=invalid_tiktok_links");
+  }
+
+  const { fetchTikTokVideoAuthor } = await import("@/lib/tiktok");
+  const authors = await Promise.all(uniqueLinks.map((link) => fetchTikTokVideoAuthor(link).catch(() => null)));
+  if (authors.some((author) => author !== ownerHandle)) {
+    redirect("/submit?error=tiktok_ownership_mismatch");
   }
 
   try {

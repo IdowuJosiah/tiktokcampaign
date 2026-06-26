@@ -95,3 +95,18 @@ export async function fetchTikTokUserInfo(accessToken: string): Promise<TikTokUs
     avatarUrl: user.avatar_url,
   };
 }
+
+const OEMBED_URL = "https://www.tiktok.com/oembed";
+
+export async function fetchTikTokVideoAuthor(videoUrl: string): Promise<string | null> {
+  const url = new URL(OEMBED_URL);
+  url.searchParams.set("url", videoUrl);
+
+  const response = await fetch(url.toString());
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  const authorUrl = typeof data.author_url === "string" ? data.author_url : "";
+  const match = authorUrl.match(/tiktok\.com\/@([^/?]+)/i);
+  return match ? match[1].toLowerCase() : null;
+}
