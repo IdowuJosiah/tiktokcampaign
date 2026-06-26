@@ -248,13 +248,15 @@ export async function listMissions(ownerUserId?: string) {
 export async function getBrandWalletBalance(ownerUserId: string) {
   const row = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
-    const { data: brand, error: brandError } = await supabase
+    const { data: brands, error: brandError } = await supabase
       .from("brands")
       .select("id")
       .eq("owner_user_id", ownerUserId)
-      .maybeSingle();
+      .order("created_at", { ascending: true })
+      .limit(1);
 
     if (brandError) throw brandError;
+    const brand = brands?.[0];
     if (!brand) return 0;
 
     const { data, error } = await supabase

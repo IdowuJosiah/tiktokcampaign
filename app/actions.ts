@@ -141,14 +141,16 @@ async function ensureBrandForUser(brandName: string, ownerUserId?: string) {
   const supabase = createServerSupabaseClient();
   const brandOwnerUserId = ownerUserId ?? (await ensureUser(DEMO_BRAND_EMAIL, "brand")).id;
 
-  const { data: existingBrand, error: findError } = await supabase
+  const { data: existingBrands, error: findError } = await supabase
     .from("brands")
     .select("id")
     .eq("owner_user_id", brandOwnerUserId)
-    .maybeSingle();
+    .order("created_at", { ascending: true })
+    .limit(1);
 
   if (findError) throw findError;
 
+  const existingBrand = existingBrands?.[0];
   if (existingBrand) {
     if (brandName) {
       const { error } = await supabase.from("brands").update({ name: brandName }).eq("id", existingBrand.id);
