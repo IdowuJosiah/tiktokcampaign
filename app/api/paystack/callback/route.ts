@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const reference = new URL(request.url).searchParams.get("reference");
   if (!reference) {
-    return NextResponse.redirect(new URL("/dashboard/brand?error=deposit_verification_failed", request.url));
+    return NextResponse.redirect(new URL("/brand/wallet?error=deposit_verification_failed", request.url));
   }
 
   try {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     if (existingError) throw existingError;
     if (existing) {
-      return NextResponse.redirect(new URL("/dashboard/brand?success=funds_added", request.url));
+      return NextResponse.redirect(new URL("/brand/wallet?success=funds_added", request.url));
     }
 
     const { data: brand, error: brandError } = await supabase
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     const result = await verifyPaystackTransaction(reference);
     if (!result.success) {
-      return NextResponse.redirect(new URL("/dashboard/brand?error=deposit_not_successful", request.url));
+      return NextResponse.redirect(new URL("/brand/wallet?error=deposit_not_successful", request.url));
     }
 
     const { error: insertError } = await supabase.from("brand_wallet_transactions").insert({
@@ -52,10 +52,10 @@ export async function GET(request: NextRequest) {
 
     if (insertError) throw insertError;
 
-    return NextResponse.redirect(new URL("/dashboard/brand?success=funds_added", request.url));
+    return NextResponse.redirect(new URL("/brand/wallet?success=funds_added", request.url));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Deposit verification failed.";
     console.error("Paystack callback failed:", message);
-    return NextResponse.redirect(new URL("/dashboard/brand?error=deposit_verification_failed", request.url));
+    return NextResponse.redirect(new URL("/brand/wallet?error=deposit_verification_failed", request.url));
   }
 }

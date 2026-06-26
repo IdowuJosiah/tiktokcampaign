@@ -245,6 +245,49 @@ export async function listMissions(ownerUserId?: string) {
   return rows.map(mapMission);
 }
 
+export async function listBrandWalletTransactions(ownerUserId: string) {
+  const rows = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data: brands, error: brandError } = await supabase
+      .from("brands")
+      .select("id")
+      .eq("owner_user_id", ownerUserId)
+      .order("created_at", { ascending: true })
+      .limit(1);
+
+    if (brandError) throw brandError;
+    const brand = brands?.[0];
+    if (!brand) return [];
+
+    const { data, error } = await supabase
+      .from("brand_wallet_transactions")
+      .select("id, amount_cents, type, status, label, created_at")
+      .eq("brand_id", brand.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+    return data as Array<{ id: string; amount_cents: number; type: string; status: string; label: string | null; created_at: string }>;
+  });
+
+  return (rows ?? []).map((row) => {
+    const label =
+      row.label ??
+      (row.type === "deposit" ? "Deposit" : row.type === "allocation" ? "Campaign allocation" : row.type);
+    const positive = row.amount_cents >= 0;
+    return {
+      id: row.id,
+      label,
+      type: row.type,
+      status: row.status,
+      amountCents: row.amount_cents,
+      amount: (positive ? "+" : "−") + formatMoney(Math.abs(row.amount_cents)),
+      positive,
+      date: new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric" }).format(new Date(row.created_at)),
+    };
+  });
+}
+
 export async function getBrandWalletBalance(ownerUserId: string) {
   const row = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
