@@ -81,6 +81,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const adminNav = [
     { href: "/admin", icon: icons.dashboard, label: "Overview" },
     { href: "/admin/campaigns", icon: icons.review, label: "Campaign Queue" },
+    { href: "/admin/submissions", icon: icons.submit, label: "Submissions" },
     { href: "/admin/disputes", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>, label: "Disputes" },
     { href: "/admin/users", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>, label: "Users" },
     { href: "/admin/wallet", icon: icons.wallet, label: "Wallet Ledger" },
