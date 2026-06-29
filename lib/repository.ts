@@ -539,6 +539,181 @@ export async function getCreatorProfile(userId: string) {
     : null;
 }
 
+function startOfCurrentMonth() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+}
+
+function formatNaira(cents: number) {
+  return `₦${Math.round(cents / 100).toLocaleString()}`;
+}
+
+export async function listAdminCreators() {
+  const rows = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("creators")
+      .select("id, display_name, tiktok_handle, tiktok_verified_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return data as { id: string; display_name: string; tiktok_handle: string; tiktok_verified_at: string | null }[];
+  });
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    name: row.display_name,
+    handle: row.tiktok_handle,
+    kyc: row.tiktok_verified_at ? "Verified" : "Not started",
+    kycColor: (row.tiktok_verified_at ? "green" : "gray") as "green" | "gray",
+    status: "Active",
+    statusColor: "green" as "green",
+  }));
+}
+
+export async function listAdminBrands() {
+  const rows = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("brands")
+      .select("id, name, category")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return data as { id: string; name: string; category: string | null }[];
+  });
+
+  return (rows ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    industry: row.category ?? "—",
+    status: "Active",
+    statusColor: "green" as "green",
+  }));
+}
+
+export async function getPlatformWalletStats() {
+  const result = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const monthStart = startOfCurrentMonth();
+
+    const [{ data: brandTxns }, { data: creatorTxns }] = await Promise.all([
+      supabase
+        .from("brand_wallet_transactions")
+        .select("amount_cents, type, status")
+        .gte("created_at", monthStart),
+      supabase
+        .from("wallet_transactions")
+        .select("amount_cents, status")
+        .gte("created_at", monthStart),
+    ]);
+
+    const deposits = (brandTxns ?? [])
+      .filter((t) => t.type === "deposit" && t.status === "completed")
+      .reduce((sum, t) => sum + t.amount_cents, 0);
+
+    const paidToCreators = (creatorTxns ?? [])
+      .filter((t) => t.status === "paid")
+      .reduce((sum, t) => sum + t.amount_cents, 0);
+
+    const brandFloat = (brandTxns ?? [])
+      .filter((t) => t.status === "completed")
+      .reduce((sum, t) => sum + t.amount_cents, 0);
+
+    return { deposits, paidToCreators, float: Math.max(0, brandFloat) };
+  });
+
+  const stats = result ?? { deposits: 0, paidToCreators: 0, float: 0 };
+  return {
+    depositsLabel: formatNaira(stats.deposits),
+    paidToCreatorsLabel: formatNaira(stats.paidToCreators),
+    floatLabel: formatNaira(stats.float),
+  };
+}
+
+export async function listPlatformPayoutQueue() {
+  const rows = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("wallet_transactions")
+      .select("id, amount_cents, status, label, creators(display_name, tiktok_handle)")
+      .in("status", ["available", "paid"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    return data as Array<{
+      id: string;
+      amount_cents: number;
+      status: string;
+      label: string | null;
+      creators: CreatorRow | CreatorRow[] | null;
+    }>;
+  });
+
+  return (rows ?? []).map((row) => {
+    const creator = first(row.creators);
+    return {
+      id: row.id,
+      handle: creator?.tiktok_handle ?? "—",
+      name: creator?.display_name ?? "Creator",
+      amount: formatNaira(row.amount_cents),
+      label: row.label ?? "Reward",
+      state: (row.status === "paid" ? "complete" : "processing") as "processing" | "complete" | "failed",
+      stateLabel: row.status === "paid" ? "Complete" : "Pending payout",
+    };
+  });
+}
+
+export async function getAdminSignupStats() {
+  const result = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const [{ count: creatorCount }, { count: brandCount }] = await Promise.all([
+      supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "creator"),
+      supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "brand"),
+    ]);
+    return {
+      creatorCount: creatorCount ?? 0,
+      brandCount: brandCount ?? 0,
+      total: (creatorCount ?? 0) + (brandCount ?? 0),
+    };
+  });
+
+  return result ?? { creatorCount: 0, brandCount: 0, total: 0 };
+}
+
+export async function listRejectedSubmissionsForDisputes() {
+  const rows = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("id, creators(display_name, tiktok_handle), missions(title, brands(name)), submission_reviews(reason, decision)")
+      .eq("status", "rejected")
+      .order("submitted_at", { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    return data as Array<{
+      id: string;
+      creators: CreatorRow | CreatorRow[] | null;
+      missions: { title: string; brands: { name: string } | { name: string }[] | null } | { title: string; brands: { name: string } | { name: string }[] | null }[] | null;
+      submission_reviews: { reason: string | null; decision: string } | { reason: string | null; decision: string }[] | null;
+    }>;
+  });
+
+  return (rows ?? []).map((row) => {
+    const creator = first(row.creators);
+    const mission = first(row.missions);
+    const brand = mission ? first(mission.brands) : null;
+    const review = Array.isArray(row.submission_reviews) ? row.submission_reviews[0] : row.submission_reviews;
+    return {
+      id: row.id,
+      handle: creator?.tiktok_handle ?? "@creator",
+      name: creator?.display_name ?? "Creator",
+      campaign: mission ? `${mission.title}${brand ? ` · ${brand.name}` : ""}` : "—",
+      reason: review?.reason ?? "No reason recorded.",
+    };
+  });
+}
+
 export async function getCreatorPayoutReadiness(userId: string) {
   const row = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
