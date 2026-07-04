@@ -4,12 +4,21 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { missions as demoMissions } from "@/lib/data";
-import { clearAppSession, getAppSession, requireRole, setAppSession } from "@/lib/auth";
+import {
+  clearAppSession,
+  getAppSession,
+  requireRole,
+  setAppSession,
+} from "@/lib/auth";
 import type { UserRole } from "@/lib/domain";
-import { createServerSupabaseClient, createSupabaseCookieAuthClient } from "@/lib/supabase/server";
+import {
+  createServerSupabaseClient,
+  createSupabaseCookieAuthClient,
+} from "@/lib/supabase/server";
 
 const DEMO_BRAND_EMAIL = "brand@voicerank.local";
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const uuidPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function asString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -33,7 +42,9 @@ function checked(formData: FormData, key: string) {
 function isTikTokUrl(value: string) {
   try {
     const url = new URL(value);
-    return url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com");
+    return (
+      url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com")
+    );
   } catch {
     return false;
   }
@@ -42,8 +53,12 @@ function isTikTokUrl(value: string) {
 function isTikTokSoundUrl(value: string) {
   try {
     const url = new URL(value);
-    const isTikTokHost = url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com");
-    return isTikTokHost && (url.pathname.includes("/music/") || url.pathname.includes("/sound/"));
+    const isTikTokHost =
+      url.hostname === "tiktok.com" || url.hostname.endsWith(".tiktok.com");
+    return (
+      isTikTokHost &&
+      (url.pathname.includes("/music/") || url.pathname.includes("/sound/"))
+    );
   } catch {
     return false;
   }
@@ -91,19 +106,23 @@ function writeErrorRedirect(path: string, error: unknown): never {
           : message.toLowerCase().includes("creator_payout_profiles") ||
               message.toLowerCase().includes("creator_identity_verifications")
             ? "payout_tables_missing"
-          : message.toLowerCase().includes("out of range") || message.toLowerCase().includes("integer")
-            ? "campaign_amount_too_large"
-          : message.toLowerCase().includes("duplicate key") && message.toLowerCase().includes("submissions")
-            ? "duplicate_submission"
-      : "write_failed";
+            : message.toLowerCase().includes("out of range") ||
+                message.toLowerCase().includes("integer")
+              ? "campaign_amount_too_large"
+              : message.toLowerCase().includes("duplicate key") &&
+                  message.toLowerCase().includes("submissions")
+                ? "duplicate_submission"
+                : "write_failed";
 
   redirect(`${path}?error=${code}`);
 }
 
 function authErrorRedirect(path: string, error: unknown): never {
-  const message = error instanceof Error ? error.message : "Authentication failed.";
+  const message =
+    error instanceof Error ? error.message : "Authentication failed.";
   const code =
-    message.toLowerCase().includes("invalid") || message.toLowerCase().includes("credentials")
+    message.toLowerCase().includes("invalid") ||
+    message.toLowerCase().includes("credentials")
       ? "invalid_credentials"
       : message.toLowerCase().includes("already")
         ? "already_registered"
@@ -125,7 +144,11 @@ async function ensureUser(email: string, role: UserRole) {
     .maybeSingle();
 
   if (findError) throw findError;
-  if (existingUser) return { id: existingUser.id as string, role: normalizeRole(existingUser.role) };
+  if (existingUser)
+    return {
+      id: existingUser.id as string,
+      role: normalizeRole(existingUser.role),
+    };
 
   const { data: user, error } = await supabase
     .from("users")
@@ -139,7 +162,8 @@ async function ensureUser(email: string, role: UserRole) {
 
 async function ensureBrandForUser(brandName: string, ownerUserId?: string) {
   const supabase = createServerSupabaseClient();
-  const brandOwnerUserId = ownerUserId ?? (await ensureUser(DEMO_BRAND_EMAIL, "brand")).id;
+  const brandOwnerUserId =
+    ownerUserId ?? (await ensureUser(DEMO_BRAND_EMAIL, "brand")).id;
 
   const { data: existingBrands, error: findError } = await supabase
     .from("brands")
@@ -153,7 +177,10 @@ async function ensureBrandForUser(brandName: string, ownerUserId?: string) {
   const existingBrand = existingBrands?.[0];
   if (existingBrand) {
     if (brandName) {
-      const { error } = await supabase.from("brands").update({ name: brandName }).eq("id", existingBrand.id);
+      const { error } = await supabase
+        .from("brands")
+        .update({ name: brandName })
+        .eq("id", existingBrand.id);
       if (error) throw error;
     }
     return existingBrand.id as string;
@@ -185,7 +212,11 @@ async function getBrandWalletBalanceCents(brandId: string) {
   return (data ?? []).reduce((sum, row) => sum + row.amount_cents, 0);
 }
 
-async function ensureCreatorForUser(userId: string, handle: string, displayName?: string) {
+async function ensureCreatorForUser(
+  userId: string,
+  handle: string,
+  displayName?: string,
+) {
   const supabase = createServerSupabaseClient();
   const normalizedHandle = handle.startsWith("@") ? handle : `@${handle}`;
   const { data: existingCreator, error: findError } = await supabase
@@ -237,11 +268,16 @@ async function ensureTemporaryCreatorForUser(userId: string, email: string) {
   if (existingCreator) return existingCreator.id as string;
 
   const fallbackName = email.split("@")[0] || "creator";
-  return ensureCreatorForUser(userId, `@voicerank_${userId.slice(0, 8)}`, fallbackName);
+  return ensureCreatorForUser(
+    userId,
+    `@voicerank_${userId.slice(0, 8)}`,
+    fallbackName,
+  );
 }
 
 async function createDemoMission(slug: string) {
-  const demoMission = demoMissions.find((mission) => mission.id === slug) ?? demoMissions[0];
+  const demoMission =
+    demoMissions.find((mission) => mission.id === slug) ?? demoMissions[0];
   const brandId = await ensureBrandForUser(demoMission.brand);
   const supabase = createServerSupabaseClient();
   const deadline = new Date();
@@ -254,7 +290,9 @@ async function createDemoMission(slug: string) {
       title: demoMission.title,
       brief: demoMission.brief,
       reward_pool_cents: parseCents(demoMission.rewardPool),
-      payout_per_5_submissions_cents: parseCents(demoMission.payoutPerFiveSubmissions),
+      payout_per_5_submissions_cents: parseCents(
+        demoMission.payoutPerFiveSubmissions,
+      ),
       deadline: deadline.toISOString(),
       status: "live",
       required_hashtag: demoMission.requiredHashtag,
@@ -279,7 +317,9 @@ export async function createMission(formData: FormData) {
   const requiredHashtag = asString(formData, "requiredHashtag");
   const requiredSound = asString(formData, "requiredSound");
   const rewardPoolCents = parseCents(asString(formData, "rewardPool"));
-  const payoutPerFiveCents = parseCents(asString(formData, "payoutPerFiveSubmissions"));
+  const payoutPerFiveCents = parseCents(
+    asString(formData, "payoutPerFiveSubmissions"),
+  );
   const rules = asString(formData, "rules")
     .split("\n")
     .map((rule) => rule.trim())
@@ -306,7 +346,10 @@ export async function createMission(formData: FormData) {
 
   let brandId: string;
   try {
-    brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
+    brandId = await ensureBrandForUser(
+      asString(formData, "brandName"),
+      session.id,
+    );
   } catch (error) {
     writeErrorRedirect("/brand/missions/new", error);
   }
@@ -318,28 +361,30 @@ export async function createMission(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const deadline = asString(formData, "deadline") || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const deadline =
+      asString(formData, "deadline") ||
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     // Funds are not deducted here — the reward pool is debited from the brand
     // wallet only when an admin approves the campaign (see approveMission), so
     // rejected or abandoned drafts never move money.
-    const { error } = await supabase
-      .from("missions")
-      .insert({
-        brand_id: brandId,
-        title,
-        brief,
-        reward_pool_cents: rewardPoolCents,
-        payout_per_5_submissions_cents: payoutPerFiveCents,
-        deadline,
-        status: "draft",
-        required_hashtag: requiredHashtag,
-        required_sound: requiredSound || null,
-        minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
-        views_per_submission: parseNumber(asString(formData, "viewsPerSubmission")),
-        disclosure_required: true,
-        rules,
-      });
+    const { error } = await supabase.from("missions").insert({
+      brand_id: brandId,
+      title,
+      brief,
+      reward_pool_cents: rewardPoolCents,
+      payout_per_5_submissions_cents: payoutPerFiveCents,
+      deadline,
+      status: "draft",
+      required_hashtag: requiredHashtag,
+      required_sound: requiredSound || null,
+      minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
+      views_per_submission: parseNumber(
+        asString(formData, "viewsPerSubmission"),
+      ),
+      disclosure_required: true,
+      rules,
+    });
 
     if (error) throw error;
 
@@ -367,16 +412,29 @@ export async function initiateBrandDeposit(formData: FormData) {
 
   let brandId: string;
   try {
-    brandId = await ensureBrandForUser(asString(formData, "brandName"), session.id);
+    brandId = await ensureBrandForUser(
+      asString(formData, "brandName"),
+      session.id,
+    );
   } catch (error) {
     const message = extractErrorMessage(error, "Could not resolve brand.");
-    console.error("Brand deposit initialization failed (brand lookup):", message);
-    const isWalletTableError = message.toLowerCase().includes("brand_wallet_transactions") || message.toLowerCase().includes("relation");
-    redirect(`/brand/wallet?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`);
+    console.error(
+      "Brand deposit initialization failed (brand lookup):",
+      message,
+    );
+    const isWalletTableError =
+      message.toLowerCase().includes("brand_wallet_transactions") ||
+      message.toLowerCase().includes("relation");
+    redirect(
+      `/brand/wallet?error=${isWalletTableError ? "wallet_table_missing" : "deposit_init_failed"}`,
+    );
   }
 
   const headerStore = await headers();
-  const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin =
+    headerStore.get("origin") ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000";
   const reference = `brand_${brandId.slice(0, 8)}_${Date.now()}`;
 
   let authorizationUrl: string;
@@ -389,7 +447,10 @@ export async function initiateBrandDeposit(formData: FormData) {
       callbackUrl: `${origin}/api/paystack/callback`,
     });
   } catch (error) {
-    const message = extractErrorMessage(error, "Could not initialize Paystack transaction.");
+    const message = extractErrorMessage(
+      error,
+      "Could not initialize Paystack transaction.",
+    );
     console.error("Brand deposit initialization failed (Paystack):", message);
     redirect("/brand/wallet?error=deposit_api_failed");
   }
@@ -429,12 +490,21 @@ export async function signUp(formData: FormData) {
     authErrorRedirect("/signup", error);
   }
 
-  redirect(role === "brand" ? "/dashboard/brand" : tiktokHandle ? "/creator/profile" : "/dashboard/creator");
+  redirect(
+    role === "brand"
+      ? "/dashboard/brand"
+      : tiktokHandle
+        ? "/creator/profile"
+        : "/dashboard/creator",
+  );
 }
 
 export async function continueWithGoogle() {
   const headerStore = await headers();
-  const origin = headerStore.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin =
+    headerStore.get("origin") ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000";
   const supabase = await createSupabaseCookieAuthClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -449,7 +519,10 @@ export async function continueWithGoogle() {
   });
 
   if (error || !data.url) {
-    authErrorRedirect("/signup", error ?? new Error("Google OAuth URL was not returned."));
+    authErrorRedirect(
+      "/signup",
+      error ?? new Error("Google OAuth URL was not returned."),
+    );
   }
 
   redirect(data.url);
@@ -465,7 +538,10 @@ export async function chooseAccountRole(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const { error } = await supabase.from("users").update({ role }).eq("id", session.id);
+    const { error } = await supabase
+      .from("users")
+      .update({ role })
+      .eq("id", session.id);
 
     if (error) throw error;
     await setAppSession({ ...session, role });
@@ -543,7 +619,11 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=tiktok_required");
   }
 
-  const ownerHandle = (verifiedCreator.tiktok_username || verifiedCreator.tiktok_handle?.replace(/^@/, "") || "").toLowerCase();
+  const ownerHandle = (
+    verifiedCreator.tiktok_username ||
+    verifiedCreator.tiktok_handle?.replace(/^@/, "") ||
+    ""
+  ).toLowerCase();
   if (!ownerHandle) {
     redirect("/submit?error=tiktok_required");
   }
@@ -561,7 +641,11 @@ export async function submitTikTokVideo(formData: FormData) {
     .filter(Boolean);
   const uniqueLinks = Array.from(new Set(links));
 
-  if (links.length === 0 || links.length !== uniqueLinks.length || uniqueLinks.some((link) => !isTikTokUrl(link))) {
+  if (
+    links.length === 0 ||
+    links.length !== uniqueLinks.length ||
+    uniqueLinks.some((link) => !isTikTokUrl(link))
+  ) {
     redirect("/submit?error=invalid_tiktok_links");
   }
 
@@ -569,15 +653,24 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=minimum_five_links");
   }
 
-  const { fetchTikTokVideoAuthor, findTikTokVideoByShareUrl, refreshTikTokAccessToken } = await import("@/lib/tiktok");
-  const authors = await Promise.all(uniqueLinks.map((link) => fetchTikTokVideoAuthor(link).catch(() => null)));
+  const {
+    fetchTikTokVideoAuthor,
+    findTikTokVideoByShareUrl,
+    refreshTikTokAccessToken,
+  } = await import("@/lib/tiktok");
+  const authors = await Promise.all(
+    uniqueLinks.map((link) => fetchTikTokVideoAuthor(link).catch(() => null)),
+  );
   if (authors.some((author) => author !== ownerHandle)) {
     redirect("/submit?error=tiktok_ownership_mismatch");
   }
 
   let soundFlags: boolean[] | null = null;
 
-  if (verifiedCreator.tiktok_access_token && verifiedCreator.tiktok_refresh_token) {
+  if (
+    verifiedCreator.tiktok_access_token &&
+    verifiedCreator.tiktok_refresh_token
+  ) {
     let validationError: string | null = null;
 
     try {
@@ -587,7 +680,9 @@ export async function submitTikTokVideo(formData: FormData) {
         : 0;
 
       if (expiresAt < Date.now() + 60_000) {
-        const refreshed = await refreshTikTokAccessToken(verifiedCreator.tiktok_refresh_token);
+        const refreshed = await refreshTikTokAccessToken(
+          verifiedCreator.tiktok_refresh_token,
+        );
         accessToken = refreshed.accessToken;
         const supabaseRefresh = createServerSupabaseClient();
         await supabaseRefresh
@@ -595,7 +690,9 @@ export async function submitTikTokVideo(formData: FormData) {
           .update({
             tiktok_access_token: refreshed.accessToken,
             tiktok_refresh_token: refreshed.refreshToken,
-            tiktok_token_expires_at: new Date(Date.now() + refreshed.expiresInSeconds * 1000).toISOString(),
+            tiktok_token_expires_at: new Date(
+              Date.now() + refreshed.expiresInSeconds * 1000,
+            ).toISOString(),
           })
           .eq("id", creatorId);
       }
@@ -608,21 +705,32 @@ export async function submitTikTokVideo(formData: FormData) {
         .maybeSingle();
 
       const minimumViews = missionRow?.minimum_views ?? 0;
-      const requiredSoundKeyword = missionRow?.required_sound ? extractSoundKeyword(missionRow.required_sound) : null;
+      const requiredSoundKeyword = missionRow?.required_sound
+        ? extractSoundKeyword(missionRow.required_sound)
+        : null;
 
       const videoStats = await Promise.all(
-        uniqueLinks.map((link) => findTikTokVideoByShareUrl(accessToken, link).catch(() => null)),
+        uniqueLinks.map((link) =>
+          findTikTokVideoByShareUrl(accessToken, link).catch(() => null),
+        ),
       );
 
       if (videoStats.some((stats) => !stats)) {
         validationError = "tiktok_video_not_found";
-      } else if (minimumViews > 0 && videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)) {
+      } else if (
+        minimumViews > 0 &&
+        videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)
+      ) {
         validationError = "insufficient_views";
       } else if (requiredSoundKeyword) {
         // Caption keyword matching is a heuristic, not real sound-usage data (TikTok's
         // public API doesn't expose it) — flag mismatches for admin review instead of
         // blocking the submission outright, since false negatives are common.
-        soundFlags = videoStats.map((stats) => Boolean(stats?.description.toLowerCase().includes(requiredSoundKeyword)));
+        soundFlags = videoStats.map((stats) =>
+          Boolean(
+            stats?.description.toLowerCase().includes(requiredSoundKeyword),
+          ),
+        );
       }
     } catch (error) {
       console.error("TikTok video validation failed:", error);
@@ -661,7 +769,11 @@ export async function submitTikTokVideo(formData: FormData) {
     writeErrorRedirect("/submit", error);
   }
 
-  redirect(needsSoundReview ? "/dashboard/creator?success=submitted_for_sound_review" : "/dashboard/creator");
+  redirect(
+    needsSoundReview
+      ? "/dashboard/creator?success=submitted_for_sound_review"
+      : "/dashboard/creator",
+  );
 }
 
 export async function logOut() {
@@ -715,7 +827,10 @@ export async function savePayoutProfile(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const creatorId = await ensureTemporaryCreatorForUser(session.id, session.email);
+    const creatorId = await ensureTemporaryCreatorForUser(
+      session.id,
+      session.email,
+    );
 
     const { error } = await supabase.from("creator_payout_profiles").upsert(
       {
@@ -745,17 +860,22 @@ export async function saveIdentityVerification(formData: FormData) {
 
   try {
     const supabase = createServerSupabaseClient();
-    const creatorId = await ensureTemporaryCreatorForUser(session.id, session.email);
-
-    const { error } = await supabase.from("creator_identity_verifications").upsert(
-      {
-        creator_id: creatorId,
-        legal_name: asString(formData, "legalName"),
-        nin: asString(formData, "nin"),
-        status: "pending",
-      },
-      { onConflict: "creator_id" },
+    const creatorId = await ensureTemporaryCreatorForUser(
+      session.id,
+      session.email,
     );
+
+    const { error } = await supabase
+      .from("creator_identity_verifications")
+      .upsert(
+        {
+          creator_id: creatorId,
+          legal_name: asString(formData, "legalName"),
+          nin: asString(formData, "nin"),
+          status: "pending",
+        },
+        { onConflict: "creator_id" },
+      );
 
     if (error) throw error;
     revalidatePath("/creator/profile");
@@ -771,7 +891,11 @@ export async function approveMission(formData: FormData) {
   await requireRole("admin");
   const missionId = asString(formData, "missionId");
 
-  let mission: { status: string; brand_id: string; reward_pool_cents: number } | null;
+  let mission: {
+    status: string;
+    brand_id: string;
+    reward_pool_cents: number;
+  } | null;
   try {
     const supabaseCheck = createServerSupabaseClient();
     const { data: existing, error: findError } = await supabaseCheck
@@ -822,13 +946,15 @@ export async function approveMission(formData: FormData) {
       insufficientFunds = true;
     } else {
       if (!alreadyFunded) {
-        const { error: ledgerError } = await supabase.from("brand_wallet_transactions").insert({
-          brand_id: mission.brand_id,
-          mission_id: missionId,
-          amount_cents: -mission.reward_pool_cents,
-          type: "campaign_funding",
-          status: "completed",
-        });
+        const { error: ledgerError } = await supabase
+          .from("brand_wallet_transactions")
+          .insert({
+            brand_id: mission.brand_id,
+            mission_id: missionId,
+            amount_cents: -mission.reward_pool_cents,
+            type: "campaign_funding",
+            status: "completed",
+          });
 
         if (ledgerError) throw ledgerError;
       }
@@ -912,6 +1038,7 @@ export async function reviewSubmission(formData: FormData) {
         ? "needs_fix"
         : "rejected";
 
+  let poolExceeded = false;
   try {
     const supabase = createServerSupabaseClient();
     const { data: submission, error: submissionError } = await supabase
@@ -923,47 +1050,104 @@ export async function reviewSubmission(formData: FormData) {
     if (submissionError) throw submissionError;
     if (!submission) throw new Error("Submission not found.");
 
-    const { error: updateError } = await supabase
-      .from("submissions")
-      .update({
-        status: nextStatus,
-        reward_cents: nextStatus === "approved" ? rewardCents : 0,
-      })
-      .eq("id", submissionId);
-
-    if (updateError) throw updateError;
-
-    const { error: reviewError } = await supabase.from("submission_reviews").insert({
-      submission_id: submissionId,
-      reviewer_user_id: session.id,
-      decision,
-      reason,
-    });
-
-    if (reviewError) throw reviewError;
-
-    await supabase.from("wallet_transactions").delete().eq("submission_id", submissionId);
-
+    // Cap creator payouts so the total ever approved for a mission can't exceed
+    // its funded reward pool (which was debited from the brand at approval). The
+    // reward field is admin free-form, so without this an approval could pay out
+    // more than the brand ever funded.
     if (nextStatus === "approved" && rewardCents > 0) {
-      const { error: walletError } = await supabase.from("wallet_transactions").insert({
-        creator_id: submission.creator_id,
-        submission_id: submissionId,
-        amount_cents: rewardCents,
-        status: "available",
-        label: "Approved campaign reward",
-      });
+      const { data: missionRow, error: missionError } = await supabase
+        .from("missions")
+        .select("reward_pool_cents")
+        .eq("id", submission.mission_id)
+        .maybeSingle();
 
-      if (walletError) throw walletError;
+      if (missionError) throw missionError;
+      const poolCents = missionRow?.reward_pool_cents ?? 0;
+
+      const { data: siblingSubs, error: siblingError } = await supabase
+        .from("submissions")
+        .select("id")
+        .eq("mission_id", submission.mission_id);
+
+      if (siblingError) throw siblingError;
+      const otherSubmissionIds = (siblingSubs ?? [])
+        .map((row) => row.id as string)
+        .filter((id) => id !== submissionId);
+
+      let alreadyPaidCents = 0;
+      if (otherSubmissionIds.length > 0) {
+        const { data: paidTxns, error: paidError } = await supabase
+          .from("wallet_transactions")
+          .select("amount_cents")
+          .in("submission_id", otherSubmissionIds)
+          .in("status", ["available", "paid"]);
+
+        if (paidError) throw paidError;
+        alreadyPaidCents = (paidTxns ?? []).reduce(
+          (sum, row) => sum + row.amount_cents,
+          0,
+        );
+      }
+
+      if (alreadyPaidCents + rewardCents > poolCents) {
+        poolExceeded = true;
+      }
     }
 
-    revalidatePath("/admin/submissions");
-    revalidatePath(`/admin/submissions/${submissionId}`);
-    revalidatePath("/dashboard/creator");
-    revalidatePath("/creator/profile");
-    revalidatePath("/creator/wallet");
-    revalidatePath(`/submissions/${submissionId}`);
+    if (!poolExceeded) {
+      const { error: updateError } = await supabase
+        .from("submissions")
+        .update({
+          status: nextStatus,
+          reward_cents: nextStatus === "approved" ? rewardCents : 0,
+        })
+        .eq("id", submissionId);
+
+      if (updateError) throw updateError;
+
+      const { error: reviewError } = await supabase
+        .from("submission_reviews")
+        .insert({
+          submission_id: submissionId,
+          reviewer_user_id: session.id,
+          decision,
+          reason,
+        });
+
+      if (reviewError) throw reviewError;
+
+      await supabase
+        .from("wallet_transactions")
+        .delete()
+        .eq("submission_id", submissionId);
+
+      if (nextStatus === "approved" && rewardCents > 0) {
+        const { error: walletError } = await supabase
+          .from("wallet_transactions")
+          .insert({
+            creator_id: submission.creator_id,
+            submission_id: submissionId,
+            amount_cents: rewardCents,
+            status: "available",
+            label: "Approved campaign reward",
+          });
+
+        if (walletError) throw walletError;
+      }
+
+      revalidatePath("/admin/submissions");
+      revalidatePath(`/admin/submissions/${submissionId}`);
+      revalidatePath("/dashboard/creator");
+      revalidatePath("/creator/profile");
+      revalidatePath("/creator/wallet");
+      revalidatePath(`/submissions/${submissionId}`);
+    }
   } catch (error) {
     writeErrorRedirect(`/admin/submissions/${submissionId}`, error);
+  }
+
+  if (poolExceeded) {
+    redirect(`/admin/submissions/${submissionId}?error=reward_exceeds_pool`);
   }
 
   redirect(`/admin/submissions/${submissionId}`);

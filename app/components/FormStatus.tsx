@@ -45,6 +45,7 @@ const errors: Record<string, string> = {
   rejection_reason_required: "Enter a reason before rejecting this campaign.",
   mission_rejected: "This campaign was rejected and can't be approved. The brand needs to create a new campaign instead.",
   campaign_funding_failed: "The brand's wallet balance no longer covers this reward pool, so the campaign can't be approved. The brand needs to add funds first.",
+  reward_exceeds_pool: "This reward would push total payouts past the campaign's funded reward pool. Lower the amount or have the brand top up.",
 };
 
 const successes: Record<string, string> = {
