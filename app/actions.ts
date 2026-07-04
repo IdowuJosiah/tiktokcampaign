@@ -630,81 +630,83 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=tiktok_ownership_mismatch");
   }
 
+  // View-count and sound validation both depend on the TikTok API, which requires
+  // a live access/refresh token pair. Without them there is no way to check a
+  // mission's minimum-views requirement, so submissions can't silently skip
+  // validation just because tokens are missing — the creator must reconnect.
+  if (!verifiedCreator.tiktok_access_token || !verifiedCreator.tiktok_refresh_token) {
+    redirect("/submit?error=tiktok_reconnect_required");
+  }
+
   let soundFlags: boolean[] | null = null;
+  let validationError: string | null = null;
 
-  if (
-    verifiedCreator.tiktok_access_token &&
-    verifiedCreator.tiktok_refresh_token
-  ) {
-    let validationError: string | null = null;
+  try {
+    let accessToken = verifiedCreator.tiktok_access_token;
+    const expiresAt = verifiedCreator.tiktok_token_expires_at
+      ? new Date(verifiedCreator.tiktok_token_expires_at).getTime()
+      : 0;
 
-    try {
-      let accessToken = verifiedCreator.tiktok_access_token;
-      const expiresAt = verifiedCreator.tiktok_token_expires_at
-        ? new Date(verifiedCreator.tiktok_token_expires_at).getTime()
-        : 0;
+    if (expiresAt < Date.now() + 60_000) {
+      const refreshed = await refreshTikTokAccessToken(
+        verifiedCreator.tiktok_refresh_token,
+      );
+      accessToken = refreshed.accessToken;
+      const supabaseRefresh = createServerSupabaseClient();
+      await supabaseRefresh
+        .from("creators")
+        .update({
+          tiktok_access_token: refreshed.accessToken,
+          tiktok_refresh_token: refreshed.refreshToken,
+          tiktok_token_expires_at: new Date(
+            Date.now() + refreshed.expiresInSeconds * 1000,
+          ).toISOString(),
+        })
+        .eq("id", creatorId);
+    }
 
-      if (expiresAt < Date.now() + 60_000) {
-        const refreshed = await refreshTikTokAccessToken(
-          verifiedCreator.tiktok_refresh_token,
-        );
-        accessToken = refreshed.accessToken;
-        const supabaseRefresh = createServerSupabaseClient();
-        await supabaseRefresh
-          .from("creators")
-          .update({
-            tiktok_access_token: refreshed.accessToken,
-            tiktok_refresh_token: refreshed.refreshToken,
-            tiktok_token_expires_at: new Date(
-              Date.now() + refreshed.expiresInSeconds * 1000,
-            ).toISOString(),
-          })
-          .eq("id", creatorId);
-      }
+    const supabaseMission = createServerSupabaseClient();
+    const { data: missionRow } = await supabaseMission
+      .from("missions")
+      .select("minimum_views, required_sound")
+      .eq("id", missionId)
+      .maybeSingle();
 
-      const supabaseMission = createServerSupabaseClient();
-      const { data: missionRow } = await supabaseMission
-        .from("missions")
-        .select("minimum_views, required_sound")
-        .eq("id", missionId)
-        .maybeSingle();
+    const minimumViews = missionRow?.minimum_views ?? 0;
+    const requiredSoundKeyword = missionRow?.required_sound
+      ? extractSoundKeyword(missionRow.required_sound)
+      : null;
 
-      const minimumViews = missionRow?.minimum_views ?? 0;
-      const requiredSoundKeyword = missionRow?.required_sound
-        ? extractSoundKeyword(missionRow.required_sound)
-        : null;
+    const videoStats = await Promise.all(
+      uniqueLinks.map((link) =>
+        findTikTokVideoByShareUrl(accessToken, link).catch(() => null),
+      ),
+    );
 
-      const videoStats = await Promise.all(
-        uniqueLinks.map((link) =>
-          findTikTokVideoByShareUrl(accessToken, link).catch(() => null),
+    if (videoStats.some((stats) => !stats)) {
+      validationError = "tiktok_video_not_found";
+    } else if (
+      minimumViews > 0 &&
+      videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)
+    ) {
+      validationError = "insufficient_views";
+    } else if (requiredSoundKeyword) {
+      // Caption keyword matching is a heuristic, not real sound-usage data (TikTok's
+      // public API doesn't expose it) — flag mismatches for admin review instead of
+      // blocking the submission outright, since false negatives are common.
+      soundFlags = videoStats.map((stats) =>
+        Boolean(
+          stats?.description.toLowerCase().includes(requiredSoundKeyword),
         ),
       );
-
-      if (videoStats.some((stats) => !stats)) {
-        validationError = "tiktok_video_not_found";
-      } else if (
-        minimumViews > 0 &&
-        videoStats.some((stats) => (stats?.viewCount ?? 0) < minimumViews)
-      ) {
-        validationError = "insufficient_views";
-      } else if (requiredSoundKeyword) {
-        // Caption keyword matching is a heuristic, not real sound-usage data (TikTok's
-        // public API doesn't expose it) — flag mismatches for admin review instead of
-        // blocking the submission outright, since false negatives are common.
-        soundFlags = videoStats.map((stats) =>
-          Boolean(
-            stats?.description.toLowerCase().includes(requiredSoundKeyword),
-          ),
-        );
-      }
-    } catch (error) {
-      console.error("TikTok video validation failed:", error);
-      validationError = "tiktok_validation_failed";
     }
+  } catch (error) {
+    console.error("TikTok video validation failed:", error);
+    validationError = "tiktok_validation_failed";
+  }
 
-    if (validationError) {
-      redirect(`/submit?error=${validationError}`);
-    }
+  if (validationError) {
+    redirect(`/submit?error=${validationError}`);
   }
 
   const needsSoundReview = soundFlags?.some((matched) => !matched) ?? false;
