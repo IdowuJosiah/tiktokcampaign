@@ -25,14 +25,21 @@ function asString(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function parseCents(value: string) {
-  const amount = Number(value.replace(/[^0-9.]/g, ""));
-  return Number.isFinite(amount) ? Math.round(amount * 100) : 0;
+// Returns null (rather than silently coercing to 0) when the input has no
+// digits at all or doesn't parse to a finite number — e.g. Number("") is 0,
+// not NaN, so a naive Number.isFinite check can't tell "garbage" from "zero".
+function parseCents(value: string): number | null {
+  const trimmed = value.trim();
+  if (!/\d/.test(trimmed)) return null;
+  const amount = Number(trimmed.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(amount) ? Math.round(amount * 100) : null;
 }
 
-function parseNumber(value: string) {
-  const amount = Number(value.replace(/[^0-9]/g, ""));
-  return Number.isFinite(amount) ? amount : 0;
+function parseNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (!/\d/.test(trimmed)) return null;
+  const amount = Number(trimmed.replace(/[^0-9]/g, ""));
+  return Number.isFinite(amount) ? amount : null;
 }
 
 function checked(formData: FormData, key: string) {
@@ -295,6 +302,7 @@ export async function createMission(formData: FormData) {
   const payoutPerFiveCents = parseCents(
     asString(formData, "payoutPerFiveSubmissions"),
   );
+  const viewsPerSubmission = parseNumber(asString(formData, "viewsPerSubmission"));
   const rules = asString(formData, "rules")
     .split("\n")
     .map((rule) => rule.trim())
@@ -314,6 +322,15 @@ export async function createMission(formData: FormData) {
   }
   if (requiredSound && !isTikTokSoundUrl(requiredSound)) {
     redirect("/brand/missions/new?error=invalid_sound_url");
+  }
+  if (rewardPoolCents === null || rewardPoolCents <= 0) {
+    redirect("/brand/missions/new?error=invalid_reward_pool");
+  }
+  if (payoutPerFiveCents === null || payoutPerFiveCents <= 0) {
+    redirect("/brand/missions/new?error=invalid_payout_amount");
+  }
+  if (viewsPerSubmission === null) {
+    redirect("/brand/missions/new?error=invalid_views_per_submission");
   }
   if (payoutPerFiveCents > rewardPoolCents) {
     redirect("/brand/missions/new?error=payout_exceeds_pool");
@@ -353,10 +370,8 @@ export async function createMission(formData: FormData) {
       status: "draft",
       required_hashtag: requiredHashtag,
       required_sound: requiredSound || null,
-      minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
-      views_per_submission: parseNumber(
-        asString(formData, "viewsPerSubmission"),
-      ),
+      minimum_views: viewsPerSubmission,
+      views_per_submission: viewsPerSubmission,
       disclosure_required: true,
       rules,
     });
@@ -375,7 +390,7 @@ export async function createMission(formData: FormData) {
 
 export async function initiateBrandDeposit(formData: FormData) {
   const session = await requireRole("brand");
-  const amountCents = parseCents(asString(formData, "amount"));
+  const amountCents = parseCents(asString(formData, "amount")) ?? 0;
 
   if (amountCents < 100) {
     redirect("/brand/wallet?error=invalid_deposit_amount");
@@ -1007,13 +1022,21 @@ export async function reviewSubmission(formData: FormData) {
   const submissionId = asString(formData, "submissionId");
   const decision = asString(formData, "decision");
   const reason = asString(formData, "reason");
-  const rewardCents = parseCents(asString(formData, "reward"));
+  const rewardCentsRaw = parseCents(asString(formData, "reward"));
   const nextStatus =
     decision === "approve"
       ? "approved"
       : decision === "request_fix"
         ? "needs_fix"
         : "rejected";
+
+  // A garbage/unparseable reward field would otherwise silently become $0 —
+  // fine for reject/request_fix (no payout applies), but an approval should
+  // require the admin to enter a real amount rather than pay out nothing.
+  if (nextStatus === "approved" && rewardCentsRaw === null) {
+    redirect(`/admin/submissions/${submissionId}?error=invalid_reward_amount`);
+  }
+  const rewardCents = rewardCentsRaw ?? 0;
 
   let poolExceeded = false;
   try {
