@@ -328,7 +328,10 @@ export async function listLiveMissions() {
     return data as MissionRow[];
   });
 
-  return rows?.length ? rows.map(mapMission) : missions.filter((mission) => mission.status === "Live");
+  // Only fall back to demo data when the query itself failed (rows === null).
+  // A healthy query that legitimately found zero live missions should render
+  // an empty state, not resurrect fake campaigns creators can't actually submit to.
+  return rows === null ? missions.filter((mission) => mission.status === "Live") : rows.map(mapMission);
 }
 
 export async function findMission(id: string) {
@@ -376,7 +379,10 @@ export async function listSubmissions() {
     return data as SubmissionRow[];
   });
 
-  return rows?.length ? rows.map(mapSubmission) : submissions;
+  // Same reasoning as listLiveMissions: only fall back to mock data when the
+  // query genuinely failed, not when it legitimately found zero submissions —
+  // otherwise the admin queue shows fake, un-actionable rows that 404 on review.
+  return rows === null ? submissions : rows.map(mapSubmission);
 }
 
 export async function listMissionSubmissions(missionId: string) {
