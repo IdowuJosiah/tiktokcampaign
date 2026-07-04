@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { missions as demoMissions } from "@/lib/data";
 import {
   clearAppSession,
   getAppSession,
@@ -273,40 +272,6 @@ async function ensureTemporaryCreatorForUser(userId: string, email: string) {
     `@voicerank_${userId.slice(0, 8)}`,
     fallbackName,
   );
-}
-
-async function createDemoMission(slug: string) {
-  const demoMission =
-    demoMissions.find((mission) => mission.id === slug) ?? demoMissions[0];
-  const brandId = await ensureBrandForUser(demoMission.brand);
-  const supabase = createServerSupabaseClient();
-  const deadline = new Date();
-  deadline.setDate(deadline.getDate() + 14);
-
-  const { data: mission, error } = await supabase
-    .from("missions")
-    .insert({
-      brand_id: brandId,
-      title: demoMission.title,
-      brief: demoMission.brief,
-      reward_pool_cents: parseCents(demoMission.rewardPool),
-      payout_per_5_submissions_cents: parseCents(
-        demoMission.payoutPerFiveSubmissions,
-      ),
-      deadline: deadline.toISOString(),
-      status: "live",
-      required_hashtag: demoMission.requiredHashtag,
-      required_sound: demoMission.requiredSound,
-      minimum_views: parseNumber(demoMission.minimumViews),
-      views_per_submission: parseNumber(demoMission.viewsPerSubmission),
-      disclosure_required: true,
-      rules: demoMission.requirements,
-    })
-    .select("id")
-    .single();
-
-  if (error) throw error;
-  return mission.id as string;
 }
 
 export async function createMission(formData: FormData) {
@@ -628,9 +593,9 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=tiktok_required");
   }
 
-  let missionId = asString(formData, "missionId");
+  const missionId = asString(formData, "missionId");
   if (!uuidPattern.test(missionId)) {
-    missionId = await createDemoMission(missionId);
+    redirect("/submit?error=invalid_mission");
   }
 
   const creatorId = verifiedCreator.id;
