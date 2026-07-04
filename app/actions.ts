@@ -879,90 +879,35 @@ export async function saveIdentityVerification(formData: FormData) {
   redirect("/creator/profile?success=nin_submitted");
 }
 
+const APPROVE_MISSION_ERROR_CODES: Record<string, string> = {
+  mission_rejected: "mission_rejected",
+  insufficient_funds: "campaign_funding_failed",
+  mission_not_found: "write_failed",
+};
+
 export async function approveMission(formData: FormData) {
   await requireRole("admin");
   const missionId = asString(formData, "missionId");
 
-  let mission: {
-    status: string;
-    brand_id: string;
-    reward_pool_cents: number;
-  } | null;
-  try {
-    const supabaseCheck = createServerSupabaseClient();
-    const { data: existing, error: findError } = await supabaseCheck
-      .from("missions")
-      .select("status, brand_id, reward_pool_cents")
-      .eq("id", missionId)
-      .maybeSingle();
-
-    if (findError) throw findError;
-    mission = existing ?? null;
-  } catch (error) {
-    writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
-  }
-
-  if (!mission) {
-    redirect(`/admin/campaigns/${missionId}?error=write_failed`);
-  }
-  if (mission.status === "rejected") {
-    redirect(`/admin/campaigns/${missionId}?error=mission_rejected`);
-  }
-  // Already approved — nothing to fund again, avoid a double debit.
-  if (mission.status !== "draft") {
-    redirect(`/admin/campaigns/${missionId}`);
-  }
-
-  let insufficientFunds = false;
+  // The balance check, wallet debit, and mission status flip all happen inside
+  // a single Postgres function (approve_mission) so they're atomic, and so
+  // concurrent approvals of this brand's missions can't both read a stale
+  // wallet balance and jointly overspend it — see
+  // database/add-transactional-approvals.sql.
+  let errorCode: string | null = null;
   try {
     const supabase = createServerSupabaseClient();
+    const { error } = await supabase.rpc("approve_mission", {
+      p_mission_id: missionId,
+    });
 
-    // The reward pool is deducted from the brand wallet at approval time. Re-check
-    // the balance now (it may have been spent on other campaigns since creation)
-    // and only fund if it still covers the pool.
-    // Guard against a double debit if a previous approval partially succeeded
-    // (debited the wallet but failed before flipping the mission live) and is
-    // retried — fund only if this mission has no campaign_funding row yet.
-    const { data: existingFunding, error: fundingLookupError } = await supabase
-      .from("brand_wallet_transactions")
-      .select("id")
-      .eq("mission_id", missionId)
-      .eq("type", "campaign_funding")
-      .limit(1);
-
-    if (fundingLookupError) throw fundingLookupError;
-    const alreadyFunded = (existingFunding?.length ?? 0) > 0;
-
-    const balanceCents = await getBrandWalletBalanceCents(mission.brand_id);
-    if (!alreadyFunded && balanceCents < mission.reward_pool_cents) {
-      insufficientFunds = true;
-    } else {
-      if (!alreadyFunded) {
-        const { error: ledgerError } = await supabase
-          .from("brand_wallet_transactions")
-          .insert({
-            brand_id: mission.brand_id,
-            mission_id: missionId,
-            amount_cents: -mission.reward_pool_cents,
-            type: "campaign_funding",
-            status: "completed",
-          });
-
-        if (ledgerError) throw ledgerError;
+    if (error) {
+      if (error.message in APPROVE_MISSION_ERROR_CODES) {
+        errorCode = APPROVE_MISSION_ERROR_CODES[error.message];
+      } else {
+        throw error;
       }
-
-      const now = new Date().toISOString();
-      const { error } = await supabase
-        .from("missions")
-        .update({
-          status: "live",
-          approved_at: now,
-          funded_at: now,
-        })
-        .eq("id", missionId);
-
-      if (error) throw error;
-
+    } else {
       revalidatePath("/");
       revalidatePath("/campaigns");
       revalidatePath("/creator/missions");
@@ -975,8 +920,8 @@ export async function approveMission(formData: FormData) {
     writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
   }
 
-  if (insufficientFunds) {
-    redirect(`/admin/campaigns/${missionId}?error=campaign_funding_failed`);
+  if (errorCode) {
+    redirect(`/admin/campaigns/${missionId}?error=${errorCode}`);
   }
 
   redirect(`/admin/campaigns/${missionId}`);
@@ -1038,103 +983,34 @@ export async function reviewSubmission(formData: FormData) {
   }
   const rewardCents = rewardCentsRaw ?? 0;
 
-  let poolExceeded = false;
+  const REVIEW_SUBMISSION_ERROR_CODES: Record<string, string> = {
+    reward_exceeds_pool: "reward_exceeds_pool",
+    submission_not_found: "write_failed",
+  };
+
+  // The status update, review record, and wallet transaction are all written
+  // inside a single Postgres function (review_submission), including the
+  // cumulative-payout-vs-pool check, so concurrent reviews of sibling
+  // submissions for the same mission can't race past the funded pool — see
+  // database/add-transactional-approvals.sql.
+  let errorCode: string | null = null;
   try {
     const supabase = createServerSupabaseClient();
-    const { data: submission, error: submissionError } = await supabase
-      .from("submissions")
-      .select("id, creator_id, mission_id")
-      .eq("id", submissionId)
-      .maybeSingle();
+    const { error } = await supabase.rpc("review_submission", {
+      p_submission_id: submissionId,
+      p_decision: decision,
+      p_reason: reason,
+      p_reward_cents: rewardCents,
+      p_reviewer_user_id: session.id,
+    });
 
-    if (submissionError) throw submissionError;
-    if (!submission) throw new Error("Submission not found.");
-
-    // Cap creator payouts so the total ever approved for a mission can't exceed
-    // its funded reward pool (which was debited from the brand at approval). The
-    // reward field is admin free-form, so without this an approval could pay out
-    // more than the brand ever funded.
-    if (nextStatus === "approved" && rewardCents > 0) {
-      const { data: missionRow, error: missionError } = await supabase
-        .from("missions")
-        .select("reward_pool_cents")
-        .eq("id", submission.mission_id)
-        .maybeSingle();
-
-      if (missionError) throw missionError;
-      const poolCents = missionRow?.reward_pool_cents ?? 0;
-
-      const { data: siblingSubs, error: siblingError } = await supabase
-        .from("submissions")
-        .select("id")
-        .eq("mission_id", submission.mission_id);
-
-      if (siblingError) throw siblingError;
-      const otherSubmissionIds = (siblingSubs ?? [])
-        .map((row) => row.id as string)
-        .filter((id) => id !== submissionId);
-
-      let alreadyPaidCents = 0;
-      if (otherSubmissionIds.length > 0) {
-        const { data: paidTxns, error: paidError } = await supabase
-          .from("wallet_transactions")
-          .select("amount_cents")
-          .in("submission_id", otherSubmissionIds)
-          .in("status", ["available", "paid"]);
-
-        if (paidError) throw paidError;
-        alreadyPaidCents = (paidTxns ?? []).reduce(
-          (sum, row) => sum + row.amount_cents,
-          0,
-        );
+    if (error) {
+      if (error.message in REVIEW_SUBMISSION_ERROR_CODES) {
+        errorCode = REVIEW_SUBMISSION_ERROR_CODES[error.message];
+      } else {
+        throw error;
       }
-
-      if (alreadyPaidCents + rewardCents > poolCents) {
-        poolExceeded = true;
-      }
-    }
-
-    if (!poolExceeded) {
-      const { error: updateError } = await supabase
-        .from("submissions")
-        .update({
-          status: nextStatus,
-          reward_cents: nextStatus === "approved" ? rewardCents : 0,
-        })
-        .eq("id", submissionId);
-
-      if (updateError) throw updateError;
-
-      const { error: reviewError } = await supabase
-        .from("submission_reviews")
-        .insert({
-          submission_id: submissionId,
-          reviewer_user_id: session.id,
-          decision,
-          reason,
-        });
-
-      if (reviewError) throw reviewError;
-
-      await supabase
-        .from("wallet_transactions")
-        .delete()
-        .eq("submission_id", submissionId);
-
-      if (nextStatus === "approved" && rewardCents > 0) {
-        const { error: walletError } = await supabase
-          .from("wallet_transactions")
-          .insert({
-            creator_id: submission.creator_id,
-            submission_id: submissionId,
-            amount_cents: rewardCents,
-            status: "available",
-            label: "Approved campaign reward",
-          });
-
-        if (walletError) throw walletError;
-      }
-
+    } else {
       revalidatePath("/admin/submissions");
       revalidatePath(`/admin/submissions/${submissionId}`);
       revalidatePath("/dashboard/creator");
@@ -1146,8 +1022,8 @@ export async function reviewSubmission(formData: FormData) {
     writeErrorRedirect(`/admin/submissions/${submissionId}`, error);
   }
 
-  if (poolExceeded) {
-    redirect(`/admin/submissions/${submissionId}?error=reward_exceeds_pool`);
+  if (errorCode) {
+    redirect(`/admin/submissions/${submissionId}?error=${errorCode}`);
   }
 
   redirect(`/admin/submissions/${submissionId}`);
