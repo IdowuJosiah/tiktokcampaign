@@ -195,7 +195,24 @@ async function ensureBrandForUser(brandName: string, ownerUserId?: string) {
     .select("id")
     .single();
 
-  if (error) throw error;
+  if (error) {
+    // brands.owner_user_id is unique, so a concurrent request that raced us to
+    // create this brand triggers a unique-violation (23505) here instead of a
+    // duplicate row — fall back to fetching the row the other request created.
+    if (error.code === "23505") {
+      const { data: racedBrand, error: racedError } = await supabase
+        .from("brands")
+        .select("id")
+        .eq("owner_user_id", brandOwnerUserId)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .single();
+
+      if (racedError) throw racedError;
+      return racedBrand.id as string;
+    }
+    throw error;
+  }
   return brand.id as string;
 }
 
