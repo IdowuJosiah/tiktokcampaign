@@ -489,18 +489,19 @@ export async function signUp(formData: FormData) {
   );
 }
 
-export async function continueWithGoogle() {
+export async function continueWithGoogle(formData: FormData) {
   const headerStore = await headers();
   const origin =
     headerStore.get("origin") ??
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
   const supabase = await createSupabaseCookieAuthClient();
+  const role = formData.get("role") === "brand" ? "brand" : "creator";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback?chooseRole=1`,
+      redirectTo: `${origin}/auth/callback?chooseRole=1&role=${role}`,
       queryParams: {
         access_type: "offline",
         prompt: "consent",
