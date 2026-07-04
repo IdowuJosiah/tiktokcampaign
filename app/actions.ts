@@ -14,6 +14,7 @@ import {
   createServerSupabaseClient,
   createSupabaseCookieAuthClient,
 } from "@/lib/supabase/server";
+import { extractErrorMessage } from "@/lib/errors";
 
 const DEMO_BRAND_EMAIL = "brand@voicerank.local";
 const uuidPattern =
@@ -80,14 +81,6 @@ const MAX_TITLE_LENGTH = 80;
 const MAX_BRIEF_LENGTH = 2000;
 const MAX_HASHTAG_LENGTH = 50;
 const MAX_RULE_LENGTH = 200;
-
-function extractErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "object" && error !== null && "message" in error) {
-    return String((error as { message: unknown }).message);
-  }
-  return fallback;
-}
 
 function writeErrorRedirect(path: string, error: unknown): never {
   const message = extractErrorMessage(error, "Unable to reach Supabase.");

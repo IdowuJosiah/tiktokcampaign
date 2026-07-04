@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAppSession } from "@/lib/auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { verifyPaystackTransaction } from "@/lib/paystack";
+import { extractErrorMessage } from "@/lib/errors";
 
 export async function GET(request: NextRequest) {
   const session = await getAppSession();
@@ -28,13 +29,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/brand/wallet?success=funds_added", request.url));
     }
 
-    const { data: brand, error: brandError } = await supabase
+    const { data: brands, error: brandError } = await supabase
       .from("brands")
       .select("id")
       .eq("owner_user_id", session.id)
-      .maybeSingle();
+      .order("created_at", { ascending: true })
+      .limit(1);
 
     if (brandError) throw brandError;
+    const brand = brands?.[0];
     if (!brand) throw new Error("Brand profile not found.");
 
     const result = await verifyPaystackTransaction(reference);
@@ -54,8 +57,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL("/brand/wallet?success=funds_added", request.url));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Deposit verification failed.";
-    console.error("Paystack callback failed:", message);
+    const message = extractErrorMessage(error, "Deposit verification failed.");
+    console.error("Paystack callback failed:", message, error);
     return NextResponse.redirect(new URL("/brand/wallet?error=deposit_verification_failed", request.url));
   }
 }
