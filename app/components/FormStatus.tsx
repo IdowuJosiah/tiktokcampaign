@@ -44,6 +44,7 @@ const errors: Record<string, string> = {
   tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
   rejection_reason_required: "Enter a reason before rejecting this campaign.",
   mission_rejected: "This campaign was rejected and can't be approved. The brand needs to create a new campaign instead.",
+  campaign_funding_failed: "The brand's wallet balance no longer covers this reward pool, so the campaign can't be approved. The brand needs to add funds first.",
 };
 
 const successes: Record<string, string> = {

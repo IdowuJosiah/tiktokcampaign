@@ -320,7 +320,10 @@ export async function createMission(formData: FormData) {
     const supabase = createServerSupabaseClient();
     const deadline = asString(formData, "deadline") || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: mission, error } = await supabase
+    // Funds are not deducted here — the reward pool is debited from the brand
+    // wallet only when an admin approves the campaign (see approveMission), so
+    // rejected or abandoned drafts never move money.
+    const { error } = await supabase
       .from("missions")
       .insert({
         brand_id: brandId,
@@ -335,23 +338,10 @@ export async function createMission(formData: FormData) {
         minimum_views: parseNumber(asString(formData, "viewsPerSubmission")),
         views_per_submission: parseNumber(asString(formData, "viewsPerSubmission")),
         disclosure_required: true,
-        funded_at: new Date().toISOString(),
         rules,
-      })
-      .select("id")
-      .single();
+      });
 
     if (error) throw error;
-
-    const { error: ledgerError } = await supabase.from("brand_wallet_transactions").insert({
-      brand_id: brandId,
-      mission_id: mission.id,
-      amount_cents: -rewardPoolCents,
-      type: "campaign_funding",
-      status: "completed",
-    });
-
-    if (ledgerError) throw ledgerError;
 
     revalidatePath("/");
     revalidatePath("/brand/missions");
@@ -781,47 +771,94 @@ export async function approveMission(formData: FormData) {
   await requireRole("admin");
   const missionId = asString(formData, "missionId");
 
-  let currentStatus: string | null;
+  let mission: { status: string; brand_id: string; reward_pool_cents: number } | null;
   try {
     const supabaseCheck = createServerSupabaseClient();
     const { data: existing, error: findError } = await supabaseCheck
       .from("missions")
-      .select("status")
+      .select("status, brand_id, reward_pool_cents")
       .eq("id", missionId)
       .maybeSingle();
 
     if (findError) throw findError;
-    currentStatus = existing?.status ?? null;
+    mission = existing ?? null;
   } catch (error) {
     writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
   }
 
-  if (currentStatus === "rejected") {
+  if (!mission) {
+    redirect(`/admin/campaigns/${missionId}?error=write_failed`);
+  }
+  if (mission.status === "rejected") {
     redirect(`/admin/campaigns/${missionId}?error=mission_rejected`);
   }
+  // Already approved — nothing to fund again, avoid a double debit.
+  if (mission.status !== "draft") {
+    redirect(`/admin/campaigns/${missionId}`);
+  }
 
+  let insufficientFunds = false;
   try {
     const supabase = createServerSupabaseClient();
-    const now = new Date().toISOString();
-    const { error } = await supabase
-      .from("missions")
-      .update({
-        status: "live",
-        approved_at: now,
-        funded_at: now,
-      })
-      .eq("id", missionId);
 
-    if (error) throw error;
-    revalidatePath("/");
-    revalidatePath("/campaigns");
-    revalidatePath("/creator/missions");
-    revalidatePath("/admin/campaigns");
-    revalidatePath("/internal/ops/submissions");
-    revalidatePath(`/admin/campaigns/${missionId}`);
-    revalidatePath(`/internal/ops/missions/${missionId}`);
+    // The reward pool is deducted from the brand wallet at approval time. Re-check
+    // the balance now (it may have been spent on other campaigns since creation)
+    // and only fund if it still covers the pool.
+    // Guard against a double debit if a previous approval partially succeeded
+    // (debited the wallet but failed before flipping the mission live) and is
+    // retried — fund only if this mission has no campaign_funding row yet.
+    const { data: existingFunding, error: fundingLookupError } = await supabase
+      .from("brand_wallet_transactions")
+      .select("id")
+      .eq("mission_id", missionId)
+      .eq("type", "campaign_funding")
+      .limit(1);
+
+    if (fundingLookupError) throw fundingLookupError;
+    const alreadyFunded = (existingFunding?.length ?? 0) > 0;
+
+    const balanceCents = await getBrandWalletBalanceCents(mission.brand_id);
+    if (!alreadyFunded && balanceCents < mission.reward_pool_cents) {
+      insufficientFunds = true;
+    } else {
+      if (!alreadyFunded) {
+        const { error: ledgerError } = await supabase.from("brand_wallet_transactions").insert({
+          brand_id: mission.brand_id,
+          mission_id: missionId,
+          amount_cents: -mission.reward_pool_cents,
+          type: "campaign_funding",
+          status: "completed",
+        });
+
+        if (ledgerError) throw ledgerError;
+      }
+
+      const now = new Date().toISOString();
+      const { error } = await supabase
+        .from("missions")
+        .update({
+          status: "live",
+          approved_at: now,
+          funded_at: now,
+        })
+        .eq("id", missionId);
+
+      if (error) throw error;
+
+      revalidatePath("/");
+      revalidatePath("/campaigns");
+      revalidatePath("/creator/missions");
+      revalidatePath("/admin/campaigns");
+      revalidatePath("/internal/ops/submissions");
+      revalidatePath(`/admin/campaigns/${missionId}`);
+      revalidatePath(`/internal/ops/missions/${missionId}`);
+    }
   } catch (error) {
     writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
+  }
+
+  if (insufficientFunds) {
+    redirect(`/admin/campaigns/${missionId}?error=campaign_funding_failed`);
   }
 
   redirect(`/admin/campaigns/${missionId}`);
