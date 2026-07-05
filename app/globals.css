@@ -715,12 +715,12 @@ button {
 }
 
 .mission-header {
-  display: grid;
   gap: 4px;
   align-items: flex-start;
 }
 
 .mission-meta {
+  grid-column: 2 / -1;
   display: grid;
   justify-items: end;
   align-items: center;
@@ -785,6 +785,7 @@ button {
 }
 
 .funding-status {
+  grid-column: 2 / -1;
   width: fit-content;
   padding: 7px 10px;
   border-radius: 999px;
