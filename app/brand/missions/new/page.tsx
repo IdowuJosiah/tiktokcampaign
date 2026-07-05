@@ -88,7 +88,7 @@ export default async function NewMissionPage({
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Funded from your wallet balance</div>
-              <p style={{ color: "#99a1af", fontSize: 14, margin: 0, lineHeight: 1.5 }}>The reward pool is deducted from your wallet automatically when you submit this campaign. Add funds on the dashboard first if your balance is too low.</p>
+              <p style={{ color: "#99a1af", fontSize: 14, margin: 0, lineHeight: 1.5 }}>This campaign is submitted as a draft first. The reward pool is deducted from your wallet automatically once an admin approves it — make sure your balance covers it by then. Add funds on the dashboard if your balance is too low.</p>
             </div>
           </div>
 
