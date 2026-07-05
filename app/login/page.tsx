@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { continueWithGoogle, logIn } from "@/app/actions";
+import { continueWithGoogle, demoLogIn, logIn } from "@/app/actions";
 import { FormStatus } from "@/app/components/FormStatus";
 
 export default async function LoginPage({
@@ -44,12 +44,16 @@ export default async function LoginPage({
               Continue with Google
             </button>
 
-            <p className="login-demo-hint">Demo — jump straight into a portal</p>
-            <div className="login-demo-btns">
-              <button className="login-demo-btn" name="email" value="creator@demo.com" formAction={logIn} type="submit">Creator</button>
-              <button className="login-demo-btn" name="email" value="brand@demo.com" formAction={logIn} type="submit">Brand</button>
-              <button className="login-demo-btn" name="email" value="admin@demo.com" formAction={logIn} type="submit">Admin</button>
-            </div>
+            {process.env.DEMO_LOGIN_ENABLED === "true" && (
+              <>
+                <p className="login-demo-hint">Demo — jump straight into a portal</p>
+                <div className="login-demo-btns">
+                  <button className="login-demo-btn" formAction={demoLogIn.bind(null, "creator@demo.com")} formNoValidate type="submit">Creator</button>
+                  <button className="login-demo-btn" formAction={demoLogIn.bind(null, "brand@demo.com")} formNoValidate type="submit">Brand</button>
+                  <button className="login-demo-btn" formAction={demoLogIn.bind(null, "admin@demo.com")} formNoValidate type="submit">Admin</button>
+                </div>
+              </>
+            )}
           </form>
         </div>
 

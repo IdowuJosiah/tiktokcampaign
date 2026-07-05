@@ -543,6 +543,42 @@ export async function chooseAccountRole(formData: FormData) {
   redirect(role === "brand" ? "/dashboard/brand" : "/dashboard/creator");
 }
 
+const DEMO_ACCOUNTS: Record<string, UserRole> = {
+  "creator@demo.com": "creator",
+  "brand@demo.com": "brand",
+  "admin@demo.com": "admin",
+};
+
+// Passwordless login for the fixed demo accounts on /login. Gated behind
+// DEMO_LOGIN_ENABLED (off unless explicitly set) since a public,
+// no-credential admin login button would otherwise be a real risk on a
+// live production deployment. The email is bound per-button (see
+// app/login/page.tsx) rather than read from form fields — a <button
+// formAction={...}> can't carry its own name/value pair, since React
+// overrides it with its own action-id encoding.
+export async function demoLogIn(email: string, _formData: FormData) {
+  const role = DEMO_ACCOUNTS[email];
+
+  if (process.env.DEMO_LOGIN_ENABLED !== "true" || !role) {
+    redirect("/login?error=demo_login_disabled");
+  }
+
+  let destination = "/dashboard/creator";
+  try {
+    const appUser = await ensureUser(email, role);
+    if (appUser.role !== role) {
+      const supabase = createServerSupabaseClient();
+      await supabase.from("users").update({ role }).eq("id", appUser.id);
+    }
+    await setAppSession({ id: appUser.id, email, role });
+    destination = role === "admin" ? "/admin" : role === "brand" ? "/dashboard/brand" : "/dashboard/creator";
+  } catch (error) {
+    authErrorRedirect("/login", error);
+  }
+
+  redirect(destination);
+}
+
 export async function logIn(formData: FormData) {
   const email = asString(formData, "email");
   const password = asString(formData, "password");
