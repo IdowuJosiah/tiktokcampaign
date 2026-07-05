@@ -49,8 +49,8 @@ export const missions: Mission[] = [
     brand: "Kuda",
     title: "Show your real split-bill routine",
     brief: "Post a short TikTok showing how you split expenses with friends after a meal, trip, or shared purchase.",
-    rewardPool: "$2,000",
-    payoutPerFiveSubmissions: "$250",
+    rewardPool: "₦2,000",
+    payoutPerFiveSubmissions: "₦250",
     deadline: "12 days left",
     status: "Live",
     minimumViews: "1,000",
@@ -65,8 +65,8 @@ export const missions: Mission[] = [
     brand: "Chowdeck",
     title: "Fastest lunch delivery proof",
     brief: "Film a simple order-to-arrival story for a real lunch delivery in Lagos.",
-    rewardPool: "$1,200",
-    payoutPerFiveSubmissions: "$150",
+    rewardPool: "₦1,200",
+    payoutPerFiveSubmissions: "₦150",
     deadline: "6 days left",
     status: "Draft",
     minimumViews: "750",
@@ -81,8 +81,8 @@ export const missions: Mission[] = [
     brand: "PiggyVest",
     title: "Show what your locked savings protected",
     brief: "Tell a specific story about a purchase or goal that your savings discipline helped protect.",
-    rewardPool: "$1,500",
-    payoutPerFiveSubmissions: "$200",
+    rewardPool: "₦1,500",
+    payoutPerFiveSubmissions: "₦200",
     deadline: "19 days left",
     status: "Live",
     minimumViews: "1,500",
@@ -104,7 +104,7 @@ export const submissions: Submission[] = [
     views: "48.2k",
     engagement: "8.7%",
     score: 91,
-    reward: "$240",
+    reward: "₦240",
     status: "Approved",
     checks: { hashtag: true, sound: true, disclosure: true, deadline: true },
   },
@@ -117,7 +117,7 @@ export const submissions: Submission[] = [
     views: "13.9k",
     engagement: "6.1%",
     score: 78,
-    reward: "$120",
+    reward: "₦120",
     status: "Pending",
     checks: { hashtag: true, sound: true, disclosure: false, deadline: true },
   },
@@ -130,7 +130,7 @@ export const submissions: Submission[] = [
     views: "2.4k",
     engagement: "3.2%",
     score: 54,
-    reward: "$0",
+    reward: "₦0",
     status: "Needs fix",
     checks: { hashtag: true, sound: false, disclosure: false, deadline: true },
   },
@@ -145,16 +145,16 @@ export const scoreRules = [
 ];
 
 export const walletTransactions = [
-  { id: "wallet-001", label: "Kuda approved reward", amount: "$240", status: "Available" },
-  { id: "wallet-002", label: "PiggyVest pending review", amount: "$90", status: "Pending" },
-  { id: "wallet-003", label: "Paystack payout", amount: "-$150", status: "Paid" },
+  { id: "wallet-001", label: "Kuda approved reward", amount: "₦240", status: "Available" },
+  { id: "wallet-002", label: "PiggyVest pending review", amount: "₦90", status: "Pending" },
+  { id: "wallet-003", label: "Paystack payout", amount: "-₦150", status: "Paid" },
 ];
 
 export const stats = [
   { label: "Live missions", value: "2", detail: "1 draft campaign" },
   { label: "Submitted videos", value: "3", detail: "1 awaiting review" },
   { label: "Verified views", value: "64.5k", detail: "approved + pending" },
-  { label: "Reward pool", value: "$4.7k", detail: "across Phase 1" },
+  { label: "Reward pool", value: "₦4.7k", detail: "across Phase 1" },
 ];
 
 export function getMission(id: string) {

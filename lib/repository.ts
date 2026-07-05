@@ -83,7 +83,7 @@ type WalletTransactionRow = {
 };
 
 function formatMoney(cents: number) {
-  return `$${Math.round(cents / 100).toLocaleString()}`;
+  return `₦${Math.round(cents / 100).toLocaleString()}`;
 }
 
 function parseMoney(label: string) {
@@ -550,10 +550,6 @@ function startOfCurrentMonth() {
   return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 }
 
-function formatNaira(cents: number) {
-  return `₦${Math.round(cents / 100).toLocaleString()}`;
-}
-
 export async function listAdminCreators() {
   const rows = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
@@ -631,9 +627,9 @@ export async function getPlatformWalletStats() {
 
   const stats = result ?? { deposits: 0, paidToCreators: 0, float: 0 };
   return {
-    depositsLabel: formatNaira(stats.deposits),
-    paidToCreatorsLabel: formatNaira(stats.paidToCreators),
-    floatLabel: formatNaira(stats.float),
+    depositsLabel: formatMoney(stats.deposits),
+    paidToCreatorsLabel: formatMoney(stats.paidToCreators),
+    floatLabel: formatMoney(stats.float),
   };
 }
 
@@ -662,7 +658,7 @@ export async function listPlatformPayoutQueue() {
       id: row.id,
       handle: creator?.tiktok_handle ?? "—",
       name: creator?.display_name ?? "Creator",
-      amount: formatNaira(row.amount_cents),
+      amount: formatMoney(row.amount_cents),
       label: row.label ?? "Reward",
       state: (row.status === "paid" ? "complete" : "processing") as "processing" | "complete" | "failed",
       stateLabel: row.status === "paid" ? "Complete" : "Pending payout",
