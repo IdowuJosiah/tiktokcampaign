@@ -73,12 +73,12 @@ export default async function NewMissionPage({
             <div style={{ fontSize: 13, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Budget</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Reward pool (₦, in kobo)</label>
-                <input min="1" name="rewardPool" required type="number" placeholder="5000000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Reward pool (₦)</label>
+                <input min="1" name="rewardPool" required type="number" placeholder="50000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Payout per 5 submissions (kobo) <span style={{ color: "#6a7282", fontWeight: 400 }}>(can't exceed reward pool)</span></label>
-                <input min="1" name="payoutPerFiveSubmissions" required type="number" placeholder="250000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Payout per 5 submissions (₦) <span style={{ color: "#6a7282", fontWeight: 400 }}>(can't exceed reward pool)</span></label>
+                <input min="1" name="payoutPerFiveSubmissions" required type="number" placeholder="2500" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
             </div>
           </div>
