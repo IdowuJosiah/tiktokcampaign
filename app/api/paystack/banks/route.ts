@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-const fallbackBanks = [
+// Paystack's full bank list includes hundreds of small/microfinance banks (and,
+// in practice, occasional duplicate entries for the same bank). We only want to
+// offer the major Nigerian banks a creator is actually likely to hold an account
+// with, so this list is curated rather than fetched live.
+const majorBanks = [
   { name: "Access Bank", code: "044" },
   { name: "Fidelity Bank", code: "070" },
   { name: "First Bank of Nigeria", code: "011" },
@@ -16,41 +20,6 @@ const fallbackBanks = [
   { name: "Zenith Bank", code: "057" },
 ];
 
-type PaystackBank = {
-  name: string;
-  code: string;
-  active?: boolean;
-  country?: string;
-  currency?: string;
-};
-
 export async function GET() {
-  const secretKey = process.env.PAYSTACK_SECRET_KEY;
-
-  if (!secretKey) {
-    return NextResponse.json({ banks: fallbackBanks, source: "fallback" });
-  }
-
-  try {
-    const response = await fetch("https://api.paystack.co/bank?country=nigeria&enabled_for_verification=true", {
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-      },
-      next: { revalidate: 60 * 60 * 24 },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json({ banks: fallbackBanks, source: "fallback" });
-    }
-
-    const payload = (await response.json()) as { data?: PaystackBank[] };
-    const banks = (payload.data ?? [])
-      .filter((bank) => bank.name && bank.code)
-      .map((bank) => ({ name: bank.name, code: bank.code }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    return NextResponse.json({ banks: banks.length ? banks : fallbackBanks, source: "paystack" });
-  } catch {
-    return NextResponse.json({ banks: fallbackBanks, source: "fallback" });
-  }
+  return NextResponse.json({ banks: majorBanks });
 }
