@@ -550,48 +550,72 @@ function startOfCurrentMonth() {
   return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 }
 
+type AdminCreatorRow = {
+  id: string;
+  email: string;
+  creators: { display_name: string; tiktok_handle: string; tiktok_verified_at: string | null } | { display_name: string; tiktok_handle: string; tiktok_verified_at: string | null }[] | null;
+};
+
+// Counts by users.role so this matches getAdminSignupStats — the creators/brands
+// profile tables are only populated once a user completes onboarding (links
+// TikTok, creates a mission, etc.), so counting those tables directly used to
+// silently hide signed-up users who hadn't finished setup yet.
 export async function listAdminCreators() {
   const rows = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
-      .from("creators")
-      .select("id, display_name, tiktok_handle, tiktok_verified_at")
+      .from("users")
+      .select("id, email, creators(display_name, tiktok_handle, tiktok_verified_at)")
+      .eq("role", "creator")
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw error;
-    return data as { id: string; display_name: string; tiktok_handle: string; tiktok_verified_at: string | null }[];
+    return data as AdminCreatorRow[];
   });
 
-  return (rows ?? []).map((row) => ({
-    id: row.id,
-    name: row.display_name,
-    handle: row.tiktok_handle,
-    kyc: row.tiktok_verified_at ? "Verified" : "Not started",
-    kycColor: (row.tiktok_verified_at ? "green" : "gray") as "green" | "gray",
-    status: "Active",
-    statusColor: "green" as "green",
-  }));
+  return (rows ?? []).map((row) => {
+    const profile = first(row.creators);
+    return {
+      id: row.id,
+      name: profile?.display_name ?? row.email.split("@")[0],
+      handle: profile?.tiktok_handle ?? "—",
+      kyc: profile?.tiktok_verified_at ? "Verified" : "Not started",
+      kycColor: (profile?.tiktok_verified_at ? "green" : "gray") as "green" | "gray",
+      status: profile ? "Active" : "Pending setup",
+      statusColor: (profile ? "green" : "orange") as "green" | "orange",
+    };
+  });
 }
+
+type AdminBrandRow = {
+  id: string;
+  email: string;
+  brands: { name: string; category: string | null } | { name: string; category: string | null }[] | null;
+};
 
 export async function listAdminBrands() {
   const rows = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
-      .from("brands")
-      .select("id, name, category")
+      .from("users")
+      .select("id, email, brands(name, category)")
+      .eq("role", "brand")
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw error;
-    return data as { id: string; name: string; category: string | null }[];
+    return data as AdminBrandRow[];
   });
 
-  return (rows ?? []).map((row) => ({
-    id: row.id,
-    name: row.name,
-    industry: row.category ?? "—",
-    status: "Active",
-    statusColor: "green" as "green",
-  }));
+  return (rows ?? []).map((row) => {
+    const profile = first(row.brands);
+    return {
+      id: row.id,
+      name: profile?.name ?? row.email.split("@")[0],
+      industry: profile?.category ?? "—",
+      status: profile ? "Active" : "Pending setup",
+      statusColor: (profile ? "green" : "orange") as "green" | "orange",
+    };
+  });
 }
 
 export async function getPlatformWalletStats() {
