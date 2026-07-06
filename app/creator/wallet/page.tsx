@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { AppShell } from "@/app/components/AppShell";
 import { requireRole } from "@/lib/auth";
 import { getCreatorWalletSummary, listCreatorWalletTransactions } from "@/lib/repository";
@@ -23,7 +22,16 @@ export default async function CreatorWalletPage() {
           <div style={{ background: "linear-gradient(135deg,rgba(0,217,163,0.12),rgba(0,217,163,0.03))", border: "1px solid rgba(0,217,163,0.3)", borderRadius: 16, padding: 26 }}>
             <div style={{ color: "#99a1af", fontSize: 14 }}>Confirmed balance</div>
             <div style={{ fontSize: 44, fontWeight: 700, color: "#00d9a3", lineHeight: 1.1, marginTop: 6 }}>{wallet.availableLabel}</div>
-            <Link href="#withdraw" style={{ marginTop: 18, height: 44, padding: "0 24px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer", display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Withdraw</Link>
+            {wallet.available > 0 ? (
+              <a
+                href={`mailto:support@voicerank.vercel.app?subject=${encodeURIComponent("Withdrawal request")}&body=${encodeURIComponent(`Hi VoiceRank team,\n\nI'd like to withdraw my confirmed balance of ${wallet.availableLabel}.\n\nMy account: ${session.email}`)}`}
+                style={{ marginTop: 18, height: 44, padding: "0 24px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer", display: "inline-flex", alignItems: "center", textDecoration: "none" }}
+              >
+                Request withdrawal
+              </a>
+            ) : (
+              <div style={{ marginTop: 18, fontSize: 13, color: "#99a1af" }}>Approved rewards will appear here as your confirmed balance.</div>
+            )}
           </div>
           <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#99a1af", fontSize: 14 }}>
@@ -63,7 +71,7 @@ export default async function CreatorWalletPage() {
         </div>
 
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12 }}>
-          <p style={{ fontSize: 13, color: "#99a1af", margin: 0 }}>Withdrawals are processed via Paystack. Minimum withdrawal: ₦2,000 to bank account. Contact support if you have payout issues.</p>
+          <p style={{ fontSize: 13, color: "#99a1af", margin: 0 }}>Withdrawal requests are handled manually by the VoiceRank team and paid out to the bank account on your profile. Minimum withdrawal: ₦2,000.</p>
         </div>
       </div>
     </AppShell>
