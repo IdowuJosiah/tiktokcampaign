@@ -16,6 +16,7 @@ const errors: Record<string, string> = {
   already_registered: "That email is already registered. Try logging in instead.",
   brand_required: "You need to log in with a brand account before creating a mission.",
   creator_required: "You need to log in with a creator account to continue.",
+  admin_required: "You need to log in with an admin account to continue.",
   tiktok_required: "Verify your TikTok handle before submitting videos.",
   tiktok_reconnect_required: "Your TikTok connection has expired or is incomplete. Reconnect your TikTok account before submitting videos.",
   tiktok_profile_required: "Link TikTok before adding payout details.",
