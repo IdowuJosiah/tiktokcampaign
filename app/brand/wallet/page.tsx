@@ -89,7 +89,7 @@ export default async function BrandWalletPage({
               name="amount"
               required
               type="number"
-              min="100"
+              min="1"
               step="1"
               placeholder="Amount (₦)"
               style={{

@@ -623,7 +623,7 @@ export async function getPlatformWalletStats() {
     const supabase = createServerSupabaseClient();
     const monthStart = startOfCurrentMonth();
 
-    const [{ data: brandTxns }, { data: creatorTxns }] = await Promise.all([
+    const [{ data: brandTxns }, { data: creatorTxns }, { data: allBrandTxns }] = await Promise.all([
       supabase
         .from("brand_wallet_transactions")
         .select("amount_cents, type, status")
@@ -632,6 +632,13 @@ export async function getPlatformWalletStats() {
         .from("wallet_transactions")
         .select("amount_cents, status")
         .gte("created_at", monthStart),
+      // Float is a running balance, so it must sum every completed brand
+      // transaction ever — not just this month's. A month-to-date float
+      // double-counts campaign debits against deposits made in prior months.
+      supabase
+        .from("brand_wallet_transactions")
+        .select("amount_cents, status")
+        .eq("status", "completed"),
     ]);
 
     const deposits = (brandTxns ?? [])
@@ -642,9 +649,7 @@ export async function getPlatformWalletStats() {
       .filter((t) => t.status === "paid")
       .reduce((sum, t) => sum + t.amount_cents, 0);
 
-    const brandFloat = (brandTxns ?? [])
-      .filter((t) => t.status === "completed")
-      .reduce((sum, t) => sum + t.amount_cents, 0);
+    const brandFloat = (allBrandTxns ?? []).reduce((sum, t) => sum + t.amount_cents, 0);
 
     return { deposits, paidToCreators, float: Math.max(0, brandFloat) };
   });

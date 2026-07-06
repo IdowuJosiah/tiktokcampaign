@@ -41,7 +41,7 @@ export default async function AdminOverviewPage() {
           <div style={{ fontSize: 12, color: "#99a1af", marginTop: 6 }}>{signupStats.creatorCount} creators · {signupStats.brandCount} brands</div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22 }}>
-          <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 8 }}>Float (unspent MTD)</div>
+          <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 8 }}>Float (unspent balance)</div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>{walletStats.floatLabel}</div>
           <div style={{ fontSize: 12, color: "#99a1af", marginTop: 6 }}>brand wallet balance</div>
         </div>
