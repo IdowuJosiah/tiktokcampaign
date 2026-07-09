@@ -1,5 +1,6 @@
 "use server";
 
+import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -17,6 +18,21 @@ import {
 import { extractErrorMessage } from "@/lib/errors";
 
 const DEMO_BRAND_EMAIL = "brand@voicerank.local";
+
+// Dedicated admin-console credentials. Default to admin/admin so the portal
+// works out of the box, but MUST be overridden with a strong password via env
+// (ADMIN_USERNAME / ADMIN_PASSWORD on Vercel) before this is publicly live —
+// the admin console controls payouts and can read NIN/bank data.
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@voicerank.local";
+
+function safeEqual(a: string, b: string) {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -611,6 +627,35 @@ export async function logIn(formData: FormData) {
   }
 
   redirect(destination);
+}
+
+export async function adminLogIn(formData: FormData) {
+  const username = asString(formData, "username");
+  const password = asString(formData, "password");
+
+  // Compute both comparisons before branching so a mismatch doesn't reveal
+  // via timing which field was wrong.
+  const okUser = safeEqual(username, ADMIN_USERNAME);
+  const okPass = safeEqual(password, ADMIN_PASSWORD);
+  if (!okUser || !okPass) {
+    redirect("/admin/login?error=invalid_admin_credentials");
+  }
+
+  try {
+    // Bootstraps (or reuses) the admin users row so admin actions that
+    // reference the reviewer's user id have a valid foreign key — no manual
+    // SQL role-tagging needed.
+    const admin = await ensureUser(ADMIN_EMAIL, "admin");
+    if (admin.role !== "admin") {
+      const supabase = createServerSupabaseClient();
+      await supabase.from("users").update({ role: "admin" }).eq("id", admin.id);
+    }
+    await setAppSession({ id: admin.id, email: ADMIN_EMAIL, role: "admin" });
+  } catch (error) {
+    authErrorRedirect("/admin/login", error);
+  }
+
+  redirect("/admin");
 }
 
 export async function submitTikTokVideo(formData: FormData) {

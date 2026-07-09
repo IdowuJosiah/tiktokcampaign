@@ -79,7 +79,8 @@ export async function requireRole(role: UserRole) {
   const session = await getAppSession();
 
   if (!session) {
-    redirect(`/login?error=${role}_required`);
+    // Admin areas have their own dedicated login portal.
+    redirect(role === "admin" ? "/admin/login" : `/login?error=${role}_required`);
   }
 
   if (session.role !== role) {

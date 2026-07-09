@@ -13,6 +13,7 @@ const errors: Record<string, string> = {
   oauth_app_user_failed: "Google login worked, but VoiceRank could not create your app profile. Check the users table/schema.",
   invalid_credentials: "The email or password is not correct.",
   demo_login_disabled: "Demo login is not enabled on this deployment.",
+  invalid_admin_credentials: "Incorrect admin username or password.",
   already_registered: "That email is already registered. Try logging in instead.",
   brand_required: "You need to log in with a brand account before creating a mission.",
   creator_required: "You need to log in with a creator account to continue.",
