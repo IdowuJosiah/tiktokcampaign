@@ -1151,32 +1151,18 @@ export async function reviewSubmission(formData: FormData) {
   const submissionId = asString(formData, "submissionId");
   const decision = asString(formData, "decision");
   const reason = asString(formData, "reason");
-  const rewardCentsRaw = parseCents(asString(formData, "reward"));
-  const nextStatus =
-    decision === "approve"
-      ? "approved"
-      : decision === "request_fix"
-        ? "needs_fix"
-        : "rejected";
 
-  // A garbage/unparseable reward field would otherwise silently become $0 —
-  // fine for reject/request_fix (no payout applies), but an approval should
-  // require the admin to enter a real amount rather than pay out nothing.
-  if (nextStatus === "approved" && rewardCentsRaw === null) {
-    redirect(`/admin/submissions/${submissionId}?error=invalid_reward_amount`);
-  }
-  const rewardCents = rewardCentsRaw ?? 0;
-
+  // The payout is NOT set by the admin — it's the campaign's
+  // payout_per_5_submissions_cents that the brand chose, credited
+  // automatically each time the creator reaches a complete group of 5 approved
+  // submissions for that campaign (capped at the funded reward pool). The admin
+  // only approves / requests a fix / rejects. All of that — status, review
+  // record, and the batch payout — happens atomically inside the
+  // review_submission function (see database/add-batch-payout-review.sql).
   const REVIEW_SUBMISSION_ERROR_CODES: Record<string, string> = {
-    reward_exceeds_pool: "reward_exceeds_pool",
     submission_not_found: "write_failed",
   };
 
-  // The status update, review record, and wallet transaction are all written
-  // inside a single Postgres function (review_submission), including the
-  // cumulative-payout-vs-pool check, so concurrent reviews of sibling
-  // submissions for the same mission can't race past the funded pool — see
-  // database/add-transactional-approvals.sql.
   let errorCode: string | null = null;
   try {
     const supabase = createServerSupabaseClient();
@@ -1184,7 +1170,6 @@ export async function reviewSubmission(formData: FormData) {
       p_submission_id: submissionId,
       p_decision: decision,
       p_reason: reason,
-      p_reward_cents: rewardCents,
       p_reviewer_user_id: session.id,
     });
 

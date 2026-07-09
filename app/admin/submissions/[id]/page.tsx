@@ -4,7 +4,7 @@ import { reviewSubmission } from "@/app/actions";
 import { AppShell } from "@/app/components/AppShell";
 import { FormStatus } from "@/app/components/FormStatus";
 import { requireRole } from "@/lib/auth";
-import { findSubmissionForAdmin, missionTitle } from "@/lib/repository";
+import { findSubmissionForAdmin, findMissionForOps } from "@/lib/repository";
 
 export default async function AdminSubmissionDetailPage({
   params,
@@ -21,8 +21,9 @@ export default async function AdminSubmissionDetailPage({
     notFound();
   }
 
-  const campaignName = await missionTitle(submission.missionId);
-  const currentReward = submission.reward.replace(/[^0-9.]/g, "") || "0";
+  const mission = await findMissionForOps(submission.missionId);
+  const campaignName = mission?.title ?? "Campaign";
+  const payoutPerFive = mission?.payoutPerFiveSubmissions ?? "—";
 
   return (
     <AppShell>
@@ -49,9 +50,9 @@ export default async function AdminSubmissionDetailPage({
           <small>{submission.engagement} engagement</small>
         </article>
         <article>
-          <span>Reward</span>
-          <strong>{submission.reward}</strong>
-          <small>{submission.status === "Approved" ? "Available to creator" : "Not released"}</small>
+          <span>Payout</span>
+          <strong>{payoutPerFive}</strong>
+          <small>Per 5 approved · set by the brand</small>
         </article>
       </section>
 
@@ -96,15 +97,15 @@ export default async function AdminSubmissionDetailPage({
           <label>
             Decision
             <select name="decision" required>
-              <option value="approve">Approve and release reward</option>
+              <option value="approve">Approve</option>
               <option value="request_fix">Needs fix</option>
               <option value="reject">Reject</option>
             </select>
           </label>
-          <label>
-            Reward amount
-            <input min="0" name="reward" placeholder="120" step="1" type="number" defaultValue={currentReward} />
-          </label>
+          <p className="muted-copy" style={{ margin: 0 }}>
+            The creator is paid {payoutPerFive} automatically for every 5 approved submissions on this
+            campaign — no manual amount needed.
+          </p>
           <label>
             Review note
             <textarea name="reason" placeholder="Short reason shown in admin history later." />

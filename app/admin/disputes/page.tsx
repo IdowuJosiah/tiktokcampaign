@@ -46,7 +46,6 @@ export default async function AdminDisputesPage() {
                   <input type="hidden" name="submissionId" value={d.id} />
                   <input type="hidden" name="decision" value="approve" />
                   <input type="hidden" name="reason" value="Rejection overturned after appeal review." />
-                  <input type="hidden" name="reward" value="0" />
                   <button
                     type="submit"
                     style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer" }}
