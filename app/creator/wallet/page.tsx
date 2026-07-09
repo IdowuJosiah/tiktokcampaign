@@ -1,9 +1,16 @@
 import { AppShell } from "@/app/components/AppShell";
+import { FormStatus } from "@/app/components/FormStatus";
+import { requestWithdrawal } from "@/app/actions";
 import { requireRole } from "@/lib/auth";
 import { getCreatorWalletSummary, listCreatorWalletTransactions } from "@/lib/repository";
 
-export default async function CreatorWalletPage() {
+export default async function CreatorWalletPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>;
+}) {
   const session = await requireRole("creator");
+  const { error, success } = await searchParams;
   const [walletTransactions, wallet] = await Promise.all([
     listCreatorWalletTransactions(session.id),
     getCreatorWalletSummary(session.id),
@@ -17,18 +24,24 @@ export default async function CreatorWalletPage() {
           <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Hold your earnings and cash out</p>
         </div>
 
+        <FormStatus error={error} success={success} />
+
         {/* Balance cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20, marginBottom: 24 }}>
           <div style={{ background: "linear-gradient(135deg,rgba(0,217,163,0.12),rgba(0,217,163,0.03))", border: "1px solid rgba(0,217,163,0.3)", borderRadius: 16, padding: 26 }}>
             <div style={{ color: "#99a1af", fontSize: 14 }}>Confirmed balance</div>
             <div style={{ fontSize: 44, fontWeight: 700, color: "#00d9a3", lineHeight: 1.1, marginTop: 6 }}>{wallet.availableLabel}</div>
-            {wallet.available > 0 ? (
-              <a
-                href={`mailto:support@voicerank.vercel.app?subject=${encodeURIComponent("Withdrawal request")}&body=${encodeURIComponent(`Hi VoiceRank team,\n\nI'd like to withdraw my confirmed balance of ${wallet.availableLabel}.\n\nMy account: ${session.email}`)}`}
-                style={{ marginTop: 18, height: 44, padding: "0 24px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer", display: "inline-flex", alignItems: "center", textDecoration: "none" }}
-              >
-                Request withdrawal
-              </a>
+            {wallet.pending > 0 ? (
+              <div style={{ marginTop: 18, fontSize: 13, color: "#ff8904" }}>Withdrawal requested — being sent to your bank.</div>
+            ) : wallet.available > 0 ? (
+              <form action={requestWithdrawal}>
+                <button
+                  type="submit"
+                  style={{ marginTop: 18, height: 44, padding: "0 24px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer" }}
+                >
+                  Request withdrawal
+                </button>
+              </form>
             ) : (
               <div style={{ marginTop: 18, fontSize: 13, color: "#99a1af" }}>Approved rewards will appear here as your confirmed balance.</div>
             )}
@@ -39,7 +52,7 @@ export default async function CreatorWalletPage() {
               Pending balance
             </div>
             <div style={{ fontSize: 32, fontWeight: 700, marginTop: 6 }}>{wallet.pendingLabel}</div>
-            <div style={{ color: "#ff8904", fontSize: 13, marginTop: 6 }}>In review window</div>
+            <div style={{ color: "#ff8904", fontSize: 13, marginTop: 6 }}>{wallet.pending > 0 ? "Withdrawal being processed" : "In review window"}</div>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { AppShell } from "@/app/components/AppShell";
 import { requireRole } from "@/lib/auth";
-import { getPlatformWalletStats, listPlatformPayoutQueue } from "@/lib/repository";
+import { getPlatformWalletStats, listPlatformPayoutQueue, listWithdrawalRequests } from "@/lib/repository";
+import { markWithdrawalPaid } from "@/app/actions";
 
 type PayoutState = "processing" | "complete" | "failed";
 
@@ -14,7 +15,11 @@ const headerCell: React.CSSProperties = { fontSize: 12, color: "#6a7282", fontWe
 
 export default async function AdminWalletPage() {
   await requireRole("admin");
-  const [walletStats, payoutQueue] = await Promise.all([getPlatformWalletStats(), listPlatformPayoutQueue()]);
+  const [walletStats, payoutQueue, withdrawals] = await Promise.all([
+    getPlatformWalletStats(),
+    listPlatformPayoutQueue(),
+    listWithdrawalRequests(),
+  ]);
 
   return (
     <AppShell>
@@ -38,6 +43,43 @@ export default async function AdminWalletPage() {
           <div style={{ fontSize: 22, fontWeight: 700, marginTop: 8 }}>{walletStats.floatLabel}</div>
         </div>
       </div>
+
+      {/* Withdrawal requests */}
+      {withdrawals.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Withdrawal requests</div>
+          <div style={{ background: "rgba(255,137,4,0.04)", border: "1px solid rgba(255,137,4,0.25)", borderRadius: 14, overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1.4fr 0.8fr 2fr auto", gap: 16, padding: "13px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <span style={headerCell}>Creator</span>
+              <span style={headerCell}>Amount</span>
+              <span style={headerCell}>Bank details</span>
+              <span style={headerCell}>Action</span>
+            </div>
+            {withdrawals.map((w, i) => (
+              <div
+                key={w.creatorId}
+                style={{ display: "grid", gridTemplateColumns: "1.4fr 0.8fr 2fr auto", gap: 16, padding: "15px 22px", borderBottom: i < withdrawals.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", alignItems: "center" }}
+              >
+                <div>
+                  <div style={{ fontSize: 14, color: "#fff" }}>{w.name}</div>
+                  <div style={{ fontSize: 12, color: "#99a1af" }}>{w.handle}</div>
+                </div>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#ff8904" }}>{w.amountLabel}</span>
+                <div style={{ fontSize: 13, color: "#d1d5dc" }}>
+                  {w.accountName} · {w.accountNumber}
+                  <div style={{ fontSize: 12, color: "#99a1af" }}>{w.bankName}</div>
+                </div>
+                <form action={markWithdrawalPaid}>
+                  <input type="hidden" name="creatorId" value={w.creatorId} />
+                  <button type="submit" style={{ height: 38, padding: "0 16px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap" }}>
+                    Mark as paid
+                  </button>
+                </form>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Payout queue */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>

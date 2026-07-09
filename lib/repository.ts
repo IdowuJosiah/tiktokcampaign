@@ -695,6 +695,65 @@ export async function listPlatformPayoutQueue() {
   });
 }
 
+// Groups pending wallet transactions (i.e. requested withdrawals) by creator,
+// with the bank details the admin needs to send the payout.
+export async function listWithdrawalRequests() {
+  const result = await trySupabase(async () => {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("wallet_transactions")
+      .select("amount_cents, creator_id, creators(display_name, tiktok_handle)")
+      .eq("status", "pending");
+    if (error) throw error;
+
+    const rows = (data ?? []) as Array<{
+      amount_cents: number;
+      creator_id: string;
+      creators: CreatorRow | CreatorRow[] | null;
+    }>;
+    if (rows.length === 0) return [];
+
+    const byCreator = new Map<string, { name: string; handle: string; total: number }>();
+    for (const row of rows) {
+      const creator = first(row.creators);
+      const current = byCreator.get(row.creator_id) ?? {
+        name: creator?.display_name ?? "Creator",
+        handle: creator?.tiktok_handle ?? "—",
+        total: 0,
+      };
+      current.total += row.amount_cents;
+      byCreator.set(row.creator_id, current);
+    }
+
+    const creatorIds = [...byCreator.keys()];
+    const { data: profiles, error: profileError } = await supabase
+      .from("creator_payout_profiles")
+      .select("creator_id, bank_name, account_number, account_name")
+      .in("creator_id", creatorIds);
+    if (profileError) throw profileError;
+
+    const bankByCreator = new Map(
+      (profiles ?? []).map((p) => [p.creator_id as string, p]),
+    );
+
+    return creatorIds.map((id) => {
+      const group = byCreator.get(id)!;
+      const bank = bankByCreator.get(id);
+      return {
+        creatorId: id,
+        name: group.name,
+        handle: group.handle,
+        amountLabel: formatMoney(group.total),
+        bankName: (bank?.bank_name as string) ?? "—",
+        accountNumber: (bank?.account_number as string) ?? "—",
+        accountName: (bank?.account_name as string) ?? "—",
+      };
+    });
+  });
+
+  return result ?? [];
+}
+
 export async function getAdminSignupStats() {
   const result = await trySupabase(async () => {
     const supabase = createServerSupabaseClient();

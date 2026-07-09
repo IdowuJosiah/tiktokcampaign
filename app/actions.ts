@@ -945,6 +945,92 @@ export async function savePayoutProfile(formData: FormData) {
   redirect("/creator/profile");
 }
 
+const MIN_WITHDRAWAL_CENTS = 200000; // ₦2,000
+
+// A withdrawal request moves the creator's confirmed (available) rewards into
+// the "pending" state — that status was previously unused, so it now means
+// "withdrawal requested, awaiting admin payout". An admin later marks it paid
+// (markWithdrawalPaid), which moves it to "paid" (lifetime paid).
+export async function requestWithdrawal() {
+  const session = await requireRole("creator");
+
+  let errorCode: string | null = null;
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: creator, error: creatorError } = await supabase
+      .from("creators")
+      .select("id")
+      .eq("user_id", session.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (creatorError) throw creatorError;
+
+    if (!creator) {
+      errorCode = "withdrawal_no_bank";
+    } else {
+      const [{ data: profile, error: profileError }, { data: txns, error: txnError }] = await Promise.all([
+        supabase.from("creator_payout_profiles").select("id").eq("creator_id", creator.id).maybeSingle(),
+        supabase.from("wallet_transactions").select("amount_cents, status").eq("creator_id", creator.id),
+      ]);
+      if (profileError) throw profileError;
+      if (txnError) throw txnError;
+
+      const rows = txns ?? [];
+      const available = rows
+        .filter((r) => r.status === "available")
+        .reduce((sum, r) => sum + r.amount_cents, 0);
+
+      if (!profile) {
+        errorCode = "withdrawal_no_bank";
+      } else if (rows.some((r) => r.status === "pending")) {
+        errorCode = "withdrawal_pending";
+      } else if (available < MIN_WITHDRAWAL_CENTS) {
+        errorCode = "withdrawal_min_balance";
+      } else {
+        const { error: updateError } = await supabase
+          .from("wallet_transactions")
+          .update({ status: "pending" })
+          .eq("creator_id", creator.id)
+          .eq("status", "available");
+        if (updateError) throw updateError;
+
+        revalidatePath("/creator/wallet");
+        revalidatePath("/admin/wallet");
+      }
+    }
+  } catch (error) {
+    writeErrorRedirect("/creator/wallet", error);
+  }
+
+  if (errorCode) {
+    redirect(`/creator/wallet?error=${errorCode}`);
+  }
+  redirect("/creator/wallet?success=withdrawal_requested");
+}
+
+export async function markWithdrawalPaid(formData: FormData) {
+  await requireRole("admin");
+  const creatorId = asString(formData, "creatorId");
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase
+      .from("wallet_transactions")
+      .update({ status: "paid" })
+      .eq("creator_id", creatorId)
+      .eq("status", "pending");
+    if (error) throw error;
+
+    revalidatePath("/admin/wallet");
+    revalidatePath("/creator/wallet");
+  } catch (error) {
+    writeErrorRedirect("/admin/wallet", error);
+  }
+
+  redirect("/admin/wallet");
+}
+
 export async function saveIdentityVerification(formData: FormData) {
   const session = await requireRole("creator");
 

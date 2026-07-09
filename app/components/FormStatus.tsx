@@ -14,6 +14,9 @@ const errors: Record<string, string> = {
   invalid_credentials: "The email or password is not correct.",
   demo_login_disabled: "Demo login is not enabled on this deployment.",
   invalid_admin_credentials: "Incorrect admin username or password.",
+  withdrawal_no_bank: "Add your bank details in Profile & Setup before requesting a withdrawal.",
+  withdrawal_min_balance: "You need at least ₦2,000 in confirmed balance to withdraw.",
+  withdrawal_pending: "You already have a withdrawal being processed.",
   already_registered: "That email is already registered. Try logging in instead.",
   brand_required: "You need to log in with a brand account before creating a mission.",
   creator_required: "You need to log in with a creator account to continue.",
@@ -62,6 +65,7 @@ const successes: Record<string, string> = {
   tiktok_verified: "TikTok account connected and verified.",
   funds_added: "Deposit verified and added to your wallet balance.",
   submitted_for_sound_review: "Submitted! We couldn't auto-confirm the required sound on one or more videos, so this batch is flagged for manual review.",
+  withdrawal_requested: "Withdrawal requested. We'll send the payout to your bank shortly.",
 };
 
 export function FormStatus({ error, success }: { error?: string; success?: string }) {
