@@ -1195,5 +1195,6 @@ export async function reviewSubmission(formData: FormData) {
     redirect(`/admin/submissions/${submissionId}?error=${errorCode}`);
   }
 
-  redirect(`/admin/submissions/${submissionId}`);
+  // Back to the queue after a successful review.
+  redirect("/admin/submissions");
 }
