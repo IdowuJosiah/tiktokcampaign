@@ -284,7 +284,23 @@ async function ensureCreatorForUser(
     .select("id")
     .single();
 
-  if (error) throw error;
+  if (error) {
+    // creators.user_id is unique, so a request that raced us to create this
+    // creator triggers a 23505. Fall back to the row the other request made.
+    // A 23505 from the tiktok_handle unique constraint instead won't match by
+    // user_id, so that (and any other error) is re-thrown.
+    if (error.code === "23505") {
+      const { data: racedCreator } = await supabase
+        .from("creators")
+        .select("id")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (racedCreator) return racedCreator.id as string;
+    }
+    throw error;
+  }
   return creator.id as string;
 }
 
