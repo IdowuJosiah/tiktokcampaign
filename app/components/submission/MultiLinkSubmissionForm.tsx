@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { submitTikTokVideo } from "@/app/actions";
 import type { Mission } from "@/lib/data";
 
@@ -8,6 +8,12 @@ type Props = {
   creatorHandle: string;
   missions: Mission[];
 };
+
+type LinkStatus =
+  | { state: "loading" }
+  | { state: "ok" }
+  | { state: "error"; message: string }
+  | null;
 
 function normalizeUrl(value: string) {
   return value.trim().replace(/\/$/, "");
@@ -22,14 +28,88 @@ function isTikTokUrl(value: string) {
   }
 }
 
+function reasonMessage(reason: string | undefined) {
+  switch (reason) {
+    case "ownership":
+      return "This video isn't on your connected TikTok account.";
+    case "not_found":
+      return "We couldn't find this video. Make sure it's public and the link is correct.";
+    case "tiktok_required":
+    case "creator_required":
+      return "Verify your TikTok account before adding links.";
+    case "invalid":
+      return "Enter a valid TikTok URL.";
+    default:
+      return "Couldn't verify this link right now. Try again.";
+  }
+}
+
 const MINIMUM_LINKS = 5;
 
 export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
-  const [links, setLinks] = useState(Array(MINIMUM_LINKS).fill(""));
+  const [links, setLinks] = useState<string[]>(Array(MINIMUM_LINKS).fill(""));
+  const [statuses, setStatuses] = useState<LinkStatus[]>(Array(MINIMUM_LINKS).fill(null));
+  const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const seqs = useRef<Record<number, number>>({});
+
   const normalizedLinks = useMemo(() => links.map(normalizeUrl).filter(Boolean), [links]);
   const duplicates = normalizedLinks.filter((link, index) => normalizedLinks.indexOf(link) !== index);
   const invalidLinks = normalizedLinks.filter((link) => !isTikTokUrl(link));
-  const canSubmit = normalizedLinks.length >= MINIMUM_LINKS && duplicates.length === 0 && invalidLinks.length === 0;
+
+  const allVerified = links.every((link, index) => {
+    if (!normalizeUrl(link)) return true; // empty entries don't block; the minimum check covers count
+    return statuses[index]?.state === "ok";
+  });
+  const canSubmit =
+    normalizedLinks.length >= MINIMUM_LINKS &&
+    duplicates.length === 0 &&
+    invalidLinks.length === 0 &&
+    allVerified;
+
+  function setStatusAt(index: number, status: LinkStatus) {
+    setStatuses((prev) => {
+      const next = [...prev];
+      next[index] = status;
+      return next;
+    });
+  }
+
+  function scheduleCheck(index: number, rawValue: string) {
+    clearTimeout(timers.current[index]);
+    const normalized = normalizeUrl(rawValue);
+
+    // Nothing to verify yet, or the format is wrong (a separate inline message
+    // already covers that) — clear any prior status and don't hit the API.
+    if (!normalized || !isTikTokUrl(normalized)) {
+      setStatusAt(index, null);
+      return;
+    }
+
+    setStatusAt(index, { state: "loading" });
+    const mySeq = (seqs.current[index] ?? 0) + 1;
+    seqs.current[index] = mySeq;
+
+    timers.current[index] = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/tiktok/verify-link?url=${encodeURIComponent(normalized)}`);
+        const data = await res.json();
+        if (seqs.current[index] !== mySeq) return; // a newer edit superseded this check
+        setStatusAt(index, data.ok ? { state: "ok" } : { state: "error", message: reasonMessage(data.reason) });
+      } catch {
+        if (seqs.current[index] !== mySeq) return;
+        setStatusAt(index, { state: "error", message: reasonMessage(undefined) });
+      }
+    }, 600);
+  }
+
+  function updateLink(index: number, value: string) {
+    setLinks((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+    scheduleCheck(index, value);
+  }
 
   return (
     <form action={submitTikTokVideo} className="submission-form">
@@ -50,24 +130,30 @@ export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
           const normalized = normalizeUrl(link);
           const isDuplicate = normalized && duplicates.includes(normalized);
           const isInvalid = normalized && !isTikTokUrl(normalized);
+          const status = statuses[index];
 
           return (
             <label key={index}>
               Entry {index + 1}
               <input
                 name="tiktokUrl"
-                onChange={(event) => {
-                  const nextLinks = [...links];
-                  nextLinks[index] = event.target.value;
-                  setLinks(nextLinks);
-                }}
+                onChange={(event) => updateLink(index, event.target.value)}
                 placeholder="https://www.tiktok.com/@creator/video/..."
                 required={index === 0}
                 type="url"
                 value={link}
               />
               {isInvalid ? <small>Enter a valid TikTok URL.</small> : null}
-              {isDuplicate ? <small>This link is already added.</small> : null}
+              {!isInvalid && isDuplicate ? <small>This link is already added.</small> : null}
+              {!isInvalid && !isDuplicate && status?.state === "loading" ? (
+                <small style={{ color: "var(--muted)" }}>Checking this link…</small>
+              ) : null}
+              {!isInvalid && !isDuplicate && status?.state === "ok" ? (
+                <small style={{ color: "var(--accent)" }}>✓ Verified — this is your video</small>
+              ) : null}
+              {!isInvalid && !isDuplicate && status?.state === "error" ? (
+                <small style={{ color: "#ff6b6b" }}>{status.message}</small>
+              ) : null}
             </label>
           );
         })}
@@ -76,7 +162,10 @@ export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
       <div className="hero-actions">
         <button
           className="ghost-button"
-          onClick={() => setLinks([...links, ""])}
+          onClick={() => {
+            setLinks([...links, ""]);
+            setStatuses([...statuses, null]);
+          }}
           type="button"
         >
           Add another link
@@ -84,7 +173,10 @@ export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
         {links.length > 1 ? (
           <button
             className="ghost-button"
-            onClick={() => setLinks(links.slice(0, -1))}
+            onClick={() => {
+              setLinks(links.slice(0, -1));
+              setStatuses(statuses.slice(0, -1));
+            }}
             type="button"
           >
             Remove last

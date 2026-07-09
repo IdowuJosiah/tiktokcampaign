@@ -144,7 +144,16 @@ export async function fetchTikTokVideoAuthor(videoUrl: string): Promise<string |
   const url = new URL(OEMBED_URL);
   url.searchParams.set("url", videoUrl);
 
-  const response = await fetch(url.toString());
+  // TikTok's oEmbed endpoint returns an HTML anti-bot page (not JSON) to
+  // requests without a browser-like User-Agent, which makes response.json()
+  // throw. Sending a normal UA + Accept header gets the JSON response.
+  const response = await fetch(url.toString(), {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36",
+      Accept: "application/json",
+    },
+  });
   if (!response.ok) return null;
 
   const data = await response.json();
