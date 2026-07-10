@@ -1166,11 +1166,16 @@ export async function reviewSubmission(formData: FormData) {
   let errorCode: string | null = null;
   try {
     const supabase = createServerSupabaseClient();
+    // Re-resolve the reviewer from the session email rather than trusting the
+    // session's user id directly: a session can outlive its users row (e.g. the
+    // account was deleted/rewiped), which would make reviewer_user_id violate a
+    // foreign key and surface as a generic "database write failed".
+    const reviewer = await ensureUser(session.email, session.role);
     const { error } = await supabase.rpc("review_submission", {
       p_submission_id: submissionId,
       p_decision: decision,
       p_reason: reason,
-      p_reviewer_user_id: session.id,
+      p_reviewer_user_id: reviewer.id,
     });
 
     if (error) {
