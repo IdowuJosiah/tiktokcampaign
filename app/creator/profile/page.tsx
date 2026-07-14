@@ -1,7 +1,6 @@
 import { AppShell } from "@/app/components/AppShell";
 import { FormStatus } from "@/app/components/FormStatus";
 import { PayoutSetupForm } from "@/app/components/profile/PayoutSetupForm";
-import { NinVerificationForm } from "@/app/components/profile/NinVerificationForm";
 import { requireRole } from "@/lib/auth";
 import { getCreatorPayoutReadiness, getCreatorProfile, listCreatorSubmissions } from "@/lib/repository";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
@@ -23,7 +22,6 @@ export default async function CreatorProfilePage({
   const steps = [
     { label: "TikTok", done: Boolean(creator?.verifiedAt) },
     { label: "Bank", done: Boolean(payout.accountNumber) },
-    { label: "NIN", done: payout.identityStatus === "verified" },
   ];
   const completedSteps = steps.filter((s) => s.done).length;
 
@@ -98,17 +96,6 @@ export default async function CreatorProfilePage({
             defaultBankName={payout.bankName}
           />
         </div>
-      </div>
-
-      {/* NIN */}
-      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24, marginBottom: 24 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 3</div>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>Identity Verification (NIN)</h2>
-        <NinVerificationForm
-          defaultLegalName={payout.legalName}
-          defaultNin={payout.nin}
-          identityStatus={payout.identityStatus}
-        />
       </div>
 
       {/* Submission history */}
