@@ -737,8 +737,8 @@ export async function submitTikTokVideo(formData: FormData) {
     redirect("/submit?error=invalid_tiktok_links");
   }
 
-  if (uniqueLinks.length < 5) {
-    redirect("/submit?error=minimum_five_links");
+  if (uniqueLinks.length < 3) {
+    redirect("/submit?error=minimum_links");
   }
 
   const {

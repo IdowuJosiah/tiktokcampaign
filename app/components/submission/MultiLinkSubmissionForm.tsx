@@ -44,7 +44,7 @@ function reasonMessage(reason: string | undefined) {
   }
 }
 
-const MINIMUM_LINKS = 5;
+const MINIMUM_LINKS = 3;
 
 export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
   const [links, setLinks] = useState<string[]>(Array(MINIMUM_LINKS).fill(""));
@@ -157,31 +157,6 @@ export function MultiLinkSubmissionForm({ creatorHandle, missions }: Props) {
             </label>
           );
         })}
-      </div>
-
-      <div className="hero-actions">
-        <button
-          className="ghost-button"
-          onClick={() => {
-            setLinks([...links, ""]);
-            setStatuses([...statuses, null]);
-          }}
-          type="button"
-        >
-          Add another link
-        </button>
-        {links.length > 1 ? (
-          <button
-            className="ghost-button"
-            onClick={() => {
-              setLinks(links.slice(0, -1));
-              setStatuses(statuses.slice(0, -1));
-            }}
-            type="button"
-          >
-            Remove last
-          </button>
-        ) : null}
       </div>
 
       <div className="checklist">
