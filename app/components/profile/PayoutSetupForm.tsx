@@ -48,6 +48,12 @@ export function PayoutSetupForm({
 
   const canResolve = useMemo(() => /^\d{10}$/.test(accountNumber) && bankCode, [accountNumber, bankCode]);
 
+  const hasSavedProfile = Boolean(defaultAccountNumber);
+  const isDirty =
+    bankName !== (defaultBankName ?? "") ||
+    accountNumber !== (defaultAccountNumber ?? "") ||
+    accountName !== (defaultAccountName ?? "");
+
   useEffect(() => {
     if (!canResolve) {
       return;
@@ -141,8 +147,8 @@ export function PayoutSetupForm({
         />
       </label>
       <p className="form-hint">{isResolving ? "Checking Paystack..." : status}</p>
-      <button className="primary-button full" disabled={!accountName || isResolving} type="submit">
-        Save bank details
+      <button className="primary-button full" disabled={!accountName || isResolving || !isDirty} type="submit">
+        {hasSavedProfile && !isDirty ? "Saved ✓" : hasSavedProfile ? "Update bank details" : "Save bank details"}
       </button>
     </form>
   );
