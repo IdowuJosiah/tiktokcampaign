@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   missions,
   scoreRules,
@@ -8,6 +9,31 @@ import {
   getMissionTitle,
 } from "./data";
 import { createServerSupabaseClient } from "./supabase/server";
+
+// One creator lookup per request, shared across every creator-scoped query.
+// A creator page (e.g. profile) calls several repository functions that each
+// used to look the creator up by user_id separately — that's N Supabase
+// round-trips for the same row. cache() collapses them into one. Selects the
+// superset of columns those callers need.
+const getCreatorRecord = cache(async (userId: string) => {
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("creators")
+    .select("id, display_name, tiktok_handle, tiktok_username, tiktok_avatar_url, tiktok_verified_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data as {
+    id: string;
+    display_name: string;
+    tiktok_handle: string;
+    tiktok_username: string | null;
+    tiktok_avatar_url: string | null;
+    tiktok_verified_at: string | null;
+  } | null;
+});
 
 type BrandRow = {
   name: string;
@@ -403,16 +429,10 @@ export async function listMissionSubmissions(missionId: string) {
 
 export async function listCreatorSubmissions(userId: string) {
   const rows = await trySupabase(async () => {
-    const supabase = createServerSupabaseClient();
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (creatorError) throw creatorError;
+    const creator = await getCreatorRecord(userId);
     if (!creator) return [] as SubmissionRow[];
 
+    const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("submissions")
       .select("*, creators(display_name, tiktok_handle), missions(title, brands(name)), submission_metrics(views, likes, comments, shares, saves), submission_scores(composite)")
@@ -456,16 +476,10 @@ export async function listWalletTransactions() {
 
 export async function listCreatorWalletTransactions(userId: string) {
   const rows = await trySupabase(async () => {
-    const supabase = createServerSupabaseClient();
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (creatorError) throw creatorError;
+    const creator = await getCreatorRecord(userId);
     if (!creator) return [] as WalletTransactionRow[];
 
+    const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("wallet_transactions")
       .select("id, amount_cents, status, label")
@@ -521,17 +535,7 @@ export async function missionTitle(id: string) {
 }
 
 export async function getCreatorProfile(userId: string) {
-  const row = await trySupabase(async () => {
-    const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase
-      .from("creators")
-      .select("id, display_name, tiktok_handle, tiktok_username, tiktok_avatar_url, tiktok_verified_at")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data as CreatorRow | null;
-  });
+  const row = await trySupabase(() => getCreatorRecord(userId));
 
   return row
     ? {
@@ -806,16 +810,10 @@ export async function listRejectedSubmissionsForDisputes() {
 
 export async function getCreatorPayoutReadiness(userId: string) {
   const row = await trySupabase(async () => {
-    const supabase = createServerSupabaseClient();
-    const { data: creator, error: creatorError } = await supabase
-      .from("creators")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (creatorError) throw creatorError;
+    const creator = await getCreatorRecord(userId);
     if (!creator) return null;
 
+    const supabase = createServerSupabaseClient();
     const [{ data: payout, error: payoutError }, { data: identity, error: identityError }] = await Promise.all([
       supabase
         .from("creator_payout_profiles")

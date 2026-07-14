@@ -1825,3 +1825,12 @@ button {
     padding: 18px;
   }
 }
+
+@keyframes vr-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.vr-skeleton {
+  animation: vr-pulse 1.5s ease-in-out infinite;
+}

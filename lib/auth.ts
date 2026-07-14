@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -55,7 +56,10 @@ export async function clearAppSession() {
   cookieStore.delete(SESSION_COOKIE);
 }
 
-export async function getAppSession(): Promise<AppSession | null> {
+// cache() memoizes for the duration of a single request, so the cookie parse +
+// signature verification runs once even though the AppShell and the page's
+// requireRole both read the session on every navigation.
+export const getAppSession = cache(async (): Promise<AppSession | null> => {
   const cookieStore = await cookies();
   const value = cookieStore.get(SESSION_COOKIE)?.value;
 
@@ -73,7 +77,7 @@ export async function getAppSession(): Promise<AppSession | null> {
   } catch {
     return null;
   }
-}
+});
 
 export async function requireRole(role: UserRole) {
   const session = await getAppSession();
