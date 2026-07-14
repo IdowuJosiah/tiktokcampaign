@@ -93,9 +93,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     : adminNav;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#0a0a0a", color: "#fff" }}>
+    <div className="vr-shell" style={{ display: "flex", minHeight: "100vh", background: "#0a0a0a", color: "#fff" }}>
+      {/* Mobile drawer toggle (CSS-only, keeps this a server component) */}
+      <input type="checkbox" id="vr-nav" className="vr-nav-toggle" hidden />
+      <label htmlFor="vr-nav" className="vr-overlay" aria-hidden="true" />
+
       {/* Sidebar */}
-      <aside style={{ width: 256, flexShrink: 0, background: "rgba(255,255,255,0.02)", borderRight: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
+      <aside className="vr-sidebar" style={{ width: 256, flexShrink: 0, background: "rgba(255,255,255,0.02)", borderRight: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
         <div style={{ padding: "22px 24px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,217,163,0.15)", border: "1px solid rgba(0,217,163,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -129,21 +133,26 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Topbar */}
-        <header style={{ height: 64, flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
-          {session.role === "admin" ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 14, color: "#99a1af" }}>Platform status</span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#00d9a3" }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d9a3", display: "inline-block" }} />
-                All systems operational
-              </span>
-            </div>
-          ) : (
-            <div style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
-              <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
-              <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
-            </div>
-          )}
+        <header className="vr-topbar" style={{ height: 64, flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
+          <div style={{ display: "flex", alignItems: "center", minWidth: 0, gap: 12 }}>
+            <label htmlFor="vr-nav" className="vr-hamburger" aria-label="Open menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </label>
+            {session.role === "admin" ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 14, color: "#99a1af" }}>Platform status</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#00d9a3" }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d9a3", display: "inline-block" }} />
+                  All systems operational
+                </span>
+              </div>
+            ) : (
+              <div className="vr-search" style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
+                <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
+                <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+              </div>
+            )}
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
             {session.role !== "admin" && (
               <div style={{ position: "relative", width: 36, height: 36, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -152,7 +161,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: session.role !== "admin" ? 18 : 0, borderLeft: session.role !== "admin" ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: session.role === "admin" ? "rgba(124,58,237,0.2)" : "rgba(0,217,163,0.2)", border: `1px solid ${session.role === "admin" ? "rgba(124,58,237,0.4)" : "rgba(0,217,163,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: session.role === "admin" ? "#a78bfa" : "#00d9a3", fontSize: 13, fontWeight: 700 }}>{initials}</div>
-              <div style={{ lineHeight: 1.2 }}>
+              <div className="vr-user-meta" style={{ lineHeight: 1.2 }}>
                 <div style={{ fontSize: 14, color: "#fff" }}>{session.role === "admin" ? "Admin" : session.email.split("@")[0]}</div>
                 <div style={{ fontSize: 12, color: "#99a1af" }}>{session.email}</div>
               </div>
@@ -161,7 +170,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="content-stack" style={{ flex: 1, minWidth: 0, padding: 32 }}>
+        <main className="content-stack vr-main" style={{ flex: 1, minWidth: 0, padding: 32 }}>
           {children}
         </main>
       </div>
