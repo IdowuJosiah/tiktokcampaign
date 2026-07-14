@@ -43,7 +43,7 @@ export default async function BrandDashboardPage({
           <div style={{ fontSize: 26, fontWeight: 700, color: "#00d9a3" }}>{walletBalance}</div>
           <p style={{ color: "#99a1af", fontSize: 13, margin: "6px 0 0" }}>Reward pools are funded from this balance automatically when you create a campaign.</p>
         </div>
-        <form action={initiateBrandDeposit} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <form action={initiateBrandDeposit} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <input
             name="amount"
             required
@@ -51,7 +51,7 @@ export default async function BrandDashboardPage({
             min="1"
             step="0.01"
             placeholder="Amount (₦)"
-            style={{ width: 160, height: 44, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, minWidth: 140, height: 44, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
           />
           <button type="submit" style={{ height: 44, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer" }}>
             Add funds
