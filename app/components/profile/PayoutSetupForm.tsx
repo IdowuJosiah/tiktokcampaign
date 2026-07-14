@@ -24,6 +24,9 @@ export function PayoutSetupForm({
   const [accountName, setAccountName] = useState(defaultAccountName ?? "");
   const [status, setStatus] = useState("Choose your bank and enter your 10-digit account number.");
   const [isResolving, setIsResolving] = useState(false);
+  // Once a profile is saved the form is locked (read-only) until the creator
+  // taps the edit icon.
+  const [editing, setEditing] = useState(!defaultAccountNumber);
 
   useEffect(() => {
     let mounted = true;
@@ -49,10 +52,6 @@ export function PayoutSetupForm({
   const canResolve = useMemo(() => /^\d{10}$/.test(accountNumber) && bankCode, [accountNumber, bankCode]);
 
   const hasSavedProfile = Boolean(defaultAccountNumber);
-  const isDirty =
-    bankName !== (defaultBankName ?? "") ||
-    accountNumber !== (defaultAccountNumber ?? "") ||
-    accountName !== (defaultAccountName ?? "");
 
   useEffect(() => {
     if (!canResolve) {
@@ -96,11 +95,30 @@ export function PayoutSetupForm({
     <form action={savePayoutProfile} className="submission-form">
       <input name="bankName" type="hidden" value={bankName} />
       <input name="accountName" type="hidden" value={accountName} />
+
+      {hasSavedProfile && !editing ? (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: -8 }}>
+          <button
+            type="button"
+            onClick={() => {
+              setEditing(true);
+              setStatus("Update your bank details.");
+            }}
+            aria-label="Edit bank details"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 32, padding: "0 12px", fontSize: 13, fontWeight: 700, color: "#00d9a3", background: "rgba(0,217,163,0.08)", border: "1px solid rgba(0,217,163,0.3)", borderRadius: 8, cursor: "pointer" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Edit
+          </button>
+        </div>
+      ) : null}
+
       <label>
         Bank
         <select
           name="bankCode"
           required
+          disabled={!editing}
           value={bankCode}
           onChange={(event) => {
             const selectedBank = banks.find((bank) => bank.code === event.target.value);
@@ -126,6 +144,7 @@ export function PayoutSetupForm({
           name="accountNumber"
           pattern="[0-9]{10}"
           required
+          disabled={!editing}
           type="text"
           value={accountNumber}
           onChange={(event) => {
@@ -140,6 +159,7 @@ export function PayoutSetupForm({
         Account name
         <input
           required
+          disabled={!editing}
           type="text"
           value={accountName}
           onChange={(event) => setAccountName(event.target.value)}
@@ -147,8 +167,8 @@ export function PayoutSetupForm({
         />
       </label>
       <p className="form-hint">{isResolving ? "Checking Paystack..." : status}</p>
-      <button className="primary-button full" disabled={!accountName || isResolving || !isDirty} type="submit">
-        {hasSavedProfile && !isDirty ? "Saved ✓" : hasSavedProfile ? "Update bank details" : "Save bank details"}
+      <button className="primary-button full" disabled={!editing || !accountName || isResolving} type="submit">
+        Save bank details
       </button>
     </form>
   );
