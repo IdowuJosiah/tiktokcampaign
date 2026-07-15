@@ -15,6 +15,8 @@ const errors: Record<string, string> = {
   demo_login_disabled: "Demo login is not enabled on this deployment.",
   invalid_admin_credentials: "Incorrect admin username or password.",
   withdrawal_no_bank: "Add your bank details in Profile & Setup before requesting a withdrawal.",
+  withdrawal_no_bank_code: "Your bank details are missing a bank code. Re-save your bank details in Profile & Setup, then try again.",
+  transfer_failed: "Paystack could not process the transfer right now. Your balance has been restored — please try again or contact support.",
   withdrawal_min_balance: "You need at least ₦2,000 in confirmed balance to withdraw.",
   withdrawal_pending: "You already have a withdrawal being processed.",
   already_registered: "That email is already registered. Try logging in instead.",
@@ -34,9 +36,9 @@ const errors: Record<string, string> = {
   hashtag_too_long: "Required hashtag is too long. Keep it under 50 characters.",
   rule_too_long: "One of the rules is too long. Keep each rule under 200 characters.",
   invalid_sound_url: "Required sound must be a real TikTok sound link, e.g. tiktok.com/music/... or tiktok.com/sound/...",
-  payout_exceeds_pool: "Payout per 5 submissions can't be larger than the total reward pool.",
+  payout_exceeds_pool: "Payout per 3 submissions can't be larger than the total reward pool.",
   invalid_reward_pool: "Enter a valid reward pool amount greater than ₦0.",
-  invalid_payout_amount: "Enter a valid payout-per-5-submissions amount greater than ₦0.",
+  invalid_payout_amount: "Enter a valid payout-per-3-submissions amount greater than ₦0.",
   invalid_views_per_submission: "Enter a valid views-per-submission number.",
   invalid_reward_amount: "Enter a valid reward amount for this submission.",
   insufficient_wallet_balance: "Your wallet balance doesn't cover this reward pool. Add funds first.",
@@ -66,6 +68,7 @@ const successes: Record<string, string> = {
   funds_added: "Deposit verified and added to your wallet balance.",
   submitted_for_sound_review: "Submitted! We couldn't auto-confirm the required sound on one or more videos, so this batch is flagged for manual review.",
   withdrawal_requested: "Withdrawal requested. We'll send the payout to your bank shortly.",
+  withdrawal_sent: "Payment sent! The transfer has been initiated to your bank account.",
 };
 
 export function FormStatus({ error, success }: { error?: string; success?: string }) {

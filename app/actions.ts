@@ -926,6 +926,7 @@ export async function savePayoutProfile(formData: FormData) {
       {
         creator_id: creatorId,
         bank_name: asString(formData, "bankName"),
+        bank_code: asString(formData, "bankCode") || null,
         account_number: asString(formData, "accountNumber"),
         account_name: accountName,
       },
@@ -947,10 +948,6 @@ export async function savePayoutProfile(formData: FormData) {
 
 const MIN_WITHDRAWAL_CENTS = 200000; // ₦2,000
 
-// A withdrawal request moves the creator's confirmed (available) rewards into
-// the "pending" state — that status was previously unused, so it now means
-// "withdrawal requested, awaiting admin payout". An admin later marks it paid
-// (markWithdrawalPaid), which moves it to "paid" (lifetime paid).
 export async function requestWithdrawal() {
   const session = await requireRole("creator");
 
@@ -970,7 +967,11 @@ export async function requestWithdrawal() {
       errorCode = "withdrawal_no_bank";
     } else {
       const [{ data: profile, error: profileError }, { data: txns, error: txnError }] = await Promise.all([
-        supabase.from("creator_payout_profiles").select("id").eq("creator_id", creator.id).maybeSingle(),
+        supabase
+          .from("creator_payout_profiles")
+          .select("bank_name, bank_code, account_number, account_name")
+          .eq("creator_id", creator.id)
+          .maybeSingle(),
         supabase.from("wallet_transactions").select("amount_cents, status").eq("creator_id", creator.id),
       ]);
       if (profileError) throw profileError;
@@ -983,17 +984,51 @@ export async function requestWithdrawal() {
 
       if (!profile) {
         errorCode = "withdrawal_no_bank";
+      } else if (!profile.bank_code) {
+        // Profile saved before bank_code was added — creator must re-save.
+        errorCode = "withdrawal_no_bank_code";
       } else if (rows.some((r) => r.status === "pending")) {
         errorCode = "withdrawal_pending";
       } else if (available < MIN_WITHDRAWAL_CENTS) {
         errorCode = "withdrawal_min_balance";
       } else {
-        const { error: updateError } = await supabase
+        // Move to pending while we attempt the transfer.
+        const { error: pendingError } = await supabase
           .from("wallet_transactions")
           .update({ status: "pending" })
           .eq("creator_id", creator.id)
           .eq("status", "available");
-        if (updateError) throw updateError;
+        if (pendingError) throw pendingError;
+
+        try {
+          const { createPaystackTransferRecipient, initiatePaystackTransfer } = await import("@/lib/paystack");
+          const recipientCode = await createPaystackTransferRecipient({
+            name: profile.account_name as string,
+            accountNumber: profile.account_number as string,
+            bankCode: profile.bank_code as string,
+          });
+          await initiatePaystackTransfer({
+            amountCents: available,
+            recipientCode,
+            reason: "VoiceRank creator reward",
+          });
+          // Transfer successfully queued — mark as paid.
+          await supabase
+            .from("wallet_transactions")
+            .update({ status: "paid" })
+            .eq("creator_id", creator.id)
+            .eq("status", "pending");
+        } catch (transferError) {
+          // Paystack failed — revert to available so the creator can retry
+          // or the admin can pay out manually.
+          console.error("Paystack transfer failed:", transferError);
+          await supabase
+            .from("wallet_transactions")
+            .update({ status: "available" })
+            .eq("creator_id", creator.id)
+            .eq("status", "pending");
+          errorCode = "transfer_failed";
+        }
 
         revalidatePath("/creator/wallet");
         revalidatePath("/admin/wallet");
@@ -1006,7 +1041,7 @@ export async function requestWithdrawal() {
   if (errorCode) {
     redirect(`/creator/wallet?error=${errorCode}`);
   }
-  redirect("/creator/wallet?success=withdrawal_requested");
+  redirect("/creator/wallet?success=withdrawal_sent");
 }
 
 export async function markWithdrawalPaid(formData: FormData) {

@@ -732,7 +732,7 @@ export async function listWithdrawalRequests() {
     const creatorIds = [...byCreator.keys()];
     const { data: profiles, error: profileError } = await supabase
       .from("creator_payout_profiles")
-      .select("creator_id, bank_name, account_number, account_name")
+      .select("creator_id, bank_name, bank_code, account_number, account_name")
       .in("creator_id", creatorIds);
     if (profileError) throw profileError;
 

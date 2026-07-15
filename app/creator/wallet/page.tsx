@@ -84,7 +84,7 @@ export default async function CreatorWalletPage({
         </div>
 
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12 }}>
-          <p style={{ fontSize: 13, color: "#99a1af", margin: 0 }}>Withdrawal requests are handled manually by the VoiceRank team and paid out to the bank account on your profile. Minimum withdrawal: ₦2,000.</p>
+          <p style={{ fontSize: 13, color: "#99a1af", margin: 0 }}>Withdrawals are sent automatically via Paystack to the bank account on your profile. Minimum withdrawal: ₦2,000.</p>
         </div>
       </div>
     </AppShell>
