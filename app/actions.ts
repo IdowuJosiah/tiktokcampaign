@@ -1181,6 +1181,49 @@ export async function rejectMission(formData: FormData) {
   redirect(`/admin/campaigns/${missionId}`);
 }
 
+const CLOSE_MISSION_ERROR_CODES: Record<string, string> = {
+  mission_not_found: "write_failed",
+  mission_not_live: "mission_not_live",
+};
+
+export async function closeMission(formData: FormData) {
+  await requireRole("admin");
+  const missionId = asString(formData, "missionId");
+
+  let errorCode: string | null = null;
+  try {
+    const supabase = createServerSupabaseClient();
+    const { error } = await supabase.rpc("close_mission", {
+      p_mission_id: missionId,
+    });
+
+    if (error) {
+      if (error.message in CLOSE_MISSION_ERROR_CODES) {
+        errorCode = CLOSE_MISSION_ERROR_CODES[error.message];
+      } else {
+        throw error;
+      }
+    } else {
+      revalidatePath("/");
+      revalidatePath("/campaigns");
+      revalidatePath("/creator/missions");
+      revalidatePath("/admin/campaigns");
+      revalidatePath("/brand/missions");
+      revalidatePath("/brand/wallet");
+      revalidatePath(`/admin/campaigns/${missionId}`);
+      revalidatePath(`/internal/ops/missions/${missionId}`);
+    }
+  } catch (error) {
+    writeErrorRedirect(`/admin/campaigns/${missionId}`, error);
+  }
+
+  if (errorCode) {
+    redirect(`/admin/campaigns/${missionId}?error=${errorCode}`);
+  }
+
+  redirect(`/admin/campaigns/${missionId}?success=mission_closed`);
+}
+
 export async function reviewSubmission(formData: FormData) {
   const session = await requireRole("admin");
   const submissionId = asString(formData, "submissionId");

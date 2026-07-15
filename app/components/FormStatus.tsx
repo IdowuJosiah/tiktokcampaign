@@ -57,6 +57,7 @@ const errors: Record<string, string> = {
   tiktok_validation_failed: "We couldn't verify these videos against TikTok right now. Try again shortly.",
   rejection_reason_required: "Enter a reason before rejecting this campaign.",
   mission_rejected: "This campaign was rejected and can't be approved. The brand needs to create a new campaign instead.",
+  mission_not_live: "This campaign is not live and cannot be closed.",
   campaign_funding_failed: "The brand's wallet balance no longer covers this reward pool, so the campaign can't be approved. The brand needs to add funds first.",
   reward_exceeds_pool: "This reward would push total payouts past the campaign's funded reward pool. Lower the amount or have the brand top up.",
   invalid_mission: "Select a campaign from the list before submitting.",
@@ -64,6 +65,7 @@ const errors: Record<string, string> = {
 
 const successes: Record<string, string> = {
   nin_submitted: "NIN submitted successfully. It will be reviewed shortly.",
+  mission_closed: "Campaign closed. Unspent funds have been refunded to the brand's wallet.",
   tiktok_verified: "TikTok account connected and verified.",
   funds_added: "Deposit verified and added to your wallet balance.",
   submitted_for_sound_review: "Submitted! We couldn't auto-confirm the required sound on one or more videos, so this batch is flagged for manual review.",

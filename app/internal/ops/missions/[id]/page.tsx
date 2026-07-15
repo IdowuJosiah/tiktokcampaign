@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { approveMission, rejectMission } from "@/app/actions";
+import { approveMission, closeMission, rejectMission } from "@/app/actions";
 import { AppShell } from "@/app/components/AppShell";
 import { FormStatus } from "@/app/components/FormStatus";
 import { SubmissionRow } from "@/app/components/SubmissionRow";
@@ -11,11 +11,11 @@ export default async function InternalMissionDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; success?: string }>;
 }) {
   await requireRole("admin");
   const { id } = await params;
-  const { error } = await searchParams;
+  const { error, success } = await searchParams;
   const [mission, submissions] = await Promise.all([findMissionForOps(id), listMissionSubmissions(id)]);
 
   if (!mission) {
@@ -90,7 +90,7 @@ export default async function InternalMissionDetailPage({
         </ul>
       </section>
 
-      <FormStatus error={isRejected ? undefined : error} />
+      <FormStatus error={isRejected ? undefined : error} success={success} />
 
       <section className="panel form-panel compact">
         <div className="section-title">
@@ -107,7 +107,21 @@ export default async function InternalMissionDetailPage({
             The brand needs to create a new campaign with this feedback applied — this one can&apos;t be approved as-is.
           </p>
         ) : isLive ? (
-          <p className="muted-copy">Approved and visible to creators.</p>
+          <form action={closeMission} className="submission-form">
+            <input name="missionId" type="hidden" value={mission.id} />
+            <p className="muted-copy">
+              This campaign is live. Closing it will remove it from the creator marketplace and refund
+              the unspent portion of the reward pool back to the brand&apos;s wallet. Creator rewards
+              that have already been earned are not affected.
+            </p>
+            <button
+              className="ghost-button full"
+              type="submit"
+              style={{ color: "#ff6467", borderColor: "rgba(255,100,103,0.4)" }}
+            >
+              Close campaign &amp; refund unused funds
+            </button>
+          </form>
         ) : (
           <form action={approveMission} className="submission-form">
             <input name="missionId" type="hidden" value={mission.id} />

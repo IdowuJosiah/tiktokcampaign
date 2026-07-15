@@ -299,7 +299,7 @@ export async function listBrandWalletTransactions(ownerUserId: string) {
   return (rows ?? []).map((row) => {
     const label =
       row.label ??
-      (row.type === "deposit" ? "Deposit" : row.type === "allocation" ? "Campaign allocation" : row.type);
+      (row.type === "deposit" ? "Deposit" : row.type === "campaign_funding" ? "Campaign allocation" : row.type === "refund" ? "Campaign refund" : row.type);
     const positive = row.amount_cents >= 0;
     return {
       id: row.id,
