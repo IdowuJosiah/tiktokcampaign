@@ -37,8 +37,8 @@ export default async function CampaignBriefPage({
                 <div style={{ color: "#99a1af", fontSize: 15, marginTop: 5 }}>{campaign.brand}</div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 34, fontWeight: 700, color: "#00d9a3", lineHeight: 1 }}>{campaign.payoutPerFiveSubmissions}</div>
-                <div style={{ color: "#99a1af", fontSize: 13 }}>per 5 qualifying submissions</div>
+                <div style={{ fontSize: 34, fontWeight: 700, color: "#00d9a3", lineHeight: 1 }}>{campaign.payoutPerThreeSubmissions}</div>
+                <div style={{ color: "#99a1af", fontSize: 13 }}>per 3 qualifying submissions</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 20, marginTop: 14, color: "#99a1af", fontSize: 14, flexWrap: "wrap" }}>
@@ -127,8 +127,8 @@ export default async function CampaignBriefPage({
         <div style={{ display: "flex", alignItems: "center", gap: 14, background: "rgba(255,221,85,0.06)", border: "1px solid rgba(255,221,85,0.25)", borderRadius: 14, padding: "16px 20px", marginTop: 18 }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffdd55" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <div style={{ flex: 1 }}>
-            <span style={{ fontSize: 14, color: "#fff", fontWeight: 700 }}>Earn {campaign.payoutPerFiveSubmissions}</span>
-            <span style={{ fontSize: 14, color: "#d1d5dc" }}> per 5 approved submissions in this campaign.</span>
+            <span style={{ fontSize: 14, color: "#fff", fontWeight: 700 }}>Earn {campaign.payoutPerThreeSubmissions}</span>
+            <span style={{ fontSize: 14, color: "#d1d5dc" }}> per 3 approved submissions in this campaign.</span>
           </div>
         </div>
 

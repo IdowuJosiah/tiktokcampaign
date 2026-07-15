@@ -21,7 +21,7 @@ export function MissionCard({
       <p>{mission.brief}</p>
       <div className="mission-meta">
         <strong>{mission.rewardPool} pool</strong>
-        <span>{mission.payoutPerFiveSubmissions} per 5 submissions · {mission.deadline}</span>
+        <span>{mission.payoutPerThreeSubmissions} per 3 submissions · {mission.deadline}</span>
       </div>
       {mission.fundingStatus ? <span className="funding-status">{mission.fundingStatus}</span> : null}
       {mission.status === "Rejected" && mission.rejectionReason ? (

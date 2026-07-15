@@ -50,7 +50,7 @@ export default async function BrandMissionDetailPage({
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
           {[
             { label: "Reward pool", value: mission.rewardPool, sub: mission.fundingStatus },
-            { label: "Per 5 submissions", value: mission.payoutPerFiveSubmissions, sub: "Payout batch" },
+            { label: "Per 3 submissions", value: mission.payoutPerThreeSubmissions, sub: "Payout batch" },
             { label: "Approved", value: String(approved), sub: "submissions" },
             { label: "Pending", value: String(pending), sub: "awaiting review" },
           ].map((stat) => (

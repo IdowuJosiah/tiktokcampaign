@@ -7,7 +7,7 @@ export type Mission = {
   title: string;
   brief: string;
   rewardPool: string;
-  payoutPerFiveSubmissions: string;
+  payoutPerThreeSubmissions: string;
   deadline: string;
   status: MissionStatus;
   minimumViews: string;
@@ -50,7 +50,7 @@ export const missions: Mission[] = [
     title: "Show your real split-bill routine",
     brief: "Post a short TikTok showing how you split expenses with friends after a meal, trip, or shared purchase.",
     rewardPool: "₦2,000",
-    payoutPerFiveSubmissions: "₦250",
+    payoutPerThreeSubmissions: "₦250",
     deadline: "12 days left",
     status: "Live",
     minimumViews: "1,000",
@@ -66,7 +66,7 @@ export const missions: Mission[] = [
     title: "Fastest lunch delivery proof",
     brief: "Film a simple order-to-arrival story for a real lunch delivery in Lagos.",
     rewardPool: "₦1,200",
-    payoutPerFiveSubmissions: "₦150",
+    payoutPerThreeSubmissions: "₦150",
     deadline: "6 days left",
     status: "Draft",
     minimumViews: "750",
@@ -82,7 +82,7 @@ export const missions: Mission[] = [
     title: "Show what your locked savings protected",
     brief: "Tell a specific story about a purchase or goal that your savings discipline helped protect.",
     rewardPool: "₦1,500",
-    payoutPerFiveSubmissions: "₦200",
+    payoutPerThreeSubmissions: "₦200",
     deadline: "19 days left",
     status: "Live",
     minimumViews: "1,500",

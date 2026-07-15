@@ -96,7 +96,7 @@ export default async function AdminCampaignQueuePage({
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 24, fontWeight: 700, color: "#00d9a3" }}>{selected.rewardPool}</div>
-                  <div style={{ fontSize: 13, color: "#99a1af" }}>pool · {selected.payoutPerFiveSubmissions}/5 subs</div>
+                  <div style={{ fontSize: 13, color: "#99a1af" }}>pool · {selected.payoutPerThreeSubmissions}/3 subs</div>
                 </div>
               </div>
 

@@ -44,7 +44,7 @@ type MissionRow = {
   title: string;
   brief: string;
   reward_pool_cents: number;
-  payout_per_5_submissions_cents: number | null;
+  payout_per_3_submissions_cents: number | null;
   deadline: string;
   status: "draft" | "live" | "closed" | "rejected";
   required_hashtag: string;
@@ -155,7 +155,7 @@ function mapMission(row: MissionRow) {
     title: row.title,
     brief: row.brief,
     rewardPool: formatMoney(row.reward_pool_cents),
-    payoutPerFiveSubmissions: formatMoney(row.payout_per_5_submissions_cents ?? 0),
+    payoutPerThreeSubmissions: formatMoney(row.payout_per_3_submissions_cents ?? 0),
     deadline,
     status: missionStatus(row.status),
     minimumViews: row.minimum_views.toLocaleString(),
@@ -172,7 +172,7 @@ function mapMission(row: MissionRow) {
           `Use ${row.required_hashtag}`,
           row.required_sound ? `Use ${row.required_sound}` : "Creator choice sound",
           `${viewsPerSubmission.toLocaleString()} views required for each submission`,
-          `${formatMoney(row.payout_per_5_submissions_cents ?? 0)} paid per 5 approved submissions`,
+          `${formatMoney(row.payout_per_3_submissions_cents ?? 0)} paid per 3 approved submissions`,
           row.disclosure_required ? "Add paid partnership disclosure" : "Disclosure optional",
         ],
   };

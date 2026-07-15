@@ -23,7 +23,7 @@ export default async function AdminSubmissionDetailPage({
 
   const mission = await findMissionForOps(submission.missionId);
   const campaignName = mission?.title ?? "Campaign";
-  const payoutPerFive = mission?.payoutPerFiveSubmissions ?? "—";
+  const payoutPerThree = mission?.payoutPerThreeSubmissions ?? "—";
 
   return (
     <AppShell>
@@ -51,8 +51,8 @@ export default async function AdminSubmissionDetailPage({
         </article>
         <article>
           <span>Payout</span>
-          <strong>{payoutPerFive}</strong>
-          <small>Per 5 approved · set by the brand</small>
+          <strong>{payoutPerThree}</strong>
+          <small>Per 3 approved · set by the brand</small>
         </article>
       </section>
 
@@ -103,7 +103,7 @@ export default async function AdminSubmissionDetailPage({
             </select>
           </label>
           <p className="muted-copy" style={{ margin: 0 }}>
-            The creator is paid {payoutPerFive} automatically for every 5 approved submissions on this
+            The creator is paid {payoutPerThree} automatically for every 3 approved submissions on this
             campaign — no manual amount needed.
           </p>
           <label>

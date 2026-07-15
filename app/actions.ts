@@ -115,7 +115,7 @@ function writeErrorRedirect(path: string, error: unknown): never {
       ? "timeout"
       : message.toLowerCase().includes("schema cache")
         ? "schema_cache_stale"
-        : message.toLowerCase().includes("payout_per_5_submissions_cents") ||
+        : message.toLowerCase().includes("payout_per_3_submissions_cents") ||
             message.toLowerCase().includes("views_per_submission")
           ? "campaign_columns_missing"
           : message.toLowerCase().includes("creator_payout_profiles") ||
@@ -331,8 +331,8 @@ export async function createMission(formData: FormData) {
   const requiredHashtag = asString(formData, "requiredHashtag");
   const requiredSound = asString(formData, "requiredSound");
   const rewardPoolCents = parseCents(asString(formData, "rewardPool"));
-  const payoutPerFiveCents = parseCents(
-    asString(formData, "payoutPerFiveSubmissions"),
+  const payoutPerThreeCents = parseCents(
+    asString(formData, "payoutPerThreeSubmissions"),
   );
   const viewsPerSubmission = parseNumber(asString(formData, "viewsPerSubmission"));
   const rules = asString(formData, "rules")
@@ -358,13 +358,13 @@ export async function createMission(formData: FormData) {
   if (rewardPoolCents === null || rewardPoolCents <= 0) {
     redirect("/brand/missions/new?error=invalid_reward_pool");
   }
-  if (payoutPerFiveCents === null || payoutPerFiveCents <= 0) {
+  if (payoutPerThreeCents === null || payoutPerThreeCents <= 0) {
     redirect("/brand/missions/new?error=invalid_payout_amount");
   }
   if (viewsPerSubmission === null) {
     redirect("/brand/missions/new?error=invalid_views_per_submission");
   }
-  if (payoutPerFiveCents > rewardPoolCents) {
+  if (payoutPerThreeCents > rewardPoolCents) {
     redirect("/brand/missions/new?error=payout_exceeds_pool");
   }
 
@@ -397,7 +397,7 @@ export async function createMission(formData: FormData) {
       title,
       brief,
       reward_pool_cents: rewardPoolCents,
-      payout_per_5_submissions_cents: payoutPerFiveCents,
+      payout_per_3_submissions_cents: payoutPerThreeCents,
       deadline,
       status: "draft",
       required_hashtag: requiredHashtag,
@@ -1153,8 +1153,8 @@ export async function reviewSubmission(formData: FormData) {
   const reason = asString(formData, "reason");
 
   // The payout is NOT set by the admin — it's the campaign's
-  // payout_per_5_submissions_cents that the brand chose, credited
-  // automatically each time the creator reaches a complete group of 5 approved
+  // payout_per_3_submissions_cents that the brand chose, credited
+  // automatically each time the creator reaches a complete group of 3 approved
   // submissions for that campaign (capped at the funded reward pool). The admin
   // only approves / requests a fix / rejects. All of that — status, review
   // record, and the batch payout — happens atomically inside the

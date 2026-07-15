@@ -48,8 +48,8 @@ export default async function InternalMissionDetailPage({
         </article>
         <article>
           <span>Payment batch</span>
-          <strong>{mission.payoutPerFiveSubmissions}</strong>
-          <small>Per 5 approved submissions</small>
+          <strong>{mission.payoutPerThreeSubmissions}</strong>
+          <small>Per 3 approved submissions</small>
         </article>
         <article>
           <span>Funding source</span>
