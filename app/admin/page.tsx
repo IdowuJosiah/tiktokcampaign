@@ -13,6 +13,7 @@ export default async function AdminOverviewPage() {
   ]);
 
   const pendingReview = campaigns.filter((c) => c.status === "Draft").length;
+  const liveCampaigns = campaigns.filter((c) => c.status === "Live");
   const openDisputes = submissions.filter((s) => s.status === "Rejected").length;
   const totalSubs = submissions.length;
 
@@ -45,6 +46,41 @@ export default async function AdminOverviewPage() {
           <div style={{ fontSize: 24, fontWeight: 700 }}>{walletStats.floatLabel}</div>
           <div style={{ fontSize: 12, color: "#99a1af", marginTop: 6 }}>brand wallet balance</div>
         </div>
+      </div>
+
+      {/* Live campaigns */}
+      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, marginBottom: 20, overflow: "hidden" }}>
+        <div style={{ padding: "18px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: 16, fontWeight: 700 }}>Live campaigns</div>
+          <span style={{ fontSize: 13, color: "#00d9a3", background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.25)", borderRadius: 999, padding: "3px 12px" }}>{liveCampaigns.length} live</span>
+        </div>
+        {liveCampaigns.length === 0 ? (
+          <div style={{ padding: "32px 24px", color: "#99a1af", fontSize: 14 }}>No live campaigns right now.</div>
+        ) : (
+          <div>
+            {liveCampaigns.map((c, i) => (
+              <Link
+                key={c.id}
+                href={`/admin/campaigns/${c.id}`}
+                style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: 16, alignItems: "center", padding: "15px 24px", borderBottom: i < liveCampaigns.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", textDecoration: "none", color: "inherit" }}
+              >
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{c.title}</div>
+                  <div style={{ fontSize: 12, color: "#99a1af", marginTop: 2 }}>{c.brand}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 13, color: "#99a1af" }}>Pool</div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>{c.rewardPool}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 13, color: "#99a1af" }}>Deadline</div>
+                  <div style={{ fontSize: 14 }}>{c.deadline}</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Bottom two-column panel */}
