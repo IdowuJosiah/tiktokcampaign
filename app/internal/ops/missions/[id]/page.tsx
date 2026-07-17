@@ -24,6 +24,7 @@ export default async function InternalMissionDetailPage({
 
   const isRejected = mission.status === "Rejected";
   const isLive = mission.status === "Live";
+  const isClosed = mission.status === "Closed";
 
   return (
     <AppShell>
@@ -96,11 +97,16 @@ export default async function InternalMissionDetailPage({
         <div className="section-title">
           <div>
             <p className="eyebrow">Decision</p>
-            <h2>{isLive ? "This campaign is live." : isRejected ? "This campaign was rejected." : "Approve or reject this campaign."}</h2>
+            <h2>{isLive ? "This campaign is live." : isRejected ? "This campaign was rejected." : isClosed ? "This campaign is closed." : "Approve or reject this campaign."}</h2>
           </div>
         </div>
 
-        {isRejected ? (
+        {isClosed ? (
+          <p className="muted-copy">
+            This campaign was closed by an admin. Unused funds have been refunded to the brand&apos;s wallet.
+            The brand will need to create a new campaign.
+          </p>
+        ) : isRejected ? (
           <p className="muted-copy">
             Reason: {mission.rejectionReason || "No reason recorded."}
             <br />
@@ -141,7 +147,7 @@ export default async function InternalMissionDetailPage({
         )}
       </section>
 
-      {isLive ? (
+      {(isLive || isClosed) ? (
         <section className="panel compact">
           <div className="section-title">
             <div>
