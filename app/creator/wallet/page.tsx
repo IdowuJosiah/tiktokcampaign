@@ -48,7 +48,7 @@ export default async function CreatorWalletPage({
           </div>
           <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 16, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 14 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               Pending balance
             </div>
             <div style={{ fontSize: 32, fontWeight: 700, marginTop: 6 }}>{wallet.pendingLabel}</div>

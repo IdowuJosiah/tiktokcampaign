@@ -38,7 +38,7 @@ export default async function CreatorProfilePage({
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Setup progress — {completedSteps} / {steps.length} complete</div>
           <div style={{ display: "flex", gap: 8 }}>
             {steps.map((step) => (
-              <div key={step.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: step.done ? "#00d9a3" : "#99a1af" }}>
+              <div key={step.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: step.done ? "#00d9a3" : "var(--muted)" }}>
                 <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "rgba(0,0,0,0.06)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "var(--line)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
                   {step.done ? "✓" : "·"}
                 </div>

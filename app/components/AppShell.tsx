@@ -30,7 +30,7 @@ function NavItem({ href, icon, label, active }: { href: string; icon: React.Reac
     padding: "0 14px",
     height: 46,
     borderRadius: 10,
-    color: active ? "#00d9a3" : "#99a1af",
+    color: active ? "#00d9a3" : "var(--muted)",
     background: active ? "rgba(0,217,163,0.08)" : "transparent",
     border: `1px solid ${active ? "rgba(0,217,163,0.3)" : "transparent"}`,
     textDecoration: "none",

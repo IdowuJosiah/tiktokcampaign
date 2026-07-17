@@ -19,7 +19,7 @@ function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selecte
       style={{
         display: "block",
         background: selected ? "rgba(0,217,163,0.06)" : "#fff",
-        border: selected ? "1px solid rgba(0,217,163,0.3)" : "1px solid rgba(255,255,255,0.1)",
+        border: selected ? "1px solid rgba(0,217,163,0.3)" : "1px solid var(--line)",
         borderRadius: 12,
         padding: 16,
         cursor: "pointer",
@@ -29,7 +29,7 @@ function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selecte
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: 14, fontWeight: 700 }}>{mission.title}</span>
-        <span style={{ fontSize: 11, color: selected ? "#ff8904" : "#99a1af" }}>{waitLabel}</span>
+        <span style={{ fontSize: 11, color: selected ? "#ff8904" : "var(--muted)" }}>{waitLabel}</span>
       </div>
       <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>
         {mission.brand} · {mission.rewardPool} pool
@@ -67,7 +67,7 @@ export default async function AdminCampaignQueuePage({
 
       {pending.length === 0 ? (
         <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
           <div>Queue is clear — no campaigns pending review.</div>
         </div>
       ) : (

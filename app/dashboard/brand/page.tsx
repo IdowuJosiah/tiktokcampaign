@@ -121,7 +121,7 @@ export default async function BrandDashboardPage({
                 <div style={{ fontSize: 15, fontWeight: 700 }}>{c.title}</div>
                 <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 2 }}>{c.brand}</div>
               </div>
-              <span style={{ fontSize: 12, color: c.status === "Live" ? "#00d9a3" : "#99a1af", background: c.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${c.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "4px 10px" }}>
+              <span style={{ fontSize: 12, color: c.status === "Live" ? "#00d9a3" : "var(--muted)", background: c.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${c.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "4px 10px" }}>
                 {c.status}
               </span>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#00d9a3", minWidth: 90, textAlign: "right" }}>{c.rewardPool}</div>

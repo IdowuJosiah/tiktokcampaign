@@ -24,7 +24,7 @@ export default async function BrandMissionDetailPage({
       <div style={{ maxWidth: 980 }}>
         {/* Back */}
         <Link href="/brand/missions" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 14, textDecoration: "none", marginBottom: 20 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           Back to campaigns
         </Link>
 
@@ -39,7 +39,7 @@ export default async function BrandMissionDetailPage({
                 <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>{mission.title}</h1>
                 <div style={{ color: "var(--muted)", fontSize: 15, marginTop: 5 }}>{mission.brand}</div>
               </div>
-              <span style={{ fontSize: 13, color: mission.status === "Live" ? "#00d9a3" : "#99a1af", background: mission.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${mission.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "6px 14px" }}>
+              <span style={{ fontSize: 13, color: mission.status === "Live" ? "#00d9a3" : "var(--muted)", background: mission.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${mission.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "6px 14px" }}>
                 {mission.status}
               </span>
             </div>

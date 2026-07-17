@@ -236,7 +236,7 @@ export default async function BrandWalletPage({
                 style={{
                   fontSize: 14,
                   fontWeight: 700,
-                  color: tx.positive ? "#00d9a3" : "#d1d5dc",
+                  color: tx.positive ? "#00d9a3" : "var(--foreground)",
                   minWidth: 110,
                   textAlign: "right",
                   whiteSpace: "nowrap",

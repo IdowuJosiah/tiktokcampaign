@@ -24,7 +24,7 @@ export default async function CampaignsPage() {
         </div>
         <div style={{ flex: 1 }} />
         <span style={{ fontSize: 13, color: "var(--muted)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 13px", display: "flex", alignItems: "center", gap: 7 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
           Sort: Highest reward
         </span>
       </div>
@@ -57,7 +57,7 @@ export default async function CampaignsPage() {
                   <span style={{ color: "var(--muted)", fontSize: 12, marginLeft: 6 }}>pool</span>
                 </div>
                 <span style={{ color: "var(--muted)", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                   {c.deadline ?? "Open"}
                 </span>
               </div>

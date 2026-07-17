@@ -76,7 +76,7 @@ export default async function AdminOverviewPage() {
                   <div style={{ fontSize: 13, color: "var(--muted)" }}>Deadline</div>
                   <div style={{ fontSize: 14 }}>{c.deadline}</div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
               </Link>
             ))}
           </div>
@@ -113,7 +113,7 @@ export default async function AdminOverviewPage() {
 
             <Link href="/admin/submissions" style={{ display: "flex", alignItems: "center", gap: 14, padding: 14, border: "1px solid var(--line)", borderRadius: 11, cursor: "pointer", textDecoration: "none", color: "inherit" }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>All submissions</div>

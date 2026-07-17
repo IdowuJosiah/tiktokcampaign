@@ -89,7 +89,7 @@ export default async function AdminWalletPage() {
       <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
         {payoutQueue.length === 0 ? (
           <div style={{ padding: 48, textAlign: "center", color: "var(--muted)" }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
             <div>No pending payouts.</div>
           </div>
         ) : (

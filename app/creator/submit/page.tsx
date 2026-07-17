@@ -22,7 +22,7 @@ export default async function CreatorSubmitPage({
     <AppShell>
       <div style={{ maxWidth: 760 }}>
         <Link href="/campaigns" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 14, textDecoration: "none", marginBottom: 18 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           Back to campaigns
         </Link>
 

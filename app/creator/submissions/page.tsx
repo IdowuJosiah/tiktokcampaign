@@ -71,7 +71,7 @@ export default async function CreatorSubmissionsPage() {
                     </a>
                     <span style={{ color: "var(--muted)", fontSize: 13, flexShrink: 0 }}>{submission.views} views</span>
                     <span style={{ color: "var(--muted)", fontSize: 13, flexShrink: 0 }}>{submission.reward}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: STATUS_COLORS[submission.status] ?? "#d1d5dc", flexShrink: 0 }}>{submission.status}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: STATUS_COLORS[submission.status] ?? "var(--muted)", flexShrink: 0 }}>{submission.status}</span>
                   </div>
                 ))}
               </div>

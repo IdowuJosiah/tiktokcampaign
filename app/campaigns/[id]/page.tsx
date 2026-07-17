@@ -21,7 +21,7 @@ export default async function CampaignBriefPage({
       <div style={{ maxWidth: 920 }}>
         {/* Back */}
         <Link href="/campaigns" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 14, textDecoration: "none", marginBottom: 20 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           Back to campaigns
         </Link>
 
@@ -44,12 +44,12 @@ export default async function CampaignBriefPage({
             <div style={{ display: "flex", gap: 20, marginTop: 14, color: "var(--muted)", fontSize: 14, flexWrap: "wrap" }}>
               {campaign.deadline && (
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                   Deadline: {campaign.deadline}
                 </span>
               )}
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 {campaign.viewsPerSubmission} views required
               </span>
             </div>
@@ -125,7 +125,7 @@ export default async function CampaignBriefPage({
 
         {/* Payout info */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, background: "rgba(255,221,85,0.06)", border: "1px solid rgba(255,221,85,0.25)", borderRadius: 14, padding: "16px 20px", marginTop: 18 }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffdd55" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0a800" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <div style={{ flex: 1 }}>
             <span style={{ fontSize: 14, color: "var(--foreground)", fontWeight: 700 }}>Earn {campaign.payoutPerThreeSubmissions}</span>
             <span style={{ fontSize: 14, color: "var(--foreground)" }}> per 3 approved submissions in this campaign.</span>
