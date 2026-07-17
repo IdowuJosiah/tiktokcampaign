@@ -5,8 +5,8 @@ export default function NotFound() {
     <main
       style={{
         minHeight: "100vh",
-        background: "#0a0a0a",
-        color: "#fff",
+        background: "var(--background)",
+        color: "var(--foreground)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -40,7 +40,7 @@ export default function NotFound() {
       <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 28, margin: "0 0 12px" }}>
         Page not found
       </h1>
-      <p style={{ color: "#99a1af", fontSize: 15, margin: "0 0 28px", maxWidth: 380, lineHeight: 1.5 }}>
+      <p style={{ color: "var(--muted)", fontSize: 15, margin: "0 0 28px", maxWidth: 380, lineHeight: 1.5 }}>
         The page you&apos;re looking for doesn&apos;t exist or may have moved.
       </p>
       <Link

@@ -18,7 +18,7 @@ export default async function AdminLoginPage({
         </div>
 
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 30, textAlign: "center", margin: "14px 0 6px" }}>Admin Console</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Sign in to manage VoiceRank</p>
+        <p style={{ color: "var(--muted)", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Sign in to manage VoiceRank</p>
 
         <FormStatus error={error} />
 

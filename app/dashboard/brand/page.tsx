@@ -26,7 +26,7 @@ export default async function BrandDashboardPage({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Brand Dashboard</h1>
-          <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Manage your campaigns and track performance</p>
+          <p style={{ color: "var(--muted)", fontSize: 15, margin: "6px 0 0" }}>Manage your campaigns and track performance</p>
         </div>
         <Link href="/brand/missions/new" style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
@@ -37,11 +37,11 @@ export default async function BrandDashboardPage({
       <FormStatus error={error} success={success} />
 
       {/* Wallet */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, marginBottom: 28, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, marginBottom: 28, flexWrap: "wrap" }}>
         <div>
-          <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 8 }}>Wallet balance</div>
+          <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>Wallet balance</div>
           <div style={{ fontSize: 26, fontWeight: 700, color: "#00d9a3" }}>{walletBalance}</div>
-          <p style={{ color: "#99a1af", fontSize: 13, margin: "6px 0 0" }}>Reward pools are funded from this balance automatically when you create a campaign.</p>
+          <p style={{ color: "var(--muted)", fontSize: 13, margin: "6px 0 0" }}>Reward pools are funded from this balance automatically when you create a campaign.</p>
         </div>
         <form action={initiateBrandDeposit} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <input
@@ -51,7 +51,7 @@ export default async function BrandDashboardPage({
             min="1"
             step="0.01"
             placeholder="Amount (₦)"
-            style={{ flex: 1, minWidth: 140, height: 44, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, minWidth: 140, height: 44, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit" }}
           />
           <button type="submit" style={{ height: 44, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, cursor: "pointer" }}>
             Add funds
@@ -61,9 +61,9 @@ export default async function BrandDashboardPage({
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, marginBottom: 28 }}>
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 10 }}>Total Campaigns</div>
+            <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 10 }}>Total Campaigns</div>
             <div style={{ fontSize: 24, fontWeight: 700 }}>{campaigns.length}</div>
           </div>
           <div style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(0,217,163,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -71,9 +71,9 @@ export default async function BrandDashboardPage({
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 10 }}>Live Campaigns</div>
+            <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 10 }}>Live Campaigns</div>
             <div style={{ fontSize: 24, fontWeight: 700 }}>{liveCampaigns.length}</div>
             <div style={{ color: "#00d9a3", fontSize: 12, marginTop: 4 }}>Creator visible</div>
           </div>
@@ -82,9 +82,9 @@ export default async function BrandDashboardPage({
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 10 }}>Total Submissions</div>
+            <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 10 }}>Total Submissions</div>
             <div style={{ fontSize: 24, fontWeight: 700 }}>{submissions.length}</div>
           </div>
           <div style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(255,137,4,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -92,9 +92,9 @@ export default async function BrandDashboardPage({
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ color: "#99a1af", fontSize: 13, marginBottom: 10 }}>Pending Review</div>
+            <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 10 }}>Pending Review</div>
             <div style={{ fontSize: 24, fontWeight: 700 }}>{pendingSubs.length}</div>
           </div>
           <div style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(124,58,237,0.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -106,22 +106,22 @@ export default async function BrandDashboardPage({
       {/* Campaign list */}
       <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 600, margin: "0 0 20px" }}>Your Campaigns</h2>
 
-      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
         {campaigns.length === 0 ? (
-          <div style={{ padding: 32, textAlign: "center", color: "#99a1af" }}>
+          <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>
             No campaigns yet. <Link href="/brand/missions/new" style={{ color: "#00d9a3", textDecoration: "none", fontWeight: 700 }}>Create your first campaign →</Link>
           </div>
         ) : (
           campaigns.map((c, i) => (
-            <Link key={c.id} href={`/brand/missions/${c.id}`} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", borderBottom: i < campaigns.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", textDecoration: "none", color: "inherit" }}>
+            <Link key={c.id} href={`/brand/missions/${c.id}`} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", borderBottom: i < campaigns.length - 1 ? "1px solid var(--line)" : "none", textDecoration: "none", color: "inherit" }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="1.8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 15, fontWeight: 700 }}>{c.title}</div>
-                <div style={{ color: "#99a1af", fontSize: 13, marginTop: 2 }}>{c.brand}</div>
+                <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 2 }}>{c.brand}</div>
               </div>
-              <span style={{ fontSize: 12, color: c.status === "Live" ? "#00d9a3" : "#99a1af", background: c.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(255,255,255,0.06)", border: `1px solid ${c.status === "Live" ? "rgba(0,217,163,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 999, padding: "4px 10px" }}>
+              <span style={{ fontSize: 12, color: c.status === "Live" ? "#00d9a3" : "#99a1af", background: c.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${c.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "4px 10px" }}>
                 {c.status}
               </span>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#00d9a3", minWidth: 90, textAlign: "right" }}>{c.rewardPool}</div>

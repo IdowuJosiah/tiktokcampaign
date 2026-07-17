@@ -19,7 +19,7 @@ export default async function LoginPage({
         </div>
 
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 30, textAlign: "center", margin: "14px 0 6px" }}>Welcome back</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Sign in to continue earning</p>
+        <p style={{ color: "var(--muted)", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Sign in to continue earning</p>
 
         <FormStatus error={error} />
 
@@ -31,7 +31,7 @@ export default async function LoginPage({
             </div>
             <div className="auth-field" style={{ marginTop: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-                <label htmlFor="login-password" style={{ margin: 0, fontSize: 13, color: "#d1d5dc" }}>Password</label>
+                <label htmlFor="login-password" style={{ margin: 0, fontSize: 13, color: "#374151" }}>Password</label>
                 <span style={{ fontSize: 13, color: "#00d9a3", cursor: "pointer" }}>Forgot password?</span>
               </div>
               <input id="login-password" name="password" required type="password" placeholder="••••••••" />
@@ -57,7 +57,7 @@ export default async function LoginPage({
           </form>
         </div>
 
-        <p style={{ textAlign: "center", color: "#99a1af", fontSize: 14, marginTop: 22 }}>
+        <p style={{ textAlign: "center", color: "var(--muted)", fontSize: 14, marginTop: 22 }}>
           Don&apos;t have an account? <Link href="/signup" style={{ color: "#00d9a3", fontWeight: 700, textDecoration: "none" }}>Sign up</Link>
         </p>
       </div>

@@ -18,8 +18,8 @@ const icons: Record<string, React.ReactNode> = {
   ops: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>,
   help: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>,
   logout: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-  bell: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
-  searchbar: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>,
+  bell: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>,
+  searchbar: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>,
 };
 
 function NavItem({ href, icon, label, active }: { href: string; icon: React.ReactNode; label: string; active?: boolean }) {
@@ -50,7 +50,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   if (!session) {
     return (
-      <main style={{ minHeight: "100vh", background: "#0a0a0a" }}>
+      <main style={{ minHeight: "100vh", background: "var(--background)" }}>
         {children}
       </main>
     );
@@ -93,21 +93,21 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     : adminNav;
 
   return (
-    <div className="vr-shell" style={{ display: "flex", minHeight: "100vh", background: "#0a0a0a", color: "#fff" }}>
+    <div className="vr-shell" style={{ display: "flex", minHeight: "100vh", background: "var(--background)", color: "var(--foreground)" }}>
       {/* Mobile drawer toggle (CSS-only, keeps this a server component) */}
       <input type="checkbox" id="vr-nav" className="vr-nav-toggle" hidden />
       <label htmlFor="vr-nav" className="vr-overlay" aria-hidden="true" />
 
       {/* Sidebar */}
-      <aside className="vr-sidebar" style={{ width: 256, flexShrink: 0, background: "rgba(255,255,255,0.02)", borderRight: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
-        <div style={{ padding: "22px 24px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+      <aside className="vr-sidebar" style={{ width: 256, flexShrink: 0, background: "#ffffff", borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
+        <div style={{ padding: "22px 24px", borderBottom: "1px solid var(--line)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,217,163,0.15)", border: "1px solid rgba(0,217,163,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <MicIcon />
             </div>
             <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 16 }}>VoiceRank</span>
           </div>
-          <div style={{ color: "#99a1af", fontSize: 13, marginTop: 6 }}>{portalLabel}</div>
+          <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>{portalLabel}</div>
         </div>
 
         <nav style={{ padding: 16, display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
@@ -116,13 +116,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        <div style={{ padding: 16, borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", gap: 4 }}>
-          <a href="#" style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 8, color: "#99a1af", textDecoration: "none", fontSize: 14 }}>
+        <div style={{ padding: 16, borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 4 }}>
+          <a href="#" style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 8, color: "var(--muted)", textDecoration: "none", fontSize: 14 }}>
             {icons.help}
             <span>Help &amp; Support</span>
           </a>
           <form action={logOut}>
-            <button type="submit" style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 8, color: "#99a1af", background: "transparent", border: "none", fontSize: 14, cursor: "pointer" }}>
+            <button type="submit" style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "9px 12px", borderRadius: 8, color: "var(--muted)", background: "transparent", border: "none", fontSize: 14, cursor: "pointer" }}>
               {icons.logout}
               <span>Logout</span>
             </button>
@@ -133,14 +133,14 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {/* Topbar */}
-        <header className="vr-topbar" style={{ height: 64, flexShrink: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
+        <header className="vr-topbar" style={{ height: 64, flexShrink: 0, borderBottom: "1px solid var(--line)", background: "rgba(248,249,250,0.95)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px" }}>
           <div style={{ display: "flex", alignItems: "center", minWidth: 0, gap: 12 }}>
             <label htmlFor="vr-nav" className="vr-hamburger" aria-label="Open menu">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </label>
             {session.role === "admin" ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 14, color: "#99a1af" }}>Platform status</span>
+                <span style={{ fontSize: 14, color: "var(--muted)" }}>Platform status</span>
                 <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#00d9a3" }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d9a3", display: "inline-block" }} />
                   All systems operational
@@ -149,7 +149,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             ) : (
               <div className="vr-search" style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
                 <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
-                <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+                <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
               </div>
             )}
           </div>
@@ -159,11 +159,11 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
                 {icons.bell}
               </div>
             )}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: session.role !== "admin" ? 18 : 0, borderLeft: session.role !== "admin" ? "1px solid rgba(255,255,255,0.1)" : "none" }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: session.role === "admin" ? "rgba(124,58,237,0.2)" : "rgba(0,217,163,0.2)", border: `1px solid ${session.role === "admin" ? "rgba(124,58,237,0.4)" : "rgba(0,217,163,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: session.role === "admin" ? "#a78bfa" : "#00d9a3", fontSize: 13, fontWeight: 700 }}>{initials}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: session.role !== "admin" ? 18 : 0, borderLeft: session.role !== "admin" ? "1px solid var(--line)" : "none" }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: session.role === "admin" ? "rgba(124,58,237,0.15)" : "rgba(0,217,163,0.15)", border: `1px solid ${session.role === "admin" ? "rgba(124,58,237,0.3)" : "rgba(0,217,163,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", color: session.role === "admin" ? "#7c3aed" : "#00d9a3", fontSize: 13, fontWeight: 700 }}>{initials}</div>
               <div className="vr-user-meta" style={{ lineHeight: 1.2 }}>
-                <div style={{ fontSize: 14, color: "#fff" }}>{session.role === "admin" ? "Admin" : session.email.split("@")[0]}</div>
-                <div style={{ fontSize: 12, color: "#99a1af" }}>{session.email}</div>
+                <div style={{ fontSize: 14, color: "var(--foreground)" }}>{session.role === "admin" ? "Admin" : session.email.split("@")[0]}</div>
+                <div style={{ fontSize: 12, color: "var(--muted)" }}>{session.email}</div>
               </div>
             </div>
           </div>

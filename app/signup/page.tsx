@@ -34,13 +34,13 @@ export default async function SignupPage({
           </div>
 
           <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, textAlign: "center", margin: 0 }}>Create your account</h1>
-          <p style={{ color: "#99a1af", fontSize: 14, textAlign: "center", margin: "8px 0 26px" }}>Choose how you want to use VoiceRank</p>
+          <p style={{ color: "var(--muted)", fontSize: 14, textAlign: "center", margin: "8px 0 26px" }}>Choose how you want to use VoiceRank</p>
 
           <FormStatus error={error} />
 
           <SignupForm defaultRole={defaultRole} />
 
-          <p style={{ textAlign: "center", color: "#99a1af", fontSize: 14, marginTop: 22 }}>
+          <p style={{ textAlign: "center", color: "var(--muted)", fontSize: 14, marginTop: 22 }}>
             Already have an account?{" "}
             <Link href="/login" style={{ color: "#00d9a3", fontWeight: 700, textDecoration: "none" }}>Sign in</Link>
           </p>

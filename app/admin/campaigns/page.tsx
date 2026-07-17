@@ -18,7 +18,7 @@ function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selecte
       href={`/admin/campaigns?id=${mission.id}`}
       style={{
         display: "block",
-        background: selected ? "rgba(0,217,163,0.06)" : "rgba(255,255,255,0.02)",
+        background: selected ? "rgba(0,217,163,0.06)" : "#fff",
         border: selected ? "1px solid rgba(0,217,163,0.3)" : "1px solid rgba(255,255,255,0.1)",
         borderRadius: 12,
         padding: 16,
@@ -31,7 +31,7 @@ function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selecte
         <span style={{ fontSize: 14, fontWeight: 700 }}>{mission.title}</span>
         <span style={{ fontSize: 11, color: selected ? "#ff8904" : "#99a1af" }}>{waitLabel}</span>
       </div>
-      <div style={{ fontSize: 13, color: "#99a1af", marginTop: 4 }}>
+      <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>
         {mission.brand} · {mission.rewardPool} pool
       </div>
     </a>
@@ -60,13 +60,13 @@ export default async function AdminCampaignQueuePage({
     <AppShell>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Campaign Review</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>
+        <p style={{ color: "var(--muted)", fontSize: 15, margin: "6px 0 0" }}>
           {pending.length} campaign{pending.length !== 1 ? "s" : ""} awaiting approval · oldest first
         </p>
       </div>
 
       {pending.length === 0 ? (
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 48, textAlign: "center", color: "#99a1af" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
           <div>Queue is clear — no campaigns pending review.</div>
         </div>
@@ -86,24 +86,24 @@ export default async function AdminCampaignQueuePage({
 
           {/* Detail panel */}
           {selected && (
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 26 }}>
+            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 26 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <div>
                   <div style={{ fontSize: 19, fontWeight: 700 }}>{selected.title}</div>
-                  <div style={{ fontSize: 14, color: "#99a1af", marginTop: 4 }}>
+                  <div style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>
                     {selected.brand} · {selected.deadline}
                   </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 24, fontWeight: 700, color: "#00d9a3" }}>{selected.rewardPool}</div>
-                  <div style={{ fontSize: 13, color: "#99a1af" }}>pool · {selected.payoutPerThreeSubmissions}/3 subs</div>
+                  <div style={{ fontSize: 13, color: "var(--muted)" }}>pool · {selected.payoutPerThreeSubmissions}/3 subs</div>
                 </div>
               </div>
 
               {/* Brief */}
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
-                <div style={{ fontSize: 12, color: "#99a1af", fontWeight: 700, marginBottom: 6 }}>BRIEF</div>
-                <p style={{ fontSize: 14, color: "#d1d5dc", margin: 0, lineHeight: 1.5 }}>{selected.brief}</p>
+              <div style={{ background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
+                <div style={{ fontSize: 12, color: "var(--muted)", fontWeight: 700, marginBottom: 6 }}>BRIEF</div>
+                <p style={{ fontSize: 14, color: "var(--foreground)", margin: 0, lineHeight: 1.5 }}>{selected.brief}</p>
               </div>
 
               {/* Review checklist */}
@@ -117,7 +117,7 @@ export default async function AdminCampaignQueuePage({
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(0,217,163,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
                     </div>
-                    <span style={{ fontSize: 14, color: "#d1d5dc" }}>{check}</span>
+                    <span style={{ fontSize: 14, color: "var(--foreground)" }}>{check}</span>
                   </div>
                 ))}
               </div>
@@ -125,13 +125,13 @@ export default async function AdminCampaignQueuePage({
               {/* Funding status */}
               <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,217,163,0.06)", border: "1px solid rgba(0,217,163,0.3)", borderRadius: 11, padding: "14px 18px", marginBottom: 22 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/></svg>
-                <span style={{ fontSize: 14, color: "#d1d5dc" }}>
+                <span style={{ fontSize: 14, color: "var(--foreground)" }}>
                   Funding status:{" "}
                   <strong style={{ color: selected.fundingStatus === "Funded" ? "#00d9a3" : "#ff8904" }}>
                     {selected.fundingStatus ?? "Unknown"}
                   </strong>
                   {selected.depositReference && (
-                    <span style={{ color: "#99a1af", fontSize: 13, marginLeft: 8 }}>· ref {selected.depositReference}</span>
+                    <span style={{ color: "var(--muted)", fontSize: 13, marginLeft: 8 }}>· ref {selected.depositReference}</span>
                   )}
                 </span>
               </div>

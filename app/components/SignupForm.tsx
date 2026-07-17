@@ -8,9 +8,9 @@ const INPUT_STYLE: React.CSSProperties = {
   height: 44,
   padding: "0 14px",
   fontSize: 14,
-  color: "#fff",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  color: "var(--foreground)" as string,
+  background: "rgba(0,0,0,0.04)",
+  border: "1px solid var(--line)" as string,
   borderRadius: 8,
   outline: "none",
   fontFamily: "inherit",
@@ -28,10 +28,10 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
     justifyContent: "center",
     gap: 8,
     padding: "18px 12px",
-    border: `1px solid ${active ? "#00d9a3" : "rgba(255,255,255,0.1)"}`,
+    border: `1px solid ${active ? "#00d9a3" : "var(--line)"}`,
     borderRadius: 12,
-    background: active ? "rgba(0,217,163,0.1)" : "rgba(255,255,255,0.03)",
-    color: active ? "#00d9a3" : "#99a1af",
+    background: active ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.03)",
+    color: active ? "#00d9a3" : "var(--muted)",
     cursor: "pointer",
     transition: "all 0.15s",
   });
@@ -44,28 +44,28 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
           <input type="radio" name="role" value="creator" checked={role === "creator"} onChange={() => setRole("creator")} style={{ display: "none" }} />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg>
           <span style={{ fontSize: 14, fontWeight: 700, color: "inherit" }}>Creator</span>
-          <span style={{ fontSize: 12, color: "#99a1af" }}>Earn from posts</span>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>Earn from posts</span>
         </div>
         <div style={cardStyle(role === "brand")} onClick={() => setRole("brand")}>
           <input type="radio" name="role" value="brand" checked={role === "brand"} onChange={() => setRole("brand")} style={{ display: "none" }} />
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
           <span style={{ fontSize: 14, fontWeight: 700, color: "inherit" }}>Brand</span>
-          <span style={{ fontSize: 12, color: "#99a1af" }}>Launch campaigns</span>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>Launch campaigns</span>
         </div>
       </div>
 
       {/* Fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 18 }}>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Full name</label>
+          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Full name</label>
           <input name="name" required type="text" placeholder="Ada Obi" style={INPUT_STYLE} />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Email</label>
+          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Email</label>
           <input name="email" required type="email" placeholder="you@example.com" style={INPUT_STYLE} />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Password</label>
+          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Password</label>
           <input name="password" required type="password" placeholder="Min 8 characters, 1 number" style={INPUT_STYLE} />
         </div>
       </div>
@@ -78,10 +78,10 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
       </button>
 
       {/* Divider */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0", color: "#6a7282", fontSize: 12 }}>
-        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0", color: "var(--muted)", fontSize: 12 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
         OR
-        <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
+        <div style={{ flex: 1, height: 1, background: "var(--line)" }} />
       </div>
 
       {/* OAuth */}
@@ -90,7 +90,7 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
           type="submit"
           formAction={continueWithGoogle}
           formNoValidate
-          style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, cursor: "pointer" }}
+          style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.9 3.2-7.8z"/>

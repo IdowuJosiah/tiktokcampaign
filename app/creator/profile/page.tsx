@@ -29,7 +29,7 @@ export default async function CreatorProfilePage({
     <AppShell>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Profile &amp; Setup</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Complete your profile to start earning</p>
+        <p style={{ color: "var(--muted)", fontSize: 15, margin: "6px 0 0" }}>Complete your profile to start earning</p>
       </div>
 
       {/* Setup progress */}
@@ -39,7 +39,7 @@ export default async function CreatorProfilePage({
           <div style={{ display: "flex", gap: 8 }}>
             {steps.map((step) => (
               <div key={step.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: step.done ? "#00d9a3" : "#99a1af" }}>
-                <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "rgba(255,255,255,0.06)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "rgba(255,255,255,0.12)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "rgba(0,0,0,0.06)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "var(--line)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
                   {step.done ? "✓" : "·"}
                 </div>
                 {step.label}
@@ -47,7 +47,7 @@ export default async function CreatorProfilePage({
             ))}
           </div>
         </div>
-        <div style={{ height: 6, width: 160, background: "rgba(255,255,255,0.1)", borderRadius: 99, overflow: "hidden" }}>
+        <div style={{ height: 6, width: 160, background: "rgba(0,0,0,0.1)", borderRadius: 99, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${(completedSteps / steps.length) * 100}%`, background: "#00d9a3", borderRadius: 99 }} />
         </div>
       </div>
@@ -56,8 +56,8 @@ export default async function CreatorProfilePage({
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
         {/* TikTok */}
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 1</div>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 1</div>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>TikTok Account</h2>
           {creator?.verifiedAt ? (
             <div>
@@ -80,15 +80,15 @@ export default async function CreatorProfilePage({
             </div>
           ) : (
             <div>
-              <p style={{ color: "#99a1af", fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Connect your TikTok account to verify ownership and unlock campaign submissions.</p>
+              <p style={{ color: "var(--muted)", fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Connect your TikTok account to verify ownership and unlock campaign submissions.</p>
               <a href="/api/tiktok/connect" style={{ display: "inline-flex", alignItems: "center", height: 44, padding: "0 20px", fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 8, textDecoration: "none" }}>Connect TikTok →</a>
             </div>
           )}
         </div>
 
         {/* Bank */}
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 24 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#99a1af", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 2</div>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 2</div>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>Bank Account</h2>
           <PayoutSetupForm
             defaultAccountName={payout.accountName}
@@ -100,8 +100,8 @@ export default async function CreatorProfilePage({
 
       {/* Submission history */}
       {submissions.length > 0 && (
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.08)", fontSize: 15, fontWeight: 700 }}>Submission history</div>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)", fontSize: 15, fontWeight: 700 }}>Submission history</div>
           <div style={{ padding: "8px 22px" }}>
             {submissions.map((submission) => (
               <SubmissionRow submission={submission} key={submission.id} />

@@ -11,17 +11,17 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
     </svg>
   ),
   allocation: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5dc" strokeWidth="2.5">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2.5">
       <path d="M12 5v14M5 12l7-7 7 7" />
     </svg>
   ),
   fee: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="2.5">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2.5">
       <path d="M12 5v14M5 12l7-7 7 7" />
     </svg>
   ),
   payout: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5dc" strokeWidth="2.5">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2.5">
       <path d="M12 5v14M5 12l7-7 7 7" />
     </svg>
   ),
@@ -29,13 +29,13 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 
 function txIconBg(type: string) {
   if (type === "deposit") return "rgba(0,217,163,0.12)";
-  if (type === "fee") return "rgba(255,255,255,0.04)";
-  return "rgba(255,255,255,0.07)";
+  if (type === "fee") return "rgba(0,0,0,0.04)";
+  return "rgba(0,0,0,0.06)";
 }
 
 const headerCell: React.CSSProperties = {
   fontSize: 12,
-  color: "#6a7282",
+  color: "var(--muted)",
   fontWeight: 700,
   textTransform: "uppercase",
   letterSpacing: "0.4px",
@@ -60,7 +60,7 @@ export default async function BrandWalletPage({
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>
           Wallet
         </h1>
-        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>
+        <p style={{ color: "var(--muted)", fontSize: 15, margin: "6px 0 0" }}>
           Fund your campaigns and track spending
         </p>
       </div>
@@ -77,11 +77,11 @@ export default async function BrandWalletPage({
             padding: 28,
           }}
         >
-          <div style={{ color: "#99a1af", fontSize: 14 }}>Confirmed balance</div>
+          <div style={{ color: "var(--muted)", fontSize: 14 }}>Confirmed balance</div>
           <div style={{ fontSize: 44, fontWeight: 700, color: "#00d9a3", lineHeight: 1.1, marginTop: 6 }}>
             {balance}
           </div>
-          <p style={{ color: "#99a1af", fontSize: 13, margin: "10px 0 20px", lineHeight: 1.5 }}>
+          <p style={{ color: "var(--muted)", fontSize: 13, margin: "10px 0 20px", lineHeight: 1.5 }}>
             Campaigns are funded automatically from this balance.
           </p>
           <form action={initiateBrandDeposit} style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -97,8 +97,8 @@ export default async function BrandWalletPage({
                 height: 44,
                 padding: "0 14px",
                 fontSize: 15,
-                color: "#fff",
-                background: "rgba(0,0,0,0.3)",
+                color: "var(--foreground)",
+                background: "rgba(0,0,0,0.06)",
                 border: "1px solid rgba(0,217,163,0.35)",
                 borderRadius: 9,
                 outline: "none",
@@ -128,13 +128,13 @@ export default async function BrandWalletPage({
 
         <div
           style={{
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "#fff",
+            border: "1px solid var(--line)",
             borderRadius: 16,
             padding: 28,
           }}
         >
-          <div style={{ color: "#99a1af", fontSize: 14, marginBottom: 6 }}>How deposits work</div>
+          <div style={{ color: "var(--muted)", fontSize: 14, marginBottom: 6 }}>How deposits work</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 16 }}>
             {[
               { step: "1", text: "Enter an amount and click Deposit funds" },
@@ -161,7 +161,7 @@ export default async function BrandWalletPage({
                 >
                   {s.step}
                 </div>
-                <span style={{ fontSize: 13, color: "#d1d5dc", lineHeight: 1.5, paddingTop: 3 }}>{s.text}</span>
+                <span style={{ fontSize: 13, color: "var(--foreground)", lineHeight: 1.5, paddingTop: 3 }}>{s.text}</span>
               </div>
             ))}
           </div>
@@ -172,8 +172,8 @@ export default async function BrandWalletPage({
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Transaction history</div>
       <div
         style={{
-          background: "rgba(255,255,255,0.02)",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: "#fff",
+          border: "1px solid var(--line)",
           borderRadius: 14,
           overflow: "hidden",
         }}
@@ -184,7 +184,7 @@ export default async function BrandWalletPage({
             gridTemplateColumns: "1fr auto auto",
             gap: 16,
             padding: "13px 22px",
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            borderBottom: "1px solid var(--line)",
           }}
         >
           <span style={headerCell}>Description</span>
@@ -193,7 +193,7 @@ export default async function BrandWalletPage({
         </div>
 
         {transactions.length === 0 ? (
-          <div style={{ padding: "40px 22px", textAlign: "center", color: "#99a1af", fontSize: 14 }}>
+          <div style={{ padding: "40px 22px", textAlign: "center", color: "var(--muted)", fontSize: 14 }}>
             No transactions yet. Deposit funds to get started.
           </div>
         ) : (
@@ -205,7 +205,7 @@ export default async function BrandWalletPage({
                 gridTemplateColumns: "1fr auto auto",
                 gap: 16,
                 padding: "16px 22px",
-                borderBottom: i < transactions.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                borderBottom: i < transactions.length - 1 ? "1px solid var(--line)" : "none",
                 alignItems: "center",
               }}
             >
@@ -225,13 +225,13 @@ export default async function BrandWalletPage({
                   {TYPE_ICON[tx.type] ?? TYPE_ICON.allocation}
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, color: "#fff" }}>{tx.label}</div>
-                  <div style={{ fontSize: 12, color: "#99a1af", marginTop: 2, textTransform: "capitalize" }}>
+                  <div style={{ fontSize: 14, color: "var(--foreground)" }}>{tx.label}</div>
+                  <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2, textTransform: "capitalize" }}>
                     {tx.type}
                   </div>
                 </div>
               </div>
-              <span style={{ fontSize: 13, color: "#99a1af", whiteSpace: "nowrap" }}>{tx.date}</span>
+              <span style={{ fontSize: 13, color: "var(--muted)", whiteSpace: "nowrap" }}>{tx.date}</span>
               <span
                 style={{
                   fontSize: 14,

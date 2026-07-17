@@ -12,18 +12,18 @@ export default async function AdminDisputesPage() {
     <AppShell>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>Dispute Resolution</h1>
-        <p style={{ color: "#99a1af", fontSize: 15, margin: "6px 0 0" }}>Rejected submissions available for appeal review · 48h SLA</p>
+        <p style={{ color: "var(--muted)", fontSize: 15, margin: "6px 0 0" }}>Rejected submissions available for appeal review · 48h SLA</p>
       </div>
 
       {disputes.length === 0 ? (
-        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 48, textAlign: "center", color: "#99a1af" }}>
+        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#99a1af" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
           <div>No rejected submissions — nothing to dispute.</div>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {disputes.map((d) => (
-            <div key={d.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 22 }}>
+            <div key={d.id} style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(0,217,163,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#00d9a3", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
@@ -31,14 +31,14 @@ export default async function AdminDisputesPage() {
                   </div>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>{d.handle}</div>
-                    <div style={{ fontSize: 13, color: "#99a1af" }}>{d.campaign}</div>
+                    <div style={{ fontSize: 13, color: "var(--muted)" }}>{d.campaign}</div>
                   </div>
                 </div>
               </div>
 
               <div style={{ background: "rgba(255,107,107,0.05)", border: "1px solid rgba(255,107,107,0.2)", borderRadius: 10, padding: 14, marginBottom: 18 }}>
                 <div style={{ fontSize: 12, color: "#ff6b6b", fontWeight: 700, marginBottom: 6 }}>REJECTION REASON</div>
-                <div style={{ fontSize: 13, color: "#d1d5dc", lineHeight: 1.5 }}>{d.reason}</div>
+                <div style={{ fontSize: 13, color: "var(--foreground)", lineHeight: 1.5 }}>{d.reason}</div>
               </div>
 
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -55,7 +55,7 @@ export default async function AdminDisputesPage() {
                 </form>
                 <Link
                   href={`/admin/submissions/${d.id}`}
-                  style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "#d1d5dc", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none" }}
+                  style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none" }}
                 >
                   View submission
                 </Link>
