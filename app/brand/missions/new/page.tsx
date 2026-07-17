@@ -50,7 +50,7 @@ export default async function NewMissionPage({
                 <input name="requiredHashtag" required type="text" maxLength={50} placeholder="#KudaSplit" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Required sound <span style={{ color: "#6a7282", fontWeight: 400 }}>(optional, must be a tiktok.com/music or /sound link)</span></label>
+                <label style={{ display: "block", fontSize: 13, color: "#d1d5dc", marginBottom: 7 }}>Required sound <span style={{ color: "#6a7282", fontWeight: 400 }}>(optional — TikTok sound link)</span></label>
                 <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "#fff", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
@@ -88,7 +88,7 @@ export default async function NewMissionPage({
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Funded from your wallet balance</div>
-              <p style={{ color: "#99a1af", fontSize: 14, margin: 0, lineHeight: 1.5 }}>This campaign is submitted as a draft first. The reward pool is deducted from your wallet automatically once an admin approves it — make sure your balance covers it by then. Add funds on the dashboard if your balance is too low.</p>
+              <p style={{ color: "#99a1af", fontSize: 14, margin: 0, lineHeight: 1.5 }}>Submitted as a draft. The reward pool is deducted once an admin approves — make sure your balance covers it.</p>
             </div>
           </div>
 

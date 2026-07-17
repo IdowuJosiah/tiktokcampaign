@@ -103,22 +103,20 @@ export default async function InternalMissionDetailPage({
 
         {isClosed ? (
           <p className="muted-copy">
-            This campaign was closed by an admin. Unused funds have been refunded to the brand&apos;s wallet.
-            The brand will need to create a new campaign.
+            Closed by admin. Unspent funds refunded to the brand&apos;s wallet.
           </p>
         ) : isRejected ? (
           <p className="muted-copy">
             Reason: {mission.rejectionReason || "No reason recorded."}
             <br />
-            The brand needs to create a new campaign with this feedback applied — this one can&apos;t be approved as-is.
+            The brand must create a new campaign to proceed.
           </p>
         ) : isLive ? (
           <form action={closeMission} className="submission-form">
             <input name="missionId" type="hidden" value={mission.id} />
             <p className="muted-copy">
-              This campaign is live. Closing it will remove it from the creator marketplace and refund
-              the unspent portion of the reward pool back to the brand&apos;s wallet. Creator rewards
-              that have already been earned are not affected.
+              Closing will remove this campaign and refund unspent pool funds to the brand&apos;s wallet.
+              Already-earned rewards are unaffected.
             </p>
             <button
               className="ghost-button full"
@@ -133,7 +131,7 @@ export default async function InternalMissionDetailPage({
             <input name="missionId" type="hidden" value={mission.id} />
             <label>
               Rejection reason (only required if rejecting)
-              <textarea name="reason" placeholder="Explain what needs to change before this campaign can be approved" rows={3} />
+              <textarea name="reason" placeholder="What needs to change before this can be approved" rows={3} />
             </label>
             <div className="decision-actions">
               <button className="primary-button full" formAction={approveMission} type="submit">

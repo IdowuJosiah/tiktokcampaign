@@ -60,7 +60,7 @@ export default async function AdminSubmissionDetailPage({
         <div className="section-title">
           <div>
             <p className="eyebrow">Video link</p>
-            <h2>Check the submitted TikTok.</h2>
+            <h2>Submitted TikTok.</h2>
           </div>
           <a className="ghost-button" href={submission.link} rel="noreferrer" target="_blank">Open TikTok</a>
         </div>
@@ -103,12 +103,11 @@ export default async function AdminSubmissionDetailPage({
             </select>
           </label>
           <p className="muted-copy" style={{ margin: 0 }}>
-            The creator is paid {payoutPerThree} automatically for every 3 approved submissions on this
-            campaign — no manual amount needed.
+            Creator earns {payoutPerThree} per 3 approved submissions — paid automatically.
           </p>
           <label>
             Review note
-            <textarea name="reason" placeholder="Short reason shown in admin history later." />
+            <textarea name="reason" placeholder="Reason for this decision." />
           </label>
           <button className="primary-button full" type="submit">Save review</button>
         </form>
