@@ -335,6 +335,8 @@ export async function createMission(formData: FormData) {
     asString(formData, "payoutPerThreeSubmissions"),
   );
   const viewsPerSubmission = parseNumber(asString(formData, "viewsPerSubmission"));
+  const minFollowerCountRaw = asString(formData, "minFollowerCount");
+  const minFollowerCount = minFollowerCountRaw ? parseNumber(minFollowerCountRaw) : 0;
   const rules = asString(formData, "rules")
     .split("\n")
     .map((rule) => rule.trim())
@@ -363,6 +365,9 @@ export async function createMission(formData: FormData) {
   }
   if (viewsPerSubmission === null) {
     redirect("/brand/missions/new?error=invalid_views_per_submission");
+  }
+  if (minFollowerCount === null || minFollowerCount < 0) {
+    redirect("/brand/missions/new?error=invalid_min_follower_count");
   }
   if (payoutPerThreeCents > rewardPoolCents) {
     redirect("/brand/missions/new?error=payout_exceeds_pool");
@@ -404,6 +409,7 @@ export async function createMission(formData: FormData) {
       required_sound: requiredSound || null,
       minimum_views: viewsPerSubmission,
       views_per_submission: viewsPerSubmission,
+      minimum_follower_count: minFollowerCount || null,
       disclosure_required: true,
       rules,
     });

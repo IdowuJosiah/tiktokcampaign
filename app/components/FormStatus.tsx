@@ -40,6 +40,7 @@ const errors: Record<string, string> = {
   invalid_reward_pool: "Enter a reward pool amount greater than ₦0.",
   invalid_payout_amount: "Enter a payout amount greater than ₦0.",
   invalid_views_per_submission: "Enter a valid views-per-submission number.",
+  invalid_min_follower_count: "Minimum follower count must be a positive number.",
   invalid_reward_amount: "Enter a valid reward amount.",
   insufficient_wallet_balance: "Wallet balance doesn't cover this reward pool. Add funds first.",
   invalid_deposit_amount: "Enter a deposit of at least ₦1.",

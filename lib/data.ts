@@ -15,6 +15,7 @@ export type Mission = {
   requiredHashtag: string;
   requiredSound: string;
   requirements: string[];
+  minFollowerCount?: number | null;
   fundingStatus?: "Funded" | "Pending deposit";
   depositReference?: string | null;
   approvedAt?: string | null;

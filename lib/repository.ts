@@ -58,6 +58,7 @@ type MissionRow = {
   rejection_reason?: string | null;
   rejected_at?: string | null;
   rules: string[] | null;
+  minimum_follower_count?: number | null;
   brands: BrandRow | BrandRow[] | null;
 };
 
@@ -162,6 +163,7 @@ function mapMission(row: MissionRow) {
     viewsPerSubmission: viewsPerSubmission.toLocaleString(),
     requiredHashtag: row.required_hashtag,
     requiredSound: row.required_sound ?? "Creator choice",
+    minFollowerCount: row.minimum_follower_count ?? null,
     fundingStatus: row.funded_at ? ("Funded" as const) : ("Pending deposit" as const),
     depositReference: row.deposit_reference,
     approvedAt: row.approved_at,
