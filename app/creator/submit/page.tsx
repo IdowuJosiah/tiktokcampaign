@@ -41,7 +41,7 @@ export default async function CreatorSubmitPage({
           </div>
         ) : (
           <div>
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, marginBottom: 18 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22, marginBottom: 18 }}>
               <MultiLinkSubmissionForm creatorHandle={creator?.tiktokHandle ?? ""} missions={missions} />
             </div>
           </div>

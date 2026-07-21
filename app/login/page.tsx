@@ -31,7 +31,7 @@ export default async function LoginPage({
             </div>
             <div className="auth-field" style={{ marginTop: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
-                <label htmlFor="login-password" style={{ margin: 0, fontSize: 13, color: "#374151" }}>Password</label>
+                <label htmlFor="login-password" style={{ margin: 0, fontSize: 13, color: "var(--label)" }}>Password</label>
                 <span style={{ fontSize: 13, color: "#00d9a3", cursor: "pointer" }}>Forgot password?</span>
               </div>
               <input id="login-password" name="password" required type="password" placeholder="••••••••" />

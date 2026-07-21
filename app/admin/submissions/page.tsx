@@ -25,7 +25,7 @@ export default async function AdminSubmissionsPage() {
             <span style={{ fontSize: 12, color: "#ff8904", background: "rgba(255,137,4,0.1)", border: "1px solid rgba(255,137,4,0.3)", borderRadius: 999, padding: "3px 9px" }}>{pending.length}</span>
           )}
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
           {pending.length === 0 ? (
             <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
@@ -57,7 +57,7 @@ export default async function AdminSubmissionsPage() {
       {reviewed.length > 0 && (
         <div>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 600, margin: "0 0 16px" }}>Recently reviewed</h2>
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
             {reviewed.slice(0, 10).map((s, i) => (
               <Link key={s.id} href={`/admin/submissions/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 22px", borderBottom: i < Math.min(reviewed.length, 10) - 1 ? "1px solid var(--line)" : "none", textDecoration: "none", color: "inherit" }}>
                 <div style={{ width: 36, height: 36, borderRadius: 8, background: s.status === "Approved" ? "rgba(0,217,163,0.1)" : "rgba(255,107,107,0.1)", border: `1px solid ${s.status === "Approved" ? "rgba(0,217,163,0.2)" : "rgba(255,107,107,0.2)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

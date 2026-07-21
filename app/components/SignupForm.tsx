@@ -9,7 +9,7 @@ const INPUT_STYLE: React.CSSProperties = {
   padding: "0 14px",
   fontSize: 14,
   color: "var(--foreground)" as string,
-  background: "rgba(0,0,0,0.04)",
+  background: "var(--surface)",
   border: "1px solid var(--line)" as string,
   borderRadius: 8,
   outline: "none",
@@ -30,7 +30,7 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
     padding: "18px 12px",
     border: `1px solid ${active ? "#00d9a3" : "var(--line)"}`,
     borderRadius: 12,
-    background: active ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.03)",
+    background: active ? "rgba(0,217,163,0.1)" : "var(--soft)",
     color: active ? "#00d9a3" : "var(--muted)",
     cursor: "pointer",
     transition: "all 0.15s",
@@ -57,15 +57,15 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
       {/* Fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 18 }}>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Full name</label>
+          <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Full name</label>
           <input name="name" required type="text" placeholder="Ada Obi" style={INPUT_STYLE} />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Email</label>
+          <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Email</label>
           <input name="email" required type="email" placeholder="you@example.com" style={INPUT_STYLE} />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Password</label>
+          <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Password</label>
           <input name="password" required type="password" placeholder="Min 8 characters, 1 number" style={INPUT_STYLE} />
         </div>
       </div>
@@ -90,7 +90,7 @@ export function SignupForm({ defaultRole }: { defaultRole: "creator" | "brand" }
           type="submit"
           formAction={continueWithGoogle}
           formNoValidate
-          style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer" }}
+          style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 14, color: "var(--foreground)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.9 3.2-7.8z"/>

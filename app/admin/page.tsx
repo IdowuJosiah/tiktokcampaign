@@ -26,22 +26,22 @@ export default async function AdminOverviewPage() {
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, marginBottom: 24 }}>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
           <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>Brand deposits (MTD)</div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>{walletStats.depositsLabel}</div>
           <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>via Paystack</div>
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
           <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>Submissions scored</div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>{totalSubs.toLocaleString()}</div>
           <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>Pipeline: healthy</div>
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
           <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>Total signups</div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>{signupStats.total.toLocaleString()}</div>
           <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{signupStats.creatorCount} creators · {signupStats.brandCount} brands</div>
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
           <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>Float (unspent balance)</div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>{walletStats.floatLabel}</div>
           <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>brand wallet balance</div>
@@ -49,7 +49,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Live campaigns */}
-      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, marginBottom: 20, overflow: "hidden" }}>
+      <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, marginBottom: 20, overflow: "hidden" }}>
         <div style={{ padding: "18px 24px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 16, fontWeight: 700 }}>Live campaigns</div>
           <span style={{ fontSize: 13, color: "#00d9a3", background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.25)", borderRadius: 999, padding: "3px 12px" }}>{liveCampaigns.length} live</span>
@@ -86,7 +86,7 @@ export default async function AdminOverviewPage() {
       {/* Bottom two-column panel */}
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20 }}>
         {/* Pending actions */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>Pending actions</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <Link href="/admin/campaigns" style={{ display: "flex", alignItems: "center", gap: 14, padding: 14, border: "1px solid var(--line)", borderRadius: 11, cursor: "pointer", textDecoration: "none", color: "inherit" }}>
@@ -112,7 +112,7 @@ export default async function AdminOverviewPage() {
             </Link>
 
             <Link href="/admin/submissions" style={{ display: "flex", alignItems: "center", gap: 14, padding: 14, border: "1px solid var(--line)", borderRadius: 11, cursor: "pointer", textDecoration: "none", color: "inherit" }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
               </div>
               <div style={{ flex: 1 }}>
@@ -125,7 +125,7 @@ export default async function AdminOverviewPage() {
         </div>
 
         {/* Fraud alerts */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 18 }}>System status</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", gap: 12, padding: 13, background: "rgba(0,217,163,0.04)", border: "1px solid rgba(0,217,163,0.2)", borderRadius: 11 }}>

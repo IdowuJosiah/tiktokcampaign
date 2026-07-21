@@ -24,51 +24,51 @@ export default async function NewMissionPage({
 
         <form action={createMission}>
           {/* Basic info */}
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Campaign details</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Brand name</label>
-                <input name="brandName" required type="text" placeholder="Kuda" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Brand name</label>
+                <input name="brandName" required type="text" placeholder="Kuda" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Campaign title <span style={{ color: "var(--muted)", fontWeight: 400 }}>(max 80 characters)</span></label>
-                <input name="title" required type="text" maxLength={80} placeholder="Show your real split-bill routine" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Campaign title <span style={{ color: "var(--muted)", fontWeight: 400 }}>(max 80 characters)</span></label>
+                <input name="title" required type="text" maxLength={80} placeholder="Show your real split-bill routine" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Creator brief <span style={{ color: "var(--muted)", fontWeight: 400 }}>(max 2000 characters)</span></label>
-                <textarea name="brief" required maxLength={2000} placeholder="Tell creators what to show, what to avoid, and what counts as valid proof." style={{ width: "100%", minHeight: 120, padding: 14, fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Creator brief <span style={{ color: "var(--muted)", fontWeight: 400 }}>(max 2000 characters)</span></label>
+                <textarea name="brief" required maxLength={2000} placeholder="Tell creators what to show, what to avoid, and what counts as valid proof." style={{ width: "100%", minHeight: 120, padding: 14, fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required hashtag</label>
-                  <input name="requiredHashtag" required type="text" maxLength={50} placeholder="#KudaSplit" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                  <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Required hashtag</label>
+                  <input name="requiredHashtag" required type="text" maxLength={50} placeholder="#KudaSplit" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required sound <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional — TikTok sound link)</span></label>
-                  <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                  <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Required sound <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional — TikTok sound link)</span></label>
+                  <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Requirements */}
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Requirements</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Deadline</label>
+                <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Deadline</label>
                 <DatePicker name="deadline" required />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Minimum followers <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
-                <input min="0" name="minFollowerCount" type="number" placeholder="e.g. 1000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Minimum followers <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
+                <input min="0" name="minFollowerCount" type="number" placeholder="e.g. 1000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
             </div>
           </div>
 
           {/* Payout tiers */}
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Payout tiers</div>
             <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 18px" }}>Set different payouts for different view milestones. At least one tier is required — none can exceed the reward pool.</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
@@ -83,7 +83,7 @@ export default async function NewMissionPage({
                   type="number"
                   placeholder={i === 0 ? "e.g. 1000" : "e.g. 5000"}
                   required={i === 0}
-                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "#fff" : "rgba(0,0,0,0.02)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "var(--panel)" : "var(--soft)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
                 />
                 <input
                   min="1"
@@ -91,18 +91,18 @@ export default async function NewMissionPage({
                   type="number"
                   placeholder={i === 0 ? "e.g. 2500" : "e.g. 5000"}
                   required={i === 0}
-                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "#fff" : "rgba(0,0,0,0.02)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "var(--panel)" : "var(--soft)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
                 />
               </div>
             ))}
           </div>
 
           {/* Budget */}
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Budget</div>
             <div>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Reward pool (₦)</label>
-              <input min="1" name="rewardPool" required type="number" placeholder="50000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+              <label style={{ display: "block", fontSize: 13, color: "var(--label)", marginBottom: 7 }}>Reward pool (₦)</label>
+              <input min="1" name="rewardPool" required type="number" placeholder="50000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
             </div>
           </div>
 

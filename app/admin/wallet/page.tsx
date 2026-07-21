@@ -30,15 +30,15 @@ export default async function AdminWalletPage() {
 
       {/* Stat cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 24 }}>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Brand deposits (MTD)</div>
           <div style={{ fontSize: 22, fontWeight: 700, marginTop: 8 }}>{walletStats.depositsLabel}</div>
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Paid to creators (MTD)</div>
           <div style={{ fontSize: 22, fontWeight: 700, marginTop: 8 }}>{walletStats.paidToCreatorsLabel}</div>
         </div>
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Float (unspent balance)</div>
           <div style={{ fontSize: 22, fontWeight: 700, marginTop: 8 }}>{walletStats.floatLabel}</div>
         </div>
@@ -86,7 +86,7 @@ export default async function AdminWalletPage() {
         <div style={{ fontSize: 16, fontWeight: 700 }}>Creator reward queue</div>
       </div>
 
-      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
         {payoutQueue.length === 0 ? (
           <div style={{ padding: 48, textAlign: "center", color: "var(--muted)" }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>

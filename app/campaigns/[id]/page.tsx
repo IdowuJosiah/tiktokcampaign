@@ -70,7 +70,7 @@ export default async function CampaignBriefPage({
 
         {/* Payout tiers */}
         {campaign.payoutTiers && campaign.payoutTiers.length > 1 && (
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20, marginTop: 18 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20, marginTop: 18 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
               Payout tiers
@@ -91,12 +91,12 @@ export default async function CampaignBriefPage({
         {/* Sound + Hashtags */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 18 }}>
           {campaign.requiredSound && (
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 Required sound
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(0,0,0,0.03)", border: "1px solid var(--line)", borderRadius: 10, padding: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--soft)", border: "1px solid var(--line)", borderRadius: 10, padding: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 8, background: "rgba(0,217,163,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </div>
@@ -109,7 +109,7 @@ export default async function CampaignBriefPage({
           )}
 
           {campaign.requiredHashtag && (
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>
                 Required hashtags
@@ -128,7 +128,7 @@ export default async function CampaignBriefPage({
         {/* Requirements */}
         {campaign.requirements?.length > 0 && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 18 }}>
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#00d9a3" }}>✓ Do</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                 {campaign.requirements.slice(0, Math.ceil(campaign.requirements.length / 2)).map((req: string) => (
@@ -138,7 +138,7 @@ export default async function CampaignBriefPage({
                 ))}
               </div>
             </div>
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#ff6b6b" }}>✕ Don&apos;t</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                 <div style={{ display: "flex", gap: 9, color: "var(--foreground)", fontSize: 14 }}><span style={{ color: "#ff6b6b", flexShrink: 0 }}>✕</span>Mention competitor brands</div>

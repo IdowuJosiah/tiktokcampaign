@@ -9,7 +9,7 @@ function Chip({ label, color }: { label: string; color: ChipColor }) {
     green: { fg: "#00d9a3", bg: "rgba(0,217,163,0.1)", border: "rgba(0,217,163,0.3)" },
     orange: { fg: "#ff8904", bg: "rgba(255,137,4,0.1)", border: "rgba(255,137,4,0.3)" },
     red: { fg: "#ff6b6b", bg: "rgba(255,107,107,0.1)", border: "rgba(255,107,107,0.3)" },
-    gray: { fg: "var(--muted)", bg: "rgba(0,0,0,0.05)", border: "var(--line)" },
+    gray: { fg: "var(--muted)", bg: "var(--surface)", border: "var(--line)" },
   };
   const c = colors[color];
   return (
@@ -36,7 +36,7 @@ export default async function AdminUsersPage() {
       <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: "var(--muted)" }}>
         Creators <span style={{ fontWeight: 400, color: "var(--muted)" }}>({creators.length})</span>
       </div>
-      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden", marginBottom: 24 }}>
+      <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden", marginBottom: 24 }}>
         {creators.length === 0 ? (
           <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>No creators yet.</div>
         ) : (
@@ -71,7 +71,7 @@ export default async function AdminUsersPage() {
       <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: "var(--muted)" }}>
         Brands <span style={{ fontWeight: 400, color: "var(--muted)" }}>({brands.length})</span>
       </div>
-      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
         {brands.length === 0 ? (
           <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>No brands yet.</div>
         ) : (

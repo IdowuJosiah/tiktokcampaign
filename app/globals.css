@@ -7,11 +7,27 @@
   --line: rgba(0, 0, 0, 0.1);
   --panel: #ffffff;
   --soft: rgba(0, 0, 0, 0.03);
+  --surface: rgba(0, 0, 0, 0.04);
   --soft-strong: #f4f4f5;
   --accent: #00d9a3;
   --accent-strong: #00b88a;
   --accent-soft: rgba(0, 217, 163, 0.1);
+  --label: #374151;
   --font-heading: var(--font-lexend), 'Lexend', Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #111111;
+    --foreground: #f0f0f0;
+    --muted: #9ca3af;
+    --line: rgba(255, 255, 255, 0.1);
+    --panel: #1a1a1a;
+    --soft: rgba(255, 255, 255, 0.04);
+    --surface: rgba(255, 255, 255, 0.07);
+    --soft-strong: #222222;
+    --label: #d1d5db;
+  }
 }
 
 @theme inline {
@@ -55,14 +71,14 @@ button {
   background:
     radial-gradient(circle at 18% 18%, rgba(0, 217, 163, 0.08), transparent 28%),
     radial-gradient(circle at 82% 10%, rgba(173, 70, 255, 0.04), transparent 24%),
-    #f8f9fa;
+    var(--background);
 }
 
 .app-frame {
   display: grid;
   grid-template-columns: 276px minmax(0, 1fr);
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--background);
   color: var(--foreground);
 }
 
@@ -74,7 +90,7 @@ button {
   height: 100vh;
   padding: 16px;
   border-right: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .sidebar-brand {
@@ -185,7 +201,7 @@ button {
   min-height: 64px;
   padding: 14px 48px;
   border-bottom: 1px solid var(--line);
-  background: rgba(248, 249, 250, 0.95);
+  background: color-mix(in srgb, var(--background) 95%, transparent);
   backdrop-filter: blur(18px);
 }
 
@@ -198,7 +214,7 @@ button {
   padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   color: var(--muted);
 }
 
@@ -244,7 +260,7 @@ button {
   min-height: 64px;
   padding: 0 clamp(20px, 7vw, 144px);
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
   backdrop-filter: blur(18px);
 }
 
@@ -395,7 +411,7 @@ button {
   margin: 0 auto;
   border-color: var(--line);
   color: var(--muted);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
 }
 
 .hero-actions {
@@ -563,7 +579,7 @@ button {
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   color: var(--foreground);
   font-weight: 700;
   text-decoration: none;
@@ -615,7 +631,7 @@ button {
 .panel {
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--panel);
   padding: clamp(28px, 4vw, 56px);
 }
 
@@ -639,7 +655,7 @@ button {
 .stats-grid article {
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .stats-grid article,
@@ -754,7 +770,7 @@ button {
   padding: 6px 10px;
   border-radius: 999px;
   color: var(--muted);
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--soft);
   font-size: 12px;
 }
 
@@ -780,7 +796,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--muted);
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
   font-size: 12px;
 }
 
@@ -789,7 +805,7 @@ button {
   width: fit-content;
   padding: 7px 10px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--soft);
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
@@ -801,7 +817,7 @@ button {
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
 }
 
 .empty-state,
@@ -849,7 +865,7 @@ button {
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
 }
 
 .mission-detail-grid span {
@@ -878,7 +894,7 @@ button {
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   color: var(--foreground);
   line-height: 1.45;
 }
@@ -906,7 +922,7 @@ button {
   padding: 0 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
   color: var(--foreground);
   line-height: 52px;
 }
@@ -924,7 +940,7 @@ button {
 }
 
 .submission-form option {
-  background: #ffffff;
+  background: var(--panel);
   color: var(--foreground);
   font: inherit;
 }
@@ -1156,7 +1172,7 @@ button {
   padding: 18px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
   color: var(--muted);
   cursor: pointer;
   font-size: 14px;
@@ -1190,7 +1206,7 @@ button {
   padding: 0 14px;
   font-size: 14px;
   color: var(--foreground);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   outline: none;
@@ -1243,7 +1259,7 @@ button {
   gap: 10px;
   font-size: 14px;
   color: var(--foreground);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   cursor: pointer;
@@ -1298,7 +1314,7 @@ button {
 }
 
 .login-body {
-  background: #ffffff;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 28px;
@@ -1325,7 +1341,7 @@ button {
   height: 38px;
   font-size: 13px;
   color: var(--foreground);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   cursor: pointer;
@@ -1402,7 +1418,7 @@ button {
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .role-option span {
@@ -1450,7 +1466,7 @@ button {
   padding: 18px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
 }
 
 .link-list {
@@ -1508,7 +1524,7 @@ button {
   height: 48px;
   border-radius: 10px;
   color: var(--accent);
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--soft);
   font-weight: 800;
 }
 
@@ -1569,7 +1585,7 @@ button {
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
 }
 
 .score-rule div {
@@ -1605,7 +1621,7 @@ button {
 
 .payout-grid article {
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--soft);
   border-radius: 14px;
 }
 
@@ -1623,7 +1639,7 @@ button {
 .checks span {
   padding: 6px 9px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--soft);
 }
 
 /* ── AppShell mobile drawer (creator / brand / admin shell) ── */

@@ -16,14 +16,14 @@ export default async function AdminDisputesPage() {
       </div>
 
       {disputes.length === 0 ? (
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
           <div>No rejected submissions — nothing to dispute.</div>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {disputes.map((d) => (
-            <div key={d.id} style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
+            <div key={d.id} style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(0,217,163,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#00d9a3", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>
@@ -55,7 +55,7 @@ export default async function AdminDisputesPage() {
                 </form>
                 <Link
                   href={`/admin/submissions/${d.id}`}
-                  style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none" }}
+                  style={{ height: 42, padding: "0 20px", fontFamily: "inherit", fontSize: 14, fontWeight: 700, color: "var(--foreground)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", textDecoration: "none" }}
                 >
                   View submission
                 </Link>

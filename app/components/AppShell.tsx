@@ -99,7 +99,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <label htmlFor="vr-nav" className="vr-overlay" aria-hidden="true" />
 
       {/* Sidebar */}
-      <aside className="vr-sidebar" style={{ width: 256, flexShrink: 0, background: "#ffffff", borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
+      <aside className="vr-sidebar" style={{ width: 256, flexShrink: 0, background: "var(--panel)", borderRight: "1px solid var(--line)", display: "flex", flexDirection: "column", position: "sticky", top: 0, height: "100vh" }}>
         <div style={{ padding: "22px 24px", borderBottom: "1px solid var(--line)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,217,163,0.15)", border: "1px solid rgba(0,217,163,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -149,7 +149,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             ) : (
               <div className="vr-search" style={{ position: "relative", width: 420, maxWidth: "45vw" }}>
                 <div style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icons.searchbar}</div>
-                <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
+                <input placeholder="Search campaigns..." style={{ width: "100%", height: 36, padding: "0 12px 0 38px", fontSize: 14, color: "var(--foreground)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit" }} />
               </div>
             )}
           </div>

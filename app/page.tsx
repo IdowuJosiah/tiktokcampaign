@@ -43,26 +43,26 @@ export default async function Home() {
           <p style={{ color: "var(--muted)", fontSize: 19, margin: "28px auto 0", maxWidth: 560, lineHeight: 1.5 }}>Brands fund campaigns. Creators post, get scored, and cash out in Naira. Transparent rewards for real engagement.</p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 36 }}>
             <Link href="/signup" style={{ fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "#000", background: "#00d9a3", border: "none", borderRadius: 10, padding: "13px 26px", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Start earning →</Link>
-            <Link href="/signup?role=brand" style={{ fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "var(--foreground)", background: "rgba(0,0,0,0.05)", border: "1px solid var(--line)", borderRadius: 10, padding: "13px 26px", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>I&apos;m a brand</Link>
+            <Link href="/signup?role=brand" style={{ fontFamily: "inherit", fontSize: 15, fontWeight: 700, color: "var(--foreground)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: "13px 26px", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>I&apos;m a brand</Link>
           </div>
         </section>
 
         <section style={{ position: "relative", display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", maxWidth: 1100, margin: "30px auto 0", padding: "0 24px 70px" }}>
-          <div style={{ flex: 1, minWidth: 280, background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
+          <div style={{ flex: 1, minWidth: 280, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91 0z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
             </div>
             <h3 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 8px" }}>Connect TikTok, post, earn</h3>
             <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>Link your account, pick a campaign, post the video. We verify the sound and hashtags automatically.</p>
           </div>
-          <div style={{ flex: 1, minWidth: 280, background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
+          <div style={{ flex: 1, minWidth: 280, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             </div>
             <h3 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 8px" }}>Fair AI scoring</h3>
             <p style={{ color: "var(--muted)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>Every submission is scored on quality, reach and engagement. No black box — you always see why.</p>
           </div>
-          <div style={{ flex: 1, minWidth: 280, background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
+          <div style={{ flex: 1, minWidth: 280, background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 28 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
             </div>
@@ -80,11 +80,11 @@ export default async function Home() {
               <p style={{ color: "var(--muted)", fontSize: 13, fontWeight: 700, textTransform: "uppercase", margin: "0 0 6px" }}>Live now</p>
               <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(24px,3vw,36px)", fontWeight: 600, margin: 0 }}>Available campaigns</h2>
             </div>
-            <Link href="/campaigns" style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 16px", textDecoration: "none" }}>View all</Link>
+            <Link href="/campaigns" style={{ fontSize: 14, fontWeight: 700, color: "var(--foreground)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 16px", textDecoration: "none" }}>View all</Link>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {missions.slice(0, 3).map((m) => (
-              <Link key={m.id} href={`/campaigns/${m.id}`} style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, display: "flex", gap: 24, alignItems: "center", textDecoration: "none", color: "inherit" }}>
+              <Link key={m.id} href={`/campaigns/${m.id}`} style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24, display: "flex", gap: 24, alignItems: "center", textDecoration: "none", color: "inherit" }}>
                 <div style={{ width: 56, height: 56, borderRadius: 12, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="1.8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
                 </div>

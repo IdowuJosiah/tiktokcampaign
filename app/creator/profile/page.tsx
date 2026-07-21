@@ -39,7 +39,7 @@ export default async function CreatorProfilePage({
           <div style={{ display: "flex", gap: 8 }}>
             {steps.map((step) => (
               <div key={step.label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: step.done ? "#00d9a3" : "var(--muted)" }}>
-                <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "rgba(0,0,0,0.06)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "var(--line)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: step.done ? "rgba(0,217,163,0.2)" : "var(--surface)", border: `1px solid ${step.done ? "rgba(0,217,163,0.5)" : "var(--line)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>
                   {step.done ? "✓" : "·"}
                 </div>
                 {step.label}
@@ -56,7 +56,7 @@ export default async function CreatorProfilePage({
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
         {/* TikTok */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 1</div>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>TikTok Account</h2>
           {creator?.verifiedAt ? (
@@ -87,7 +87,7 @@ export default async function CreatorProfilePage({
         </div>
 
         {/* Bank */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 24 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Step 2</div>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 600, margin: "0 0 16px" }}>Bank Account</h2>
           <PayoutSetupForm
@@ -100,7 +100,7 @@ export default async function CreatorProfilePage({
 
       {/* Submission history */}
       {submissions.length > 0 && (
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
           <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)", fontSize: 15, fontWeight: 700 }}>Submission history</div>
           <div style={{ padding: "8px 22px" }}>
             {submissions.map((submission) => (

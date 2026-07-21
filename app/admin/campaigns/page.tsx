@@ -18,7 +18,7 @@ function QueueItem({ mission, selected, waitLabel }: { mission: Mission; selecte
       href={`/admin/campaigns?id=${mission.id}`}
       style={{
         display: "block",
-        background: selected ? "rgba(0,217,163,0.06)" : "#fff",
+        background: selected ? "rgba(0,217,163,0.06)" : "var(--panel)",
         border: selected ? "1px solid rgba(0,217,163,0.3)" : "1px solid var(--line)",
         borderRadius: 12,
         padding: 16,
@@ -66,7 +66,7 @@ export default async function AdminCampaignQueuePage({
       </div>
 
       {pending.length === 0 ? (
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 48, textAlign: "center", color: "var(--muted)" }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="1.5" style={{ marginBottom: 12 }}><path d="M20 6 9 17l-5-5"/></svg>
           <div>Queue is clear — no campaigns pending review.</div>
         </div>
@@ -86,7 +86,7 @@ export default async function AdminCampaignQueuePage({
 
           {/* Detail panel */}
           {selected && (
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 26 }}>
+            <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 26 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <div>
                   <div style={{ fontSize: 19, fontWeight: 700 }}>{selected.title}</div>
@@ -101,7 +101,7 @@ export default async function AdminCampaignQueuePage({
               </div>
 
               {/* Brief */}
-              <div style={{ background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
+              <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
                 <div style={{ fontSize: 12, color: "var(--muted)", fontWeight: 700, marginBottom: 6 }}>BRIEF</div>
                 <p style={{ fontSize: 14, color: "var(--foreground)", margin: 0, lineHeight: 1.5 }}>{selected.brief}</p>
               </div>

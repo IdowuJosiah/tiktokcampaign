@@ -46,7 +46,7 @@ export default async function CreatorWalletPage({
               <div style={{ marginTop: 18, fontSize: 13, color: "var(--muted)" }}>Approved rewards will appear here as your confirmed balance.</div>
             )}
           </div>
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 16, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 16, padding: 26, display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--muted)", fontSize: 14 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               Pending balance
@@ -57,13 +57,13 @@ export default async function CreatorWalletPage({
         </div>
 
         {/* Lifetime paid */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: "16px 22px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: "16px 22px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ color: "var(--muted)", fontSize: 14 }}>Lifetime paid out</div>
           <div style={{ fontSize: 22, fontWeight: 700 }}>{wallet.paidLabel}</div>
         </div>
 
         {/* Transaction history */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
           <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)", fontSize: 15, fontWeight: 700 }}>Transaction history</div>
           {walletTransactions.length === 0 ? (
             <div style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>No transactions yet.</div>
@@ -83,7 +83,7 @@ export default async function CreatorWalletPage({
           )}
         </div>
 
-        <div style={{ marginTop: 24, padding: "16px 20px", background: "#fff", border: "1px solid var(--line)", borderRadius: 12 }}>
+        <div style={{ marginTop: 24, padding: "16px 20px", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 12 }}>
           <p style={{ fontSize: 13, color: "var(--muted)", margin: 0 }}>Withdrawals are sent automatically via Paystack to the bank account on your profile. Minimum withdrawal: ₦2,000.</p>
         </div>
       </div>

@@ -17,13 +17,13 @@ export default async function CampaignsPage() {
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 24, flexWrap: "wrap" }}>
         <div style={{ display: "flex", gap: 8 }}>
           {["All niches", "Beauty", "Tech", "Food", "Fashion"].map((filter, i) => (
-            <span key={filter} style={{ fontSize: 13, color: i === 0 ? "#00d9a3" : "var(--foreground)", background: i === 0 ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.04)", border: `1px solid ${i === 0 ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 8, padding: "7px 13px", cursor: "pointer" }}>
+            <span key={filter} style={{ fontSize: 13, color: i === 0 ? "#00d9a3" : "var(--foreground)", background: i === 0 ? "rgba(0,217,163,0.1)" : "var(--surface)", border: `1px solid ${i === 0 ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 8, padding: "7px 13px", cursor: "pointer" }}>
               {filter}
             </span>
           ))}
         </div>
         <div style={{ flex: 1 }} />
-        <span style={{ fontSize: 13, color: "var(--muted)", background: "rgba(0,0,0,0.04)", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 13px", display: "flex", alignItems: "center", gap: 7 }}>
+        <span style={{ fontSize: 13, color: "var(--muted)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 13px", display: "flex", alignItems: "center", gap: 7 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
           Sort: Highest reward
         </span>
@@ -31,13 +31,13 @@ export default async function CampaignsPage() {
 
       {/* Campaign grid */}
       {campaigns.length === 0 ? (
-        <div style={{ padding: 48, textAlign: "center", color: "var(--muted)", background: "#fff", border: "1px solid var(--line)", borderRadius: 14 }}>
+        <div style={{ padding: 48, textAlign: "center", color: "var(--muted)", background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14 }}>
           No live campaigns at the moment. Check back soon.
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {campaigns.map((c) => (
-            <Link key={c.id} href={`/campaigns/${c.id}`} style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 22, cursor: "pointer", textDecoration: "none", color: "inherit", display: "block" }}>
+            <Link key={c.id} href={`/campaigns/${c.id}`} style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 22, cursor: "pointer", textDecoration: "none", color: "inherit", display: "block" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
                 <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
                   <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(0,217,163,0.1)", border: "1px solid rgba(0,217,163,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>

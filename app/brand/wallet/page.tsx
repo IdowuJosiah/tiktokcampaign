@@ -29,8 +29,8 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 
 function txIconBg(type: string) {
   if (type === "deposit") return "rgba(0,217,163,0.12)";
-  if (type === "fee") return "rgba(0,0,0,0.04)";
-  return "rgba(0,0,0,0.06)";
+  if (type === "fee") return "var(--surface)";
+  return "var(--surface)";
 }
 
 const headerCell: React.CSSProperties = {
@@ -98,7 +98,7 @@ export default async function BrandWalletPage({
                 padding: "0 14px",
                 fontSize: 15,
                 color: "var(--foreground)",
-                background: "rgba(0,0,0,0.06)",
+                background: "var(--surface)",
                 border: "1px solid rgba(0,217,163,0.35)",
                 borderRadius: 9,
                 outline: "none",
@@ -128,7 +128,7 @@ export default async function BrandWalletPage({
 
         <div
           style={{
-            background: "#fff",
+            background: "var(--panel)",
             border: "1px solid var(--line)",
             borderRadius: 16,
             padding: 28,
@@ -172,7 +172,7 @@ export default async function BrandWalletPage({
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Transaction history</div>
       <div
         style={{
-          background: "#fff",
+          background: "var(--panel)",
           border: "1px solid var(--line)",
           borderRadius: 14,
           overflow: "hidden",

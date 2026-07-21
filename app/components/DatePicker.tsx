@@ -79,7 +79,7 @@ export function DatePicker({ name, required }: { name: string; required?: boolea
         style={{
           width: "100%", height: 46, padding: "0 14px",
           fontSize: 14, color: value ? "var(--foreground)" : "var(--muted)",
-          background: "#fff", border: "1px solid var(--line)", borderRadius: 8,
+          background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 8,
           outline: "none", fontFamily: "inherit", boxSizing: "border-box",
           display: "flex", alignItems: "center", justifyContent: "space-between",
           cursor: "pointer",
@@ -95,7 +95,7 @@ export function DatePicker({ name, required }: { name: string; required?: boolea
       {open && (
         <div style={{
           position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 50,
-          width: 288, background: "#fff", border: "1px solid var(--line)",
+          width: 288, background: "var(--panel)", border: "1px solid var(--line)",
           borderRadius: 14, boxShadow: "0 8px 40px rgba(0,0,0,0.11)", padding: 16,
         }}>
           {/* Month nav */}

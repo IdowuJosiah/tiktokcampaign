@@ -39,7 +39,7 @@ export default async function BrandMissionDetailPage({
                 <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 26, margin: 0 }}>{mission.title}</h1>
                 <div style={{ color: "var(--muted)", fontSize: 15, marginTop: 5 }}>{mission.brand}</div>
               </div>
-              <span style={{ fontSize: 13, color: mission.status === "Live" ? "#00d9a3" : "var(--muted)", background: mission.status === "Live" ? "rgba(0,217,163,0.1)" : "rgba(0,0,0,0.05)", border: `1px solid ${mission.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "6px 14px" }}>
+              <span style={{ fontSize: 13, color: mission.status === "Live" ? "#00d9a3" : "var(--muted)", background: mission.status === "Live" ? "rgba(0,217,163,0.1)" : "var(--surface)", border: `1px solid ${mission.status === "Live" ? "rgba(0,217,163,0.3)" : "var(--line)"}`, borderRadius: 999, padding: "6px 14px" }}>
                 {mission.status}
               </span>
             </div>
@@ -54,7 +54,7 @@ export default async function BrandMissionDetailPage({
             { label: "Approved", value: String(approved), sub: "submissions" },
             { label: "Pending", value: String(pending), sub: "awaiting review" },
           ].map((stat) => (
-            <div key={stat.label} style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+            <div key={stat.label} style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
               <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>{stat.label}</div>
               <div style={{ fontSize: 22, fontWeight: 700, color: "var(--foreground)" }}>{stat.value}</div>
               <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 4 }}>{stat.sub}</div>
@@ -70,7 +70,7 @@ export default async function BrandMissionDetailPage({
 
         {/* Requirements */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 12, letterSpacing: ".5px" }}>Requirements</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -91,7 +91,7 @@ export default async function BrandMissionDetailPage({
               </div>
             </div>
           </div>
-          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
+          <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 700, textTransform: "uppercase", marginBottom: 12, letterSpacing: ".5px" }}>Rules</div>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
               {mission.requirements.map((r) => (
@@ -102,7 +102,7 @@ export default async function BrandMissionDetailPage({
         </div>
 
         {/* Submissions */}
-        <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: "var(--panel)", border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden" }}>
           <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 15, fontWeight: 700 }}>Submissions ({submissions.length})</span>
           </div>
