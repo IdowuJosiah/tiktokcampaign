@@ -38,6 +38,16 @@ export default async function NewMissionPage({
                 <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Creator brief <span style={{ color: "var(--muted)", fontWeight: 400 }}>(max 2000 characters)</span></label>
                 <textarea name="brief" required maxLength={2000} placeholder="Tell creators what to show, what to avoid, and what counts as valid proof." style={{ width: "100%", minHeight: 120, padding: 14, fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required hashtag</label>
+                  <input name="requiredHashtag" required type="text" maxLength={50} placeholder="#KudaSplit" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required sound <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional — TikTok sound link)</span></label>
+                  <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -45,14 +55,6 @@ export default async function NewMissionPage({
           <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Requirements</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required hashtag</label>
-                <input name="requiredHashtag" required type="text" maxLength={50} placeholder="#KudaSplit" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Required sound <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional — TikTok sound link)</span></label>
-                <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
-              </div>
               <div>
                 <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Deadline</label>
                 <input name="deadline" required type="date" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
