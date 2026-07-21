@@ -190,7 +190,7 @@ function mapMission(row: MissionRow) {
       : [
           `Use ${row.required_hashtag}`,
           row.required_sound ? `Use ${row.required_sound}` : "Creator choice sound",
-          `${viewsPerSubmission.toLocaleString()} views required for each submission`,
+          `${firstTier.minViews.toLocaleString()} views required for each submission`,
           `${formatMoney(row.payout_per_3_submissions_cents ?? 0)} paid per 3 approved submissions`,
           row.disclosure_required ? "Add paid partnership disclosure" : "Disclosure optional",
         ],
