@@ -62,10 +62,6 @@ export default async function NewMissionPage({
                 <input min="0" name="minFollowerCount" type="number" placeholder="e.g. 1000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
             </div>
-            <div style={{ marginTop: 16 }}>
-              <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Rules <span style={{ color: "var(--muted)", fontWeight: 400 }}>(one per line, max 200 characters each)</span></label>
-              <textarea name="rules" placeholder={"Use #KudaSplit\nShow app screen or receipt\nAdd paid partnership disclosure"} style={{ width: "100%", minHeight: 100, padding: 14, fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
-            </div>
           </div>
 
           {/* Payout tiers */}
