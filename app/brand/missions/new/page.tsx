@@ -1,6 +1,7 @@
 import { AppShell } from "@/app/components/AppShell";
 import { createMission } from "@/app/actions";
 import { FormStatus } from "@/app/components/FormStatus";
+import { DatePicker } from "@/app/components/DatePicker";
 import { requireRole } from "@/lib/auth";
 
 export default async function NewMissionPage({
@@ -57,7 +58,7 @@ export default async function NewMissionPage({
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
                 <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Deadline</label>
-                <input name="deadline" required type="date" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
+                <DatePicker name="deadline" required />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Minimum followers <span style={{ color: "var(--muted)", fontWeight: 400 }}>(optional)</span></label>
