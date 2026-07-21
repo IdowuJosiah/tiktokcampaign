@@ -54,10 +54,6 @@ export default async function NewMissionPage({
                 <input name="requiredSound" type="url" placeholder="https://www.tiktok.com/music/your-sound-12345" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Views per submission</label>
-                <input min="0" name="viewsPerSubmission" required type="number" placeholder="1000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
-              </div>
-              <div>
                 <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Deadline</label>
                 <input name="deadline" required type="date" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
@@ -72,18 +68,42 @@ export default async function NewMissionPage({
             </div>
           </div>
 
+          {/* Payout tiers */}
+          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 6 }}>Payout tiers</div>
+            <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 18px" }}>Set different payouts for different view milestones. At least one tier is required — none can exceed the reward pool.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", paddingLeft: 2 }}>Min views per submission</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--muted)", paddingLeft: 2 }}>Payout per 3 submissions (₦)</div>
+            </div>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+                <input
+                  min="0"
+                  name={`tier_views_${i}`}
+                  type="number"
+                  placeholder={i === 0 ? "e.g. 1000" : "e.g. 5000"}
+                  required={i === 0}
+                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "#fff" : "rgba(0,0,0,0.02)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                />
+                <input
+                  min="1"
+                  name={`tier_payout_${i}`}
+                  type="number"
+                  placeholder={i === 0 ? "e.g. 2500" : "e.g. 5000"}
+                  required={i === 0}
+                  style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: i === 0 ? "#fff" : "rgba(0,0,0,0.02)", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                />
+              </div>
+            ))}
+          </div>
+
           {/* Budget */}
           <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 24, marginBottom: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--muted)", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 18 }}>Budget</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Reward pool (₦)</label>
-                <input min="1" name="rewardPool" required type="number" placeholder="50000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Payout per 3 submissions (₦) <span style={{ color: "var(--muted)", fontWeight: 400 }}>(can't exceed reward pool)</span></label>
-                <input min="1" name="payoutPerThreeSubmissions" required type="number" placeholder="2500" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
-              </div>
+            <div>
+              <label style={{ display: "block", fontSize: 13, color: "#374151", marginBottom: 7 }}>Reward pool (₦)</label>
+              <input min="1" name="rewardPool" required type="number" placeholder="50000" style={{ width: "100%", height: 46, padding: "0 14px", fontSize: 14, color: "var(--foreground)", background: "#fff", border: "1px solid var(--line)", borderRadius: 8, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
             </div>
           </div>
 

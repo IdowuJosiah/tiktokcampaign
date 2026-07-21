@@ -59,6 +59,7 @@ type MissionRow = {
   rejected_at?: string | null;
   rules: string[] | null;
   minimum_follower_count?: number | null;
+  payout_tiers?: { min_views: number; payout_per_3_cents: number }[] | null;
   brands: BrandRow | BrandRow[] | null;
 };
 
@@ -144,11 +145,26 @@ function submissionStatus(status: SubmissionRow["status"]) {
 
 function mapMission(row: MissionRow) {
   const brand = first(row.brands);
-  const viewsPerSubmission = row.views_per_submission ?? row.minimum_views;
   const deadline = new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",
   }).format(new Date(row.deadline));
+
+  // Build payout tiers — prefer the JSONB column, fall back to single fields.
+  const payoutTiers: { minViews: number; payout: string }[] =
+    row.payout_tiers?.length
+      ? row.payout_tiers
+          .slice()
+          .sort((a, b) => a.min_views - b.min_views)
+          .map((t) => ({ minViews: t.min_views, payout: formatMoney(t.payout_per_3_cents) }))
+      : [{ minViews: row.views_per_submission ?? row.minimum_views, payout: formatMoney(row.payout_per_3_submissions_cents ?? 0) }];
+
+  const firstTier = payoutTiers[0];
+  const lastTier = payoutTiers[payoutTiers.length - 1];
+  const payoutRange =
+    payoutTiers.length > 1
+      ? `${firstTier.payout} – ${lastTier.payout}`
+      : firstTier.payout;
 
   return {
     id: row.id,
@@ -156,11 +172,12 @@ function mapMission(row: MissionRow) {
     title: row.title,
     brief: row.brief,
     rewardPool: formatMoney(row.reward_pool_cents),
-    payoutPerThreeSubmissions: formatMoney(row.payout_per_3_submissions_cents ?? 0),
+    payoutPerThreeSubmissions: payoutRange,
+    payoutTiers,
     deadline,
     status: missionStatus(row.status),
-    minimumViews: row.minimum_views.toLocaleString(),
-    viewsPerSubmission: viewsPerSubmission.toLocaleString(),
+    minimumViews: firstTier.minViews.toLocaleString(),
+    viewsPerSubmission: firstTier.minViews.toLocaleString(),
     requiredHashtag: row.required_hashtag,
     requiredSound: row.required_sound ?? "Creator choice",
     minFollowerCount: row.minimum_follower_count ?? null,

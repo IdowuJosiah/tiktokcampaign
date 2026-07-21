@@ -331,12 +331,17 @@ export async function createMission(formData: FormData) {
   const requiredHashtag = asString(formData, "requiredHashtag");
   const requiredSound = asString(formData, "requiredSound");
   const rewardPoolCents = parseCents(asString(formData, "rewardPool"));
-  const payoutPerThreeCents = parseCents(
-    asString(formData, "payoutPerThreeSubmissions"),
-  );
-  const viewsPerSubmission = parseNumber(asString(formData, "viewsPerSubmission"));
   const minFollowerCountRaw = asString(formData, "minFollowerCount");
   const minFollowerCount = minFollowerCountRaw ? parseNumber(minFollowerCountRaw) : 0;
+
+  // Parse up to 5 payout tiers — rows where either field is blank are skipped.
+  const rawTiers = [0, 1, 2, 3, 4].flatMap((i) => {
+    const views = parseNumber(asString(formData, `tier_views_${i}`));
+    const payout = parseCents(asString(formData, `tier_payout_${i}`));
+    if (views === null && payout === null) return [];
+    return [{ views, payout }];
+  });
+
   const rules = asString(formData, "rules")
     .split("\n")
     .map((rule) => rule.trim())
@@ -360,16 +365,28 @@ export async function createMission(formData: FormData) {
   if (rewardPoolCents === null || rewardPoolCents <= 0) {
     redirect("/brand/missions/new?error=invalid_reward_pool");
   }
-  if (payoutPerThreeCents === null || payoutPerThreeCents <= 0) {
-    redirect("/brand/missions/new?error=invalid_payout_amount");
-  }
-  if (viewsPerSubmission === null) {
-    redirect("/brand/missions/new?error=invalid_views_per_submission");
-  }
   if (minFollowerCount === null || minFollowerCount < 0) {
     redirect("/brand/missions/new?error=invalid_min_follower_count");
   }
-  if (payoutPerThreeCents > rewardPoolCents) {
+  if (rawTiers.length === 0) {
+    redirect("/brand/missions/new?error=no_payout_tiers");
+  }
+  if (rawTiers.some((t) => t.views === null || t.views < 0)) {
+    redirect("/brand/missions/new?error=invalid_tier_views");
+  }
+  if (rawTiers.some((t) => t.payout === null || t.payout <= 0)) {
+    redirect("/brand/missions/new?error=invalid_tier_payout");
+  }
+
+  // Safe to assert after validation above.
+  const tiers = (rawTiers as { views: number; payout: number }[])
+    .sort((a, b) => a.views - b.views);
+
+  const viewThresholds = tiers.map((t) => t.views);
+  if (new Set(viewThresholds).size !== viewThresholds.length) {
+    redirect("/brand/missions/new?error=duplicate_tier_views");
+  }
+  if (tiers.some((t) => t.payout > rewardPoolCents)) {
     redirect("/brand/missions/new?error=payout_exceeds_pool");
   }
 
@@ -402,13 +419,16 @@ export async function createMission(formData: FormData) {
       title,
       brief,
       reward_pool_cents: rewardPoolCents,
-      payout_per_3_submissions_cents: payoutPerThreeCents,
+      // Store first (lowest) tier in the legacy single-value columns for
+      // backwards compatibility with existing queries and admin tooling.
+      payout_per_3_submissions_cents: tiers[0].payout,
+      minimum_views: tiers[0].views,
+      views_per_submission: tiers[0].views,
+      payout_tiers: tiers.map((t) => ({ min_views: t.views, payout_per_3_cents: t.payout })),
       deadline,
       status: "draft",
       required_hashtag: requiredHashtag,
       required_sound: requiredSound || null,
-      minimum_views: viewsPerSubmission,
-      views_per_submission: viewsPerSubmission,
       minimum_follower_count: minFollowerCount || null,
       disclosure_required: true,
       rules,

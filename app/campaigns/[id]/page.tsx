@@ -38,7 +38,7 @@ export default async function CampaignBriefPage({
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 34, fontWeight: 700, color: "#00d9a3", lineHeight: 1 }}>{campaign.payoutPerThreeSubmissions}</div>
-                <div style={{ color: "var(--muted)", fontSize: 13 }}>per 3 qualifying submissions</div>
+                <div style={{ color: "var(--muted)", fontSize: 13 }}>per 3 qualifying submissions{campaign.payoutTiers && campaign.payoutTiers.length > 1 ? " (tiered)" : ""}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 20, marginTop: 14, color: "var(--muted)", fontSize: 14, flexWrap: "wrap" }}>
@@ -67,6 +67,26 @@ export default async function CampaignBriefPage({
           <div style={{ fontSize: 12, fontWeight: 700, color: "#00d9a3", letterSpacing: ".5px", textTransform: "uppercase", marginBottom: 8 }}>What to make</div>
           <p style={{ fontSize: 16, color: "var(--foreground)", margin: 0, lineHeight: 1.5 }}>{campaign.brief}</p>
         </div>
+
+        {/* Payout tiers */}
+        {campaign.payoutTiers && campaign.payoutTiers.length > 1 && (
+          <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 14, padding: 20, marginTop: 18 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d9a3" strokeWidth="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+              Payout tiers
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, fontSize: 13 }}>
+              <div style={{ fontWeight: 600, color: "var(--muted)", paddingBottom: 8, borderBottom: "1px solid var(--line)" }}>Min views per video</div>
+              <div style={{ fontWeight: 600, color: "var(--muted)", paddingBottom: 8, borderBottom: "1px solid var(--line)", paddingLeft: 16 }}>Payout per 3 submissions</div>
+              {campaign.payoutTiers.map((tier) => (
+                <>
+                  <div key={`v-${tier.minViews}`} style={{ padding: "10px 0", borderBottom: "1px solid var(--line)", color: "var(--foreground)" }}>{tier.minViews.toLocaleString()} views</div>
+                  <div key={`p-${tier.minViews}`} style={{ padding: "10px 0 10px 16px", borderBottom: "1px solid var(--line)", fontWeight: 700, color: "#00d9a3" }}>{tier.payout}</div>
+                </>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Sound + Hashtags */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 18 }}>
@@ -134,7 +154,7 @@ export default async function CampaignBriefPage({
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0a800" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           <div style={{ flex: 1 }}>
             <span style={{ fontSize: 14, color: "var(--foreground)", fontWeight: 700 }}>Earn {campaign.payoutPerThreeSubmissions}</span>
-            <span style={{ fontSize: 14, color: "var(--foreground)" }}> per 3 approved submissions in this campaign.</span>
+            <span style={{ fontSize: 14, color: "var(--foreground)" }}>{campaign.payoutTiers && campaign.payoutTiers.length > 1 ? " per 3 approved submissions, depending on your view count." : " per 3 approved submissions in this campaign."}</span>
           </div>
         </div>
 

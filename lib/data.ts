@@ -1,5 +1,6 @@
 export type MissionStatus = "Live" | "Draft" | "Closed" | "Rejected";
 export type SubmissionStatus = "Pending" | "Approved" | "Needs fix" | "Rejected";
+export type PayoutTier = { minViews: number; payout: string };
 
 export type Mission = {
   id: string;
@@ -15,6 +16,7 @@ export type Mission = {
   requiredHashtag: string;
   requiredSound: string;
   requirements: string[];
+  payoutTiers?: PayoutTier[];
   minFollowerCount?: number | null;
   fundingStatus?: "Funded" | "Pending deposit";
   depositReference?: string | null;
